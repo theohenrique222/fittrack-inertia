@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -19,6 +20,7 @@ class CreateSuperAdmin extends Command
         $password = $this->secret('Digite sua senha 🔑');
 
         $user = User::where('email', $email)->first();
+
         if ($user) {
             $this->error("Já existe um usuário com esse email: {$email}");
             return 1;
@@ -27,14 +29,14 @@ class CreateSuperAdmin extends Command
         $user = User::create([
             'name' => $name,
             'email' => $email,
-            'password' => bcrypt($password),
+            'password' => $password,
+            'role' => UserRole::ADMIN,
         ]);
 
-        $this->info('✅ Super Admin criado com sucesso! 🎉');
+        $this->info('✅ Usuário criado com sucesso! 🎉');
         $this->info("👤 Nome: {$name}");
         $this->info("📧 Email: {$email}");
 
         return 0;
-
     }
 }
