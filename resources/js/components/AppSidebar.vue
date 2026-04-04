@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, LayoutGrid } from 'lucide-vue-next';
+import { LayoutGrid } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
+import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
@@ -13,9 +14,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { clients, dashboard } from '@/routes';
+import { clients, dashboard, trainers } from '@/routes';
 import type { NavItem } from '@/types';
-import ContextSheet from '@/components/ContextSheet.vue';
 
 const mainNavItems: NavItem[] = [
     {
@@ -26,6 +26,11 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Clientes',
         href: clients(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Treinadores',
+        href: trainers(),
         icon: LayoutGrid,
     },
 ];
@@ -40,7 +45,7 @@ const mainNavItems: NavItem[] = [
                         <Link :href="dashboard()">
                             <AppLogo />
                         </Link>
-                        <Link :href="clients()"/>
+                        <Link :href="clients()" />
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
