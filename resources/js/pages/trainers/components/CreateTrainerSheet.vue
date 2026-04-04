@@ -3,18 +3,19 @@ import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { store } from '@/routes/trainers';
 
 const emit = defineEmits(['change']);
 
 const form = useForm({
     name: '',
-    nickname: '',
     email: '',
     password: '',
+    specialty: '',
 });
 
 function handleSubmit() {
-    form.post('/trainers', {
+    form.post(store.url(), {
         onSuccess: () => {
             form.reset();
             emit('change');
@@ -47,11 +48,6 @@ function handleCancel() {
             </div>
 
             <div class="mb-2">
-                <Label class="mb-2">Como gosta de ser chamado?</Label>
-                <Input v-model="form.nickname" type="text" />
-            </div>
-
-            <div class="mb-2">
                 <Label class="mb-2">Email *</Label>
                 <Input v-model="form.email" type="email" />
                 <span v-if="form.errors.email" class="text-xs text-red-500">
@@ -69,6 +65,11 @@ function handleCancel() {
                     {{ form.errors.password }}
                 </span
                 >
+            </div>
+
+            <div class="mb-2">
+                <Label class="mb-2">Especialidade</Label>
+                <Input v-model="form.specialty" type="text" />
             </div>
 
             <div class="mt-5 flex justify-around space-x-2">

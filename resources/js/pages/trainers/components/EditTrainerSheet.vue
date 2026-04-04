@@ -3,19 +3,29 @@ import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { store } from '@/routes/clients';
+import { update } from '@/routes/trainers';
+
+interface Trainer {
+    id: number;
+    name: string;
+    email: string;
+    specialty?: string;
+}
+
+const props = defineProps<{
+    trainer: Trainer;
+}>();
 
 const emit = defineEmits(['change']);
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    nickname: '',
+    name: props.trainer.name,
+    email: props.trainer.email,
+    specialty: props.trainer.specialty || '',
 });
 
 function handleSubmit() {
-    form.post(store.url(), {
+    form.put(update.url(props.trainer.id), {
         onSuccess: () => {
             form.reset();
             emit('change');
@@ -33,9 +43,9 @@ function handleCancel() {
     <form @submit.prevent="handleSubmit">
         <div>
             <div class="mb-5">
-                <h1 class="text-xl font-extrabold">Cadastrar Cliente</h1>
+                <h1 class="text-xl font-extrabold">Editar Treinador</h1>
                 <p class="text-xs font-extralight">
-                    Insira os dados do cliente
+                    Atualize os dados do treinador
                 </p>
             </div>
 
@@ -50,24 +60,21 @@ function handleCancel() {
             <div class="mb-2">
                 <Label class="mb-2">Email *</Label>
                 <Input v-model="form.email" type="email" />
-                <span v-if="form.errors.email" class="text-xs text-red-500">{{
-                    form.errors.email
-                }}</span>
+                <span v-if="form.errors.email" class="text-xs text-red-500">
+                    {{ form.errors.email }}
+                </span>
             </div>
 
             <div class="mb-2">
-                <Label class="mb-2">Senha *</Label>
-                <Input v-model="form.password" type="password" />
+                <Label class="mb-2">Especialidade</Label>
+                <Input v-model="form.specialty" type="text" />
                 <span
-                    v-if="form.errors.password"
+                    v-if="form.errors.specialty"
                     class="text-xs text-red-500"
-                    >{{ form.errors.password }}</span
+                    >
+                    {{ form.errors.specialty }}
+                </span
                 >
-            </div>
-
-            <div class="mb-2">
-                <Label class="mb-2">Apelido</Label>
-                <Input v-model="form.nickname" type="text" />
             </div>
 
             <div class="mt-5 flex justify-around space-x-2">
@@ -92,3 +99,4 @@ function handleCancel() {
         </div>
     </form>
 </template>
+

@@ -3,9 +3,14 @@
 use App\Http\Controllers\Authentication\LoginController;
 use App\Http\Controllers\Clients\ListClientsController;
 use App\Http\Controllers\Clients\StoreClientController;
+use App\Http\Controllers\Clients\UpdateClientController;
+use App\Http\Controllers\Clients\DestroyClientController;
 use App\Http\Controllers\Context\ChangeContextController;
 use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
+use App\Http\Controllers\Trainers\UpdateTrainerController;
+use App\Http\Controllers\Trainers\DestroyTrainerController;
+use App\Http\Controllers\Clients\ResetPasswordClientController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,12 +40,32 @@ $router
     ->name('clients.store');
 
 $router
+    ->put(uri: '/clients/{client}', action: UpdateClientController::class)
+    ->name('clients.update');
+
+$router
+    ->delete(uri: '/clients/{client}', action: DestroyClientController::class)
+    ->name('clients.destroy');
+
+$router
+    ->post(uri: '/clients/{client}/reset-password', action: ResetPasswordClientController::class)
+    ->name('clients.reset-password');
+
+$router
     ->get(uri: '/trainers', action: ListTrainersController::class)
     ->name('trainers');
 
 $router
     ->post(uri: '/trainers', action: StoreTrainerController::class)
     ->name('trainers.store');
+
+$router
+    ->put(uri: '/trainers/{trainer}', action: UpdateTrainerController::class)
+    ->name('trainers.update');
+
+$router
+    ->delete(uri: '/trainers/{trainer}', action: DestroyTrainerController::class)
+    ->name('trainers.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
