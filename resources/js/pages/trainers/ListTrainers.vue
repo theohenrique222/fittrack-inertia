@@ -13,16 +13,15 @@ import { SidebarMenuButton } from '@/components/ui/sidebar';
 import CreateTrainerSheet from '@/pages/trainers/components/CreateTrainerSheet.vue';
 import DataTable from '@/pages/trainers/components/DataTable.vue';
 
-
-
-
-
 const props = defineProps<{
     title: string;
     trainers: {
-        name: string;
-        email: string;
-    }[];
+        data: {
+            id: number;
+            name: string;
+            email: string;
+        }[];
+    };
 }>();
 
 const columnHelper = createColumnHelper<any>();
@@ -36,7 +35,6 @@ const columns = [
     }),
 ];
 
-// ✅ CONTROLE DO SHEET
 const isOpen = ref(false);
 
 const closeSheet = () => {
@@ -65,7 +63,7 @@ defineOptions({
             <h1>Lista de Treinadores</h1>
         </div>
 
-        <DataTable :data="props.trainers" :columns="columns" />
+        <DataTable :data="props.trainers.data" :columns="columns" />
 
         <div class="w-full text-center">
             <Sheet v-model:open="isOpen">
@@ -80,7 +78,6 @@ defineOptions({
                     </SidebarMenuButton>
                 </SheetTrigger>
 
-                <!-- 🔥 FIX PRINCIPAL -->
                 <SheetContent @interactOutside.prevent>
                     <SheetHeader>
                         <SheetTitle>Cadastro de Treinador</SheetTitle>

@@ -5,6 +5,7 @@ use App\Http\Controllers\Clients\ListClientsController;
 use App\Http\Controllers\Clients\StoreClientController;
 use App\Http\Controllers\Context\ChangeContextController;
 use App\Http\Controllers\Trainers\ListTrainersController;
+use App\Http\Controllers\Trainers\StoreTrainerController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,12 +31,16 @@ $router
     ->name('clients');
 
 $router
+    ->post(uri: '/clients', action: StoreClientController::class)
+    ->name('clients.store');
+
+$router
     ->get(uri: '/trainers', action: ListTrainersController::class)
     ->name('trainers');
 
 $router
-    ->post(uri: '/clients', action: StoreClientController::class)
-    ->name('clients.store');
+    ->post(uri: '/trainers', action: StoreTrainerController::class)
+    ->name('trainers.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

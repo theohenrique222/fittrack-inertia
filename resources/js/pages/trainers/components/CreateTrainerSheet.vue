@@ -14,7 +14,7 @@ const form = useForm({
 });
 
 function handleSubmit() {
-    form.post('/clients', {
+    form.post('/trainers', {
         onSuccess: () => {
             form.reset();
             emit('change');
@@ -54,9 +54,9 @@ function handleCancel() {
             <div class="mb-2">
                 <Label class="mb-2">Email *</Label>
                 <Input v-model="form.email" type="email" />
-                <span v-if="form.errors.email" class="text-xs text-red-500">{{
-                    form.errors.email
-                }}</span>
+                <span v-if="form.errors.email" class="text-xs text-red-500">
+                    {{ form.errors.email }}
+                </span>
             </div>
 
             <div class="mb-2">
@@ -65,7 +65,9 @@ function handleCancel() {
                 <span
                     v-if="form.errors.password"
                     class="text-xs text-red-500"
-                    >{{ form.errors.password }}</span
+                    >
+                    {{ form.errors.password }}
+                </span
                 >
             </div>
 
