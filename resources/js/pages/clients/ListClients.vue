@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { createColumnHelper } from '@tanstack/vue-table';
-import { ref } from 'vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+import { Button } from '@/components/ui/button';
+import { SidebarMenuButton } from '@/components/ui/sidebar';
 import {
     Sheet,
     SheetContent,
@@ -9,12 +10,9 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
-import { SidebarMenuButton } from '@/components/ui/sidebar';
 import CreateClientSheet from '@/pages/clients/components/CreateClientSheet.vue';
 import EditClientSheet from '@/pages/clients/components/EditClientSheet.vue';
-import DataTable from '@/pages/clients/components/DataTable.vue';
-import { Button } from '@/components/ui/button';
-import { destroy } from '@/routes/clients';
+import { destroy, resetPassword } from '@/routes/clients';
 
 interface Client {
     id: number;
@@ -30,7 +28,17 @@ const props = defineProps<{
     };
 }>();
 
-const columnHelper = createColumnHelper<Client>();
+const page = usePage();
+const successMessage = ref('');
+
+watch(() => page.props.flash, (flash: any) => {
+    if (flash?.success) {
+        successMessage.value = flash.success;
+        setTimeout(() => {
+            successMessage.value = '';
+        }, 3000);
+    }
+}, { immediate: true });
 
 const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
@@ -42,7 +50,10 @@ const handleEditClick = (client: Client) => {
 };
 
 const handleDeleteClick = (id: number) => {
-    if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
+    if (!confirm('Tem certeza que deseja deletar este cliente?')) {
+        return;
+    }
+
     router.delete(destroy.url(id), {
         onSuccess: () => {
             selectedClient.value = null;
@@ -51,34 +62,12 @@ const handleDeleteClick = (id: number) => {
 };
 
 const handleResetPasswordClick = (id: number) => {
-    if (!confirm('Tem certeza que deseja redefinir a senha para "password"?')) return;
+    if (!confirm('Tem certeza que deseja redefinir a senha para "password"?')) {
+        return;
+    }
+
     router.post(resetPassword.url(id), {});
 };
-
-const columns = [
-    columnHelper.accessor('name', {
-        header: 'Nome',
-    }),
-    columnHelper.accessor('email', {
-        header: 'Email',
-    }),
-    columnHelper.accessor('nickname', {
-        header: 'Apelido',
-    }),
-    columnHelper.display({
-        id: 'actions',
-        header: 'Ações',
-        cell: (props) => {
-            const client = props.row.original;
-            return {
-                component: 'div',
-                props: {
-                    class: 'flex gap-2',
-                },
-            };
-        },
-    }),
-];
 
 const closeCreateSheet = () => {
     isCreateOpen.value = false;
@@ -102,6 +91,10 @@ defineOptions({
 
 <template>
     <Head title="Clientes" />
+
+    <div v-if="successMessage" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+        {{ successMessage }}
+    </div>
 
     <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 dark:bg-neutral-900 bg-neutral-50">
 

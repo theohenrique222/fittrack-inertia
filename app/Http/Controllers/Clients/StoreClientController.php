@@ -7,6 +7,7 @@ use App\Actions\Clients\StoreClientAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClientResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,6 +17,8 @@ class StoreClientController extends Controller
         Request $request,
         StoreClientAction $action
     ): Response {
+        Gate::authorize('create-client');
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
@@ -29,6 +32,6 @@ class StoreClientController extends Controller
         return Inertia::render('clients/ListClients', [
             'title' => 'Lista de Clientes',
             'clients' => ClientResource::collection($clients),
-        ]);
+        ])->with('success', 'Client created successfully');
     }
 }

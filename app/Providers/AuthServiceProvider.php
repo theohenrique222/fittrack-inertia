@@ -25,6 +25,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('isSelf', function ($user) {
             return $user?->role === UserRole::SELF->value;
         });
+
+        Gate::define('create-client', function ($user) {
+            return $user?->role === UserRole::TRAINER->value;
+        });
     }
 }
 

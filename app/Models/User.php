@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'email_verified_at'])]
+#[Fillable(['name', 'email', 'password', 'role', 'email_verified_at', 'trainer_id'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -53,13 +53,13 @@ class User extends Authenticatable
         return $this->role === UserRole::SELF;
     }
 
-    public function clients(): HasMany
-    {
-        return $this->hasMany(Client::class);
-    }
-
     public function trainer()
     {
-        return $this->hasOne(Trainer::class);
+        return $this->belongsTo(User::class, 'trainer_id');
+    }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(User::class, 'trainer_id');
     }
 }
