@@ -2,7 +2,6 @@
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
-import { SidebarMenuButton } from '@/components/ui/sidebar';
 import {
     Sheet,
     SheetContent,
@@ -10,6 +9,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
+import { SidebarMenuButton } from '@/components/ui/sidebar';
 import CreateClientSheet from '@/pages/clients/components/CreateClientSheet.vue';
 import EditClientSheet from '@/pages/clients/components/EditClientSheet.vue';
 import { destroy, resetPassword } from '@/routes/clients';
@@ -29,16 +29,25 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
+
+const canCreateClient = page.props.auth.can.create_client;
+
+console.log(page.props.auth.can);
+
 const successMessage = ref('');
 
-watch(() => page.props.flash, (flash: any) => {
-    if (flash?.success) {
-        successMessage.value = flash.success;
-        setTimeout(() => {
-            successMessage.value = '';
-        }, 3000);
-    }
-}, { immediate: true });
+watch(
+    () => page.props.flash,
+    (flash: any) => {
+        if (flash?.success) {
+            successMessage.value = flash.success;
+            setTimeout(() => {
+                successMessage.value = '';
+            }, 3000);
+        }
+    },
+    { immediate: true },
+);
 
 const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
@@ -92,12 +101,16 @@ defineOptions({
 <template>
     <Head title="Clientes" />
 
-    <div v-if="successMessage" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+    <div
+        v-if="successMessage"
+        class="fixed top-4 right-4 rounded-lg bg-green-500 px-4 py-2 text-white shadow-lg"
+    >
         {{ successMessage }}
     </div>
 
-    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 dark:bg-neutral-900 bg-neutral-50">
-
+    <div
+        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-neutral-50 p-4 dark:bg-neutral-900"
+    >
         <div class="py-5 font-extrabold">
             <h1>Lista de Clientes</h1>
         </div>
@@ -106,7 +119,7 @@ defineOptions({
             <div
                 v-for="client in props.clients.data"
                 :key="client.id"
-                class="flex items-center justify-between border border-neutral-800 rounded-lg p-4"
+                class="flex items-center justify-between rounded-lg border border-neutral-800 p-4"
             >
                 <div class="flex flex-col">
                     <h3 class="font-semibold">{{ client.name }}</h3>
@@ -142,17 +155,19 @@ defineOptions({
             </div>
         </div>
 
-        <div v-if="!props.clients.data.length" class="text-center text-neutral-500 py-8">
+        <div
+            v-if="!props.clients.data.length"
+            class="py-8 text-center text-neutral-500"
+        >
             Nenhum cliente cadastrado
         </div>
 
-        <div class="w-1/2 m-auto text-center mt-4">
+        <div v-if="canCreateClient" class="m-auto mt-4 w-1/2 text-center">
             <Sheet v-model:open="isCreateOpen">
-
                 <SheetTrigger as-child>
                     <SidebarMenuButton
                         size="lg"
-                        class="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-emerald-600 text-white  bg-emerald-500"
+                        class="cursor-pointer bg-emerald-500 text-white hover:bg-emerald-600 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                         <div class="w-full text-center">
                             <span>Cadastrar Cliente</span>
@@ -161,7 +176,6 @@ defineOptions({
                 </SheetTrigger>
 
                 <SheetContent @interactOutside.prevent>
-
                     <SheetHeader>
                         <SheetTitle>Cadastro de Cliente</SheetTitle>
                     </SheetHeader>
@@ -169,7 +183,6 @@ defineOptions({
                     <div class="px-4">
                         <CreateClientSheet @change="closeCreateSheet" />
                     </div>
-
                 </SheetContent>
             </Sheet>
         </div>
@@ -191,4 +204,3 @@ defineOptions({
         </Sheet>
     </div>
 </template>
-

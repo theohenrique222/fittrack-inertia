@@ -11,6 +11,9 @@ export type User = {
 
 export type Auth = {
     user: User;
+    can: {
+        create_client: boolean;
+    };
 };
 
 export type TwoFactorConfigContent = {

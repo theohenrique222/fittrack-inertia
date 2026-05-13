@@ -6,7 +6,6 @@ enum UserRole: string
 {
     case ADMIN = 'admin';
     case PERSONAL = 'personal';
-    case TRAINER = 'trainer';
     case CLIENT = 'client';
     case SELF = 'self';
 
@@ -15,7 +14,6 @@ enum UserRole: string
         return match ($this) {
             self::ADMIN => 'Administrador',
             self::PERSONAL => 'Personal Trainer',
-            self::TRAINER => 'Treinador',
             self::CLIENT => 'Cliente',
             self::SELF => 'Freelancer',
         };

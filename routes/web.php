@@ -33,7 +33,8 @@ $router
 
 $router
     ->get(uri: '/clients', action: ListClientsController::class)
-    ->name('clients');
+    ->name('clients')
+    ->middleware('auth');
 
 $router
     ->post(uri: '/clients', action: StoreClientController::class)
@@ -53,7 +54,8 @@ $router
 
 $router
     ->get(uri: '/trainers', action: ListTrainersController::class)
-    ->name('trainers');
+    ->name('trainers')
+    ->middleware('auth');
 
 $router
     ->post(uri: '/trainers', action: StoreTrainerController::class)
