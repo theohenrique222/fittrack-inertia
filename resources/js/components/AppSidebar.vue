@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { LayoutGrid } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import ContextSheet from '@/components/ContextSheet.vue';
@@ -17,22 +18,37 @@ import {
 import { clients, dashboard, trainers } from '@/routes';
 import type { NavItem } from '@/types';
 
+
+const page = usePage();
+
+const can = page.props.auth.can;
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Painel de Controle',
         href: dashboard(),
         icon: LayoutGrid,
     },
-    {
-        title: 'Clientes',
-        href: clients(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Treinadores',
-        href: trainers(),
-        icon: LayoutGrid,
-    },
+
+    ...(can.view_clients
+        ? [
+              {
+                  title: 'Clientes',
+                  href: clients(),
+                  icon: LayoutGrid,
+              },
+          ]
+        : []),
+
+    ...(can.view_trainers
+        ? [
+              {
+                  title: 'Treinadores',
+                  href: trainers(),
+                  icon: LayoutGrid,
+              },
+          ]
+        : []),
 ];
 </script>
 

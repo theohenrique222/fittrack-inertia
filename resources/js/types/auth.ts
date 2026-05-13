@@ -12,6 +12,8 @@ export type User = {
 export type Auth = {
     user: User;
     can: {
+        view_trainers: any;
+        view_clients: any;
         create_client: boolean;
     };
 };

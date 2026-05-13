@@ -29,6 +29,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('create-client', function ($user) {
             return $user?->role === UserRole::PERSONAL;
         });
+
+        Gate::define('view-trainers', function ($user) {
+            return $user?->role !== UserRole::CLIENT;
+        });
     }
 }
 

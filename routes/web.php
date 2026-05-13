@@ -55,7 +55,7 @@ $router
 $router
     ->get(uri: '/trainers', action: ListTrainersController::class)
     ->name('trainers')
-    ->middleware('auth');
+    ->middleware(['auth', 'can:view-trainers']);
 
 $router
     ->post(uri: '/trainers', action: StoreTrainerController::class)

@@ -27,7 +27,7 @@ class StoreClientController extends Controller
         ]);
 
         $action->execute($validated);
-        $clients = (new ListClientsAction())->execute();
+        $clients = (new ListClientsAction)->execute();
 
         return Inertia::render('clients/ListClients', [
             'title' => 'Lista de Clientes',
