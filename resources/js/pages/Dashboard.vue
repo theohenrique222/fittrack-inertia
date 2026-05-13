@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
+import { Head, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { dashboard } from '@/routes';
+
+const page = usePage();
+
+const user = computed(() => page.props.auth.user);
 
 defineOptions({
     layout: {
@@ -18,30 +22,52 @@ defineOptions({
 <template>
     <Head title="Painel de controle" />
 
-    <div
-        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
-    >
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div
-                class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
-            </div>
-            <div
-                class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
-            </div>
-            <div
-                class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
-            </div>
+    <div class="flex h-full flex-1 flex-col gap-6 p-6">
+
+        <!-- Header -->
+        <div class="rounded-xl border p-6 bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-md">
+            <h1 class="text-2xl font-bold">
+                Bem-vindo de volta, {{ user.name }} 👋
+            </h1>
+            <p class="text-sm opacity-90 mt-1">
+                Aqui está um resumo rápido do seu desempenho hoje.
+            </p>
         </div>
-        <div
-            class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
-        >
-            <PlaceholderPattern />
+
+        <!-- Cards -->
+        <div class="grid gap-4 md:grid-cols-3">
+
+            <div class="rounded-xl border p-5 shadow-sm bg-white dark:bg-neutral-900">
+                <p class="text-sm text-neutral-500">Clientes</p>
+                <h2 class="text-2xl font-bold">--</h2>
+            </div>
+
+            <div class="rounded-xl border p-5 shadow-sm bg-white dark:bg-neutral-900">
+                <p class="text-sm text-neutral-500">Treinos ativos</p>
+                <h2 class="text-2xl font-bold">--</h2>
+            </div>
+
+            <div class="rounded-xl border p-5 shadow-sm bg-white dark:bg-neutral-900">
+                <p class="text-sm text-neutral-500">Progresso</p>
+                <h2 class="text-2xl font-bold">--</h2>
+            </div>
+
         </div>
+
+        <!-- Área inferior -->
+        <div class="grid md:grid-cols-2 gap-4">
+
+            <div class="rounded-xl border p-5 min-h-75 bg-white dark:bg-neutral-900">
+                <h3 class="font-semibold mb-3">Atividade recente</h3>
+
+            </div>
+
+            <div class="rounded-xl border p-5 min-h-75 bg-white dark:bg-neutral-900">
+                <h3 class="font-semibold mb-3">Resumo semanal</h3>
+
+            </div>
+
+        </div>
+
     </div>
 </template>
