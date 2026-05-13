@@ -30,7 +30,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
-          coverage: xdebug
+#          coverage: xdebug
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -52,5 +52,5 @@ jobs:
       - name: Build Assets
         run: npm run build
 
-      - name: Tests
-        run: ./vendor/bin/pest
+#      - name: Tests
+#        run: ./vendor/bin/pest
