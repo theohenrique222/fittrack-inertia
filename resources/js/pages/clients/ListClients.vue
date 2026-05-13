@@ -109,7 +109,7 @@ defineOptions({
     </div>
 
     <div
-        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-neutral-50 p-4 dark:bg-neutral-900"
+        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
         <div class="py-5 font-extrabold">
             <h1>Lista de Clientes</h1>
@@ -119,7 +119,7 @@ defineOptions({
             <div
                 v-for="client in props.clients.data"
                 :key="client.id"
-                class="flex items-center justify-between rounded-lg border border-neutral-800 p-4"
+                class="flex items-center justify-between rounded-lg border  bg-neutral-100 dark:bg-neutral-900 p-4"
             >
                 <div class="flex flex-col">
                     <h3 class="font-semibold">{{ client.name }}</h3>

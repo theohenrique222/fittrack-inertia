@@ -37,17 +37,17 @@ defineOptions({
         <!-- Cards -->
         <div class="grid gap-4 md:grid-cols-3">
 
-            <div class="rounded-xl border p-5 shadow-sm bg-white dark:bg-neutral-900">
+            <div class="rounded-xl border p-5 shadow-sm bg-neutral-100 dark:bg-neutral-900">
                 <p class="text-sm text-neutral-500">Clientes</p>
                 <h2 class="text-2xl font-bold">--</h2>
             </div>
 
-            <div class="rounded-xl border p-5 shadow-sm bg-white dark:bg-neutral-900">
+            <div class="rounded-xl border p-5 shadow-sm bg-neutral-100 dark:bg-neutral-900">
                 <p class="text-sm text-neutral-500">Treinos ativos</p>
                 <h2 class="text-2xl font-bold">--</h2>
             </div>
 
-            <div class="rounded-xl border p-5 shadow-sm bg-white dark:bg-neutral-900">
+            <div class="rounded-xl border p-5 shadow-sm bg-neutral-100 dark:bg-neutral-900">
                 <p class="text-sm text-neutral-500">Progresso</p>
                 <h2 class="text-2xl font-bold">--</h2>
             </div>
@@ -57,12 +57,12 @@ defineOptions({
         <!-- Área inferior -->
         <div class="grid md:grid-cols-2 gap-4">
 
-            <div class="rounded-xl border p-5 min-h-75 bg-white dark:bg-neutral-900">
+            <div class="rounded-xl border p-5 min-h-75 bg-neutral-100 dark:bg-neutral-900">
                 <h3 class="font-semibold mb-3">Atividade recente</h3>
 
             </div>
 
-            <div class="rounded-xl border p-5 min-h-75 bg-white dark:bg-neutral-900">
+            <div class="rounded-xl border p-5 min-h-75 bg-neutral-100 dark:bg-neutral-900">
                 <h3 class="font-semibold mb-3">Resumo semanal</h3>
 
             </div>

@@ -99,7 +99,7 @@ defineOptions({
     <Head title="Treinadores" />
 
     <div
-        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 dark:bg-neutral-900 bg-neutral-50"
+        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
         <div class="py-5 font-extrabold">
             <h1>Lista de Treinadores</h1>
@@ -109,7 +109,7 @@ defineOptions({
             <div
                 v-for="trainer in props.trainers.data"
                 :key="trainer.id"
-                class="flex items-center justify-between bg-neutral-200 dark:bg-neutral-950 rounded-lg p-4 shadow-lg"
+                class="flex items-center justify-between border bg-neutral-100 dark:bg-neutral-900 rounded-lg p-4 shadow-lg"
             >
                 <div class="flex flex-col">
                     <h3 class="font-semibold">{{ trainer.name }}</h3>
