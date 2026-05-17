@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, router, usePage } from '@inertiajs/vue3';
+import { Dumbbell, Plus } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +20,6 @@ import {
 import CreateExerciseSheet from '@/pages/exercises/components/CreateExerciseSheet.vue';
 import EditExerciseSheet from '@/pages/exercises/components/EditExerciseSheet.vue';
 import { destroy } from '@/routes/exercises';
-import { Dumbbell, Plus } from 'lucide-vue-next';
 
 interface Category {
     id: number;

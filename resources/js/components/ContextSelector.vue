@@ -12,10 +12,10 @@ import {
 const page = usePage();
 
 const availableContexts = page.props.context?.availableContexts ?? {};
-const currentContext = page.props.context?.currentContext ?? null;
-
 const handleContextChange = (newContext: string | null) => {
-    if (!newContext) return;
+    if (!newContext) {
+return;
+}
 
     router.post('/change-context', {
         context: newContext,

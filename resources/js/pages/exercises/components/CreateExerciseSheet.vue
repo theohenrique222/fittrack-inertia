@@ -19,7 +19,7 @@ interface Category {
     slug: string;
 }
 
-const props = defineProps<{
+defineProps<{
     categories: Category[];
 }>();
 

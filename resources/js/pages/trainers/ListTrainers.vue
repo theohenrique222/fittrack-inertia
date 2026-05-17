@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { createColumnHelper } from '@tanstack/vue-table';
 import { ref } from 'vue';
+import { Button } from '@/components/ui/button';
 import {
     Sheet,
     SheetContent,
@@ -12,8 +12,6 @@ import {
 import { SidebarMenuButton } from '@/components/ui/sidebar';
 import CreateTrainerSheet from '@/pages/trainers/components/CreateTrainerSheet.vue';
 import EditTrainerSheet from '@/pages/trainers/components/EditTrainerSheet.vue';
-import DataTable from '@/pages/trainers/components/DataTable.vue';
-import { Button } from '@/components/ui/button';
 import { destroy } from '@/routes/trainers';
 
 interface Trainer {
@@ -30,8 +28,6 @@ const props = defineProps<{
     };
 }>();
 
-const columnHelper = createColumnHelper<Trainer>();
-
 const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
 const selectedTrainer = ref<Trainer | null>(null);
@@ -42,38 +38,16 @@ const handleEditClick = (trainer: Trainer) => {
 };
 
 const handleDeleteClick = (id: number) => {
-    if (!confirm('Tem certeza que deseja deletar este treinador?')) return;
+    if (!confirm('Tem certeza que deseja deletar este treinador?')) {
+return;
+}
+
     router.delete(destroy.url(id), {
         onSuccess: () => {
             selectedTrainer.value = null;
         },
     });
 };
-
-const columns = [
-    columnHelper.accessor('name', {
-        header: 'Nome',
-    }),
-    columnHelper.accessor('email', {
-        header: 'Email',
-    }),
-    columnHelper.accessor('specialty', {
-        header: 'Especialidade',
-    }),
-    columnHelper.display({
-        id: 'actions',
-        header: 'Ações',
-        cell: (props) => {
-            const trainer = props.row.original;
-            return {
-                component: 'div',
-                props: {
-                    class: 'flex gap-2',
-                },
-            };
-        },
-    }),
-];
 
 const closeCreateSheet = () => {
     isCreateOpen.value = false;
