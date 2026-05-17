@@ -71,7 +71,7 @@ watch(
 );
 
 watch(selectedCategoryId, (value) => {
-    router.get('/exercises', { category_id: value || undefined }, {
+    router.get('/exercises', { category_id: value === 'all' ? undefined : value }, {
         preserveState: true,
         replace: true,
     });
@@ -163,7 +163,7 @@ defineOptions({
                         <SelectValue placeholder="Filtrar por grupo muscular" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="">Todos os grupos</SelectItem>
+                        <SelectItem value="all">Todos os grupos</SelectItem>
                         <SelectItem
                             v-for="category in categories.data"
                             :key="category.id"

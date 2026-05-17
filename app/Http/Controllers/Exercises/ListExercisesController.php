@@ -16,7 +16,8 @@ class ListExercisesController extends Controller
         ListExercisesAction $action,
         ListCategoriesAction $categoriesAction
     ): Response {
-        $exercises = $action->execute();
+        $filters = request()->only(['search', 'category_id', 'difficulty', 'equipment', 'is_active']);
+        $exercises = $action->execute($filters);
         $categories = $categoriesAction->execute();
 
         return Inertia::render('exercises/ListExercises', [
