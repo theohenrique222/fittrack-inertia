@@ -15,6 +15,12 @@ class ExerciseResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'muscle_group' => $this->muscle_group,
+            'category' => $this->whenLoaded('category', fn () => [
+                'id' => $this->category->id,
+                'name' => $this->category->name,
+                'slug' => $this->category->slug,
+            ]),
+            'category_id' => $this->category_id,
             'equipment' => $this->equipment,
             'difficulty' => $this->difficulty,
             'instructions' => $this->instructions,

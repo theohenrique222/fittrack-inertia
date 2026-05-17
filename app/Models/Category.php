@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Exercise extends Model
+class Category extends Model
 {
     use HasFactory;
 
@@ -14,13 +14,7 @@ class Exercise extends Model
         'name',
         'slug',
         'description',
-        'muscle_group',
-        'category_id',
-        'equipment',
-        'difficulty',
-        'instructions',
-        'video_url',
-        'image',
+        'icon',
         'is_active',
     ];
 
@@ -28,8 +22,8 @@ class Exercise extends Model
         'is_active' => 'boolean',
     ];
 
-    public function category(): BelongsTo
+    public function exercises(): HasMany
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Exercise::class);
     }
 }

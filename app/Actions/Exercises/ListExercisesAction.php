@@ -9,7 +9,7 @@ class ListExercisesAction
 {
     public function execute(array $filters = []): Collection
     {
-        $query = Exercise::query();
+        $query = Exercise::with('category');
 
         if (isset($filters['search']) && ! empty($filters['search'])) {
             $search = $filters['search'];
@@ -17,8 +17,8 @@ class ListExercisesAction
                 ->orWhere('description', 'like', "%{$search}%");
         }
 
-        if (isset($filters['muscle_group']) && ! empty($filters['muscle_group'])) {
-            $query->where('muscle_group', $filters['muscle_group']);
+        if (isset($filters['category_id']) && ! empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
         }
 
         if (isset($filters['difficulty']) && ! empty($filters['difficulty'])) {

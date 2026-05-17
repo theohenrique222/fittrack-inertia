@@ -9,15 +9,30 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import CreateExerciseSheet from '@/pages/exercises/components/CreateExerciseSheet.vue';
 import EditExerciseSheet from '@/pages/exercises/components/EditExerciseSheet.vue';
 import { destroy } from '@/routes/exercises';
 import { Dumbbell, Plus } from 'lucide-vue-next';
 
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 interface Exercise {
     id: number;
     name: string;
     description?: string;
+    category: Category | null;
+    category_id: number | null;
     muscle_group: string;
     equipment?: string;
     difficulty: string;
@@ -32,11 +47,15 @@ const props = defineProps<{
     exercises: {
         data: Exercise[];
     };
+    categories: {
+        data: Category[];
+    };
 }>();
 
 const page = usePage();
 
 const successMessage = ref('');
+const selectedCategoryId = ref<string>('');
 
 watch(
     () => page.props.flash,
@@ -50,6 +69,13 @@ watch(
     },
     { immediate: true },
 );
+
+watch(selectedCategoryId, (value) => {
+    router.get('/exercises', { category_id: value || undefined }, {
+        preserveState: true,
+        replace: true,
+    });
+});
 
 const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
@@ -122,9 +148,32 @@ defineOptions({
                         <DialogTitle>Criar Exercício</DialogTitle>
                     </DialogHeader>
 
-                    <CreateExerciseSheet @close="closeCreateSheet" />
+                    <CreateExerciseSheet
+                        :categories="categories.data"
+                        @close="closeCreateSheet"
+                    />
                 </DialogContent>
             </Dialog>
+        </div>
+
+        <div class="flex gap-4 mb-4">
+            <div class="w-64">
+                <Select v-model="selectedCategoryId">
+                    <SelectTrigger>
+                        <SelectValue placeholder="Filtrar por grupo muscular" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="">Todos os grupos</SelectItem>
+                        <SelectItem
+                            v-for="category in categories.data"
+                            :key="category.id"
+                            :value="String(category.id)"
+                        >
+                            {{ category.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
 
         <div class="flex flex-col gap-4">
@@ -136,7 +185,7 @@ defineOptions({
                 <div class="flex flex-col flex-1 mb-4 md:mb-0">
                     <h3 class="font-semibold">{{ exercise.name }}</h3>
                     <p class="text-sm text-neutral-500">
-                        {{ exercise.muscle_group }}
+                        {{ exercise.category?.name || exercise.muscle_group }}
                         <span v-if="exercise.equipment">
                             • {{ exercise.equipment }}
                         </span>
@@ -198,6 +247,7 @@ defineOptions({
                 <EditExerciseSheet
                     v-if="selectedExercise"
                     :exercise="selectedExercise"
+                    :categories="categories.data"
                     @close="closeEditSheet"
                 />
             </DialogContent>

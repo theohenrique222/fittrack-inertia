@@ -13,10 +13,17 @@ import {
 import { update } from '@/routes/exercises';
 import { Textarea } from '@/components/ui/textarea';
 
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 interface Exercise {
     id: number;
     name: string;
     description?: string;
+    category_id: number | null;
     muscle_group: string;
     equipment?: string;
     difficulty: string;
@@ -28,26 +35,12 @@ interface Exercise {
 
 interface Props {
     exercise: Exercise;
+    categories: Category[];
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits(['close']);
-
-const muscleGroups = [
-    'Chest',
-    'Back',
-    'Shoulders',
-    'Biceps',
-    'Triceps',
-    'Forearms',
-    'Abs',
-    'Quadriceps',
-    'Hamstrings',
-    'Glutes',
-    'Calves',
-    'Full Body',
-];
 
 const equipmentTypes = [
     'Dumbbell',
@@ -65,7 +58,7 @@ const difficulties = ['Beginner', 'Intermediate', 'Advanced'];
 const form = useForm({
     name: props.exercise.name,
     description: props.exercise.description || '',
-    muscle_group: props.exercise.muscle_group,
+    category_id: String(props.exercise.category_id ?? ''),
     equipment: props.exercise.equipment || 'none',
     difficulty: props.exercise.difficulty,
     instructions: props.exercise.instructions || '',
@@ -115,24 +108,24 @@ function handleCancel() {
             <div class="grid grid-cols-2 gap-2">
                 <div class="mb-2">
                     <Label class="mb-2">Grupo Muscular *</Label>
-                    <Select v-model="form.muscle_group">
+                    <Select v-model="form.category_id">
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione..." />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem
-                                v-for="group in muscleGroups"
-                                :key="group"
-                                :value="group"
+                                v-for="category in categories"
+                                :key="category.id"
+                                :value="String(category.id)"
                             >
-                                {{ group }}
+                                {{ category.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                     <span
-                        v-if="form.errors.muscle_group"
+                        v-if="form.errors.category_id"
                         class="text-xs text-red-500"
-                        >{{ form.errors.muscle_group }}</span
+                        >{{ form.errors.category_id }}</span
                     >
                 </div>
 
@@ -234,4 +227,3 @@ function handleCancel() {
         </div>
     </form>
 </template>
-

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Exercises;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateExerciseRequest extends FormRequest
 {
@@ -18,7 +20,7 @@ class UpdateExerciseRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', "unique:exercises,name,{$exerciseId}"],
             'description' => ['nullable', 'string'],
-            'muscle_group' => ['required', 'string', 'in:Chest,Back,Shoulders,Biceps,Triceps,Forearms,Abs,Quadriceps,Hamstrings,Glutes,Calves,Full Body'],
+            'category_id' => ['required', 'integer', Rule::in(Category::pluck('id')->toArray())],
             'equipment' => ['nullable', 'string', 'in:Dumbbell,Barbell,Machine,Cable,Bodyweight,Resistance Band,Kettlebell,Smith Machine'],
             'difficulty' => ['required', 'string', 'in:Beginner,Intermediate,Advanced'],
             'instructions' => ['nullable', 'string'],

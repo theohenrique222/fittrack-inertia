@@ -13,22 +13,17 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { store } from '@/routes/exercises';
 
-const emit = defineEmits(['close']);
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+}
 
-const muscleGroups = [
-    'Chest',
-    'Back',
-    'Shoulders',
-    'Biceps',
-    'Triceps',
-    'Forearms',
-    'Abs',
-    'Quadriceps',
-    'Hamstrings',
-    'Glutes',
-    'Calves',
-    'Full Body',
-];
+const props = defineProps<{
+    categories: Category[];
+}>();
+
+const emit = defineEmits(['close']);
 
 const equipmentTypes = [
     'Dumbbell',
@@ -46,7 +41,7 @@ const difficulties = ['Beginner', 'Intermediate', 'Advanced'];
 const form = useForm({
     name: '',
     description: '',
-    muscle_group: '',
+    category_id: '',
     equipment: 'none',
     difficulty: 'Beginner',
     instructions: '',
@@ -98,24 +93,24 @@ function handleCancel() {
             <div class="grid grid-cols-2 gap-2">
                 <div class="mb-2">
                     <Label class="mb-2">Grupo Muscular *</Label>
-                    <Select v-model="form.muscle_group">
+                    <Select v-model="form.category_id">
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione..." />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem
-                                v-for="group in muscleGroups"
-                                :key="group"
-                                :value="group"
+                                v-for="category in categories"
+                                :key="category.id"
+                                :value="String(category.id)"
                             >
-                                {{ group }}
+                                {{ category.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                     <span
-                        v-if="form.errors.muscle_group"
+                        v-if="form.errors.category_id"
                         class="text-xs text-red-500"
-                        >{{ form.errors.muscle_group }}</span
+                        >{{ form.errors.category_id }}</span
                     >
                 </div>
 
@@ -217,4 +212,3 @@ function handleCancel() {
         </div>
     </form>
 </template>
-

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Authentication\LoginController;
+use App\Http\Controllers\Categories\ListCategoriesController;
 use App\Http\Controllers\Clients\DestroyClientController;
 use App\Http\Controllers\Clients\ListClientsController;
 use App\Http\Controllers\Clients\ResetPasswordClientController;
@@ -89,6 +90,11 @@ $router
 $router
     ->delete(uri: '/exercises/{exercise}', action: DestroyExerciseController::class)
     ->name('exercises.destroy');
+
+$router
+    ->get(uri: '/categories', action: ListCategoriesController::class)
+    ->name('categories')
+    ->middleware('auth');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
