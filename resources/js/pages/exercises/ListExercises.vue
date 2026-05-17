@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { Dumbbell, Plus } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -79,7 +79,13 @@ watch(selectedCategoryId, (value) => {
 
 const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
+const isViewOpen = ref(false);
 const selectedExercise = ref<Exercise | null>(null);
+
+const handleViewClick = (exercise: Exercise) => {
+    selectedExercise.value = exercise;
+    isViewOpen.value = true;
+};
 
 const handleEditClick = (exercise: Exercise) => {
     selectedExercise.value = exercise;
@@ -105,6 +111,13 @@ const closeCreateSheet = () => {
 const closeEditSheet = () => {
     isEditOpen.value = false;
 };
+
+const exerciseImageUrl = computed(() => {
+    if (!selectedExercise.value?.image) {
+        return '/images/exercise-placeholder.png';
+    }
+    return selectedExercise.value.image;
+});
 
 defineOptions({
     layout: {
@@ -180,7 +193,8 @@ defineOptions({
             <div
                 v-for="exercise in props.exercises.data"
                 :key="exercise.id"
-                class="flex flex-col md:flex-row md:items-center md:justify-between rounded-lg border bg-neutral-100 dark:bg-neutral-900 p-4"
+                class="flex flex-col md:flex-row md:items-center md:justify-between rounded-lg border bg-neutral-100 dark:bg-neutral-900 p-4 cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+                @click="handleViewClick(exercise)"
             >
                 <div class="flex flex-col flex-1 mb-4 md:mb-0">
                     <h3 class="font-semibold">{{ exercise.name }}</h3>
@@ -216,14 +230,14 @@ defineOptions({
                     <Button
                         size="sm"
                         variant="outline"
-                        @click="handleEditClick(exercise)"
+                        @click.stop="handleEditClick(exercise)"
                     >
                         Editar
                     </Button>
                     <Button
                         size="sm"
                         variant="destructive"
-                        @click="handleDeleteClick(exercise.id)"
+                        @click.stop="handleDeleteClick(exercise.id)"
                     >
                         Deletar
                     </Button>
@@ -237,6 +251,71 @@ defineOptions({
         >
             Nenhum exercício cadastrado
         </div>
+
+        <Dialog v-model:open="isViewOpen">
+            <DialogContent class="max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>{{ selectedExercise?.name }}</DialogTitle>
+                </DialogHeader>
+
+                <div v-if="selectedExercise" class="space-y-4">
+                    <div class="w-full h-64 bg-neutral-200 dark:bg-neutral-700 rounded-lg overflow-hidden">
+                        <img
+                            :src="exerciseImageUrl"
+                            :alt="selectedExercise.name"
+                            class="w-full h-full object-cover"
+                            @error="($event.target as HTMLImageElement).src = '/images/exercise-placeholder.png'"
+                        />
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Descrição</h4>
+                        <p class="text-sm mt-1">{{ selectedExercise.description || 'Sem descrição' }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Categoria</h4>
+                            <p class="text-sm mt-1">{{ selectedExercise.category?.name || selectedExercise.muscle_group }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Equipamento</h4>
+                            <p class="text-sm mt-1">{{ selectedExercise.equipment || 'Não informado' }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Dificuldade</h4>
+                            <p class="text-sm mt-1">
+                                <span
+                                    class="px-2 py-1 rounded text-xs font-medium"
+                                    :class="{
+                                        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200':
+                                            selectedExercise.difficulty === 'Beginner',
+                                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200':
+                                            selectedExercise.difficulty === 'Intermediate',
+                                        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200':
+                                            selectedExercise.difficulty === 'Advanced',
+                                    }"
+                                >
+                                    {{ selectedExercise.difficulty }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedExercise.instructions">
+                        <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Instruções</h4>
+                        <p class="text-sm mt-1 whitespace-pre-line">{{ selectedExercise.instructions }}</p>
+                    </div>
+
+                    <div v-if="selectedExercise.video_url">
+                        <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Vídeo</h4>
+                        <a :href="selectedExercise.video_url" target="_blank" class="text-sm mt-1 text-blue-600 hover:underline">
+                            Assistir vídeo
+                        </a>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
 
         <Dialog v-model:open="isEditOpen">
             <DialogContent class="max-h-[90vh] overflow-y-auto">
