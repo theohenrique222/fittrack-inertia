@@ -1,16 +1,20 @@
 <?php
 
 use App\Http\Controllers\Authentication\LoginController;
+use App\Http\Controllers\Clients\DestroyClientController;
 use App\Http\Controllers\Clients\ListClientsController;
+use App\Http\Controllers\Clients\ResetPasswordClientController;
 use App\Http\Controllers\Clients\StoreClientController;
 use App\Http\Controllers\Clients\UpdateClientController;
-use App\Http\Controllers\Clients\DestroyClientController;
 use App\Http\Controllers\Context\ChangeContextController;
+use App\Http\Controllers\Exercises\DestroyExerciseController;
+use App\Http\Controllers\Exercises\ListExercisesController;
+use App\Http\Controllers\Exercises\StoreExerciseController;
+use App\Http\Controllers\Exercises\UpdateExerciseController;
+use App\Http\Controllers\Trainers\DestroyTrainerController;
 use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
-use App\Http\Controllers\Trainers\DestroyTrainerController;
-use App\Http\Controllers\Clients\ResetPasswordClientController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -68,6 +72,23 @@ $router
 $router
     ->delete(uri: '/trainers/{trainer}', action: DestroyTrainerController::class)
     ->name('trainers.destroy');
+
+$router
+    ->get(uri: '/exercises', action: ListExercisesController::class)
+    ->name('exercises')
+    ->middleware('auth');
+
+$router
+    ->post(uri: '/exercises', action: StoreExerciseController::class)
+    ->name('exercises.store');
+
+$router
+    ->put(uri: '/exercises/{exercise}', action: UpdateExerciseController::class)
+    ->name('exercises.update');
+
+$router
+    ->delete(uri: '/exercises/{exercise}', action: DestroyExerciseController::class)
+    ->name('exercises.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

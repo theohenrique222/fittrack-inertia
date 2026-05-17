@@ -6,11 +6,11 @@ import { X } from "lucide-vue-next"
 import {
   DialogClose,
   DialogContent,
+  DialogOverlay,
   DialogPortal,
   useForwardPropsEmits,
 } from "reka-ui"
 import { cn } from "@/lib/utils"
-import SheetOverlay from "./SheetOverlay.vue"
 
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes["class"]
@@ -33,7 +33,10 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
 <template>
   <DialogPortal>
-    <SheetOverlay />
+    <DialogOverlay
+      data-slot="sheet-overlay"
+      :class="cn('data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80')"
+    />
     <DialogContent
       data-slot="sheet-content"
       :class="cn(

@@ -17,7 +17,7 @@ class DestroyClientController extends Controller
         DestroyClientAction $action
     ): Response {
         $action->execute($client);
-        $clients = (new ListClientsAction())->execute();
+        $clients = (new ListClientsAction)->execute();
 
         return Inertia::render('clients/ListClients', [
             'title' => 'Lista de Clientes',
@@ -25,4 +25,3 @@ class DestroyClientController extends Controller
         ]);
     }
 }
-

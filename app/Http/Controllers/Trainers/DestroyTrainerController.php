@@ -17,7 +17,7 @@ class DestroyTrainerController extends Controller
         DestroyTrainerAction $action
     ): Response {
         $action->execute($trainer);
-        $trainers = (new ListTrainersAction())->execute();
+        $trainers = (new ListTrainersAction)->execute();
 
         return Inertia::render('trainers/ListTrainers', [
             'title' => 'Lista de Treinadores',
@@ -25,4 +25,3 @@ class DestroyTrainerController extends Controller
         ]);
     }
 }
-

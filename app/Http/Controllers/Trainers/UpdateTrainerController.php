@@ -25,7 +25,7 @@ class UpdateTrainerController extends Controller
         ]);
 
         $updatedTrainer = $action->execute($trainer, $validated);
-        $trainers = (new ListTrainersAction())->execute();
+        $trainers = (new ListTrainersAction)->execute();
 
         return Inertia::render('trainers/ListTrainers', [
             'title' => 'Lista de Treinadores',
@@ -33,4 +33,3 @@ class UpdateTrainerController extends Controller
         ]);
     }
 }
-

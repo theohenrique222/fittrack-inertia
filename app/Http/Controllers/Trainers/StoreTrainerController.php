@@ -24,7 +24,7 @@ class StoreTrainerController extends Controller
         ]);
 
         $action->execute($validated);
-        $trainers = (new ListTrainersAction())->execute();
+        $trainers = (new ListTrainersAction)->execute();
 
         return Inertia::render('trainers/ListTrainers', [
             'title' => 'Lista de Treinadores',

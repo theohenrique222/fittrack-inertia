@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -16,6 +15,7 @@ class LoginController extends Controller
         if (Auth::check()) {
             return to_route('dashboard');
         }
-        return Inertia::render( component: 'auth/Login');
+
+        return Inertia::render(component: 'auth/Login');
     }
 }

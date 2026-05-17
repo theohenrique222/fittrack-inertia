@@ -17,7 +17,7 @@ class Client extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function personal() : BelongsTo
+    public function personal(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trainer_id');
     }

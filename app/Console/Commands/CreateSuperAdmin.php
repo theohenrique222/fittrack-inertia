@@ -23,6 +23,7 @@ class CreateSuperAdmin extends Command
 
         if ($user) {
             $this->error("Já existe um usuário com esse email: {$email}");
+
             return 1;
         }
 

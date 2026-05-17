@@ -14,6 +14,7 @@ enum ContextsEnum: string
             self::PERSONAL => 'Painel do Personal'
         };
     }
+
     public function label(): string
     {
         return match ($this) {

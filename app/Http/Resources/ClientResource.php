@@ -17,4 +17,3 @@ class ClientResource extends JsonResource
         ];
     }
 }
-

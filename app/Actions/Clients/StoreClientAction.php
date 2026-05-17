@@ -14,7 +14,7 @@ class StoreClientAction
     public function execute(array $data): Client
     {
         return DB::transaction(function () use ($data) {
-            $user = new User();
+            $user = new User;
             $user->name = $data['name'];
             $user->email = $data['email'];
             $user->password = Hash::make($data['password'] ?? 'password');

@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         Inertia::share('context', function () {
             $contexts = collect(ContextsEnum::cases());
+
             return [
                 'currentContext' => session('context', ContextsEnum::ADMIN->value),
 

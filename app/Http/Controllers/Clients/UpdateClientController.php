@@ -25,7 +25,7 @@ class UpdateClientController extends Controller
         ]);
 
         $updatedClient = $action->execute($client, $validated);
-        $clients = (new ListClientsAction())->execute();
+        $clients = (new ListClientsAction)->execute();
 
         return Inertia::render('clients/ListClients', [
             'title' => 'Lista de Clientes',
@@ -33,4 +33,3 @@ class UpdateClientController extends Controller
         ]);
     }
 }
-

@@ -12,4 +12,3 @@ class ListClientsAction
         return Client::with('user')->get();
     }
 }
-
