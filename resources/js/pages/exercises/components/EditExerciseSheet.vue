@@ -32,7 +32,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['close']);
 
 const muscleGroups = [
     'Chest',
@@ -66,7 +66,7 @@ const form = useForm({
     name: props.exercise.name,
     description: props.exercise.description || '',
     muscle_group: props.exercise.muscle_group,
-    equipment: props.exercise.equipment || '',
+    equipment: props.exercise.equipment || 'none',
     difficulty: props.exercise.difficulty,
     instructions: props.exercise.instructions || '',
     video_url: props.exercise.video_url || '',
@@ -75,6 +75,10 @@ const form = useForm({
 });
 
 function handleSubmit() {
+    if (form.equipment === 'none') {
+        form.equipment = null;
+    }
+
     form.put(update.url(props.exercise.id), {
         onSuccess: () => {
             emit('close');
@@ -139,7 +143,7 @@ function handleCancel() {
                             <SelectValue placeholder="Selecione..." />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Nenhum</SelectItem>
+                            <SelectItem value="none">Nenhum</SelectItem>
                             <SelectItem
                                 v-for="equip in equipmentTypes"
                                 :key="equip"

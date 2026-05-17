@@ -13,7 +13,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { store } from '@/routes/exercises';
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['close']);
 
 const muscleGroups = [
     'Chest',
@@ -47,7 +47,7 @@ const form = useForm({
     name: '',
     description: '',
     muscle_group: '',
-    equipment: '',
+    equipment: 'none',
     difficulty: 'Beginner',
     instructions: '',
     video_url: '',
@@ -56,6 +56,10 @@ const form = useForm({
 });
 
 function handleSubmit() {
+    if (form.equipment === 'none') {
+        form.equipment = null;
+    }
+
     form.post(store.url(), {
         onSuccess: () => {
             form.reset();
@@ -122,7 +126,7 @@ function handleCancel() {
                             <SelectValue placeholder="Selecione..." />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Nenhum</SelectItem>
+                            <SelectItem value="none">Nenhum</SelectItem>
                             <SelectItem
                                 v-for="equip in equipmentTypes"
                                 :key="equip"
