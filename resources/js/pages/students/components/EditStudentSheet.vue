@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
+import { Mail, User, UserPlus } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,48 +38,79 @@ function handleCancel() {
     form.reset();
     emit('change');
 }
-
 </script>
 
 <template>
-    <form @submit.prevent="handleSubmit">
-        <div>
-            <div class="mb-5">
-                <h1 class="text-xl font-extrabold">Editar Aluno</h1>
-                <p class="text-xs font-extralight">
-                    Atualize os dados do aluno
+    <form @submit.prevent="handleSubmit" class="flex flex-col h-full">
+        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+            <div>
+                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                    Dados do Aluno
+                </h2>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    Atualize as informações do aluno
                 </p>
             </div>
 
-            <div class="mb-2">
-                <Label class="mb-2">Nome completo *</Label>
-                <Input v-model="form.name" type="text" />
-                <span v-if="form.errors.name" class="text-xs text-red-500">{{
-                    form.errors.name
-                }}</span>
-            </div>
+            <div class="space-y-4">
+                <div>
+                    <Label class="mb-2 flex items-center gap-1.5">
+                        <User class="w-3.5 h-3.5 text-neutral-400" />
+                        Nome completo *
+                    </Label>
+                    <Input
+                        v-model="form.name"
+                        type="text"
+                        placeholder="Ex: João da Silva"
+                    />
+                    <span
+                        v-if="form.errors.name"
+                        class="text-xs text-red-500 mt-1"
+                    >{{ form.errors.name }}</span>
+                </div>
 
-            <div class="mb-2">
-                <Label class="mb-2">Apelido</Label>
-                <Input v-model="form.nickname" type="text" />
-                <span v-if="form.errors.nickname" class="text-xs text-red-500">
-                    {{ form.errors.nickname }}
-                </span>
-            </div>
+                <div>
+                    <Label class="mb-2 flex items-center gap-1.5">
+                        <Mail class="w-3.5 h-3.5 text-neutral-400" />
+                        Email *
+                    </Label>
+                    <Input
+                        v-model="form.email"
+                        type="email"
+                        placeholder="aluno@email.com"
+                    />
+                    <span
+                        v-if="form.errors.email"
+                        class="text-xs text-red-500 mt-1"
+                    >{{ form.errors.email }}</span>
+                </div>
 
-            <div class="mb-2">
-                <Label class="mb-2">Email *</Label>
-                <Input v-model="form.email" type="email" />
-                <span v-if="form.errors.email" class="text-xs text-red-500">
-                    {{ form.errors.email }}
-                </span>
+                <div>
+                    <Label class="mb-2 flex items-center gap-1.5">
+                        <UserPlus class="w-3.5 h-3.5 text-neutral-400" />
+                        Apelido
+                    </Label>
+                    <Input
+                        v-model="form.nickname"
+                        type="text"
+                        placeholder="Ex: João, Jão..."
+                    />
+                    <span
+                        v-if="form.errors.nickname"
+                        class="text-xs text-red-500 mt-1"
+                    >{{ form.errors.nickname }}</span>
+                </div>
             </div>
+        </div>
 
-            <div class="mt-5 flex justify-around space-x-2">
+        <div
+            class="sticky bottom-0 px-6 py-4 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700"
+        >
+            <div class="flex gap-3">
                 <Button
                     type="button"
-                    variant="secondary"
-                    class="w-1/3 cursor-pointer"
+                    variant="outline"
+                    class="flex-1 cursor-pointer"
                     @click="handleCancel"
                     :disabled="form.processing"
                 >
@@ -87,10 +119,10 @@ function handleCancel() {
 
                 <Button
                     type="submit"
-                    class="w-1/3 cursor-pointer"
+                    class="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700"
                     :disabled="form.processing"
                 >
-                    {{ form.processing ? 'Salvando...' : 'Salvar' }}
+                    {{ form.processing ? 'Salvando...' : 'Salvar Alterações' }}
                 </Button>
             </div>
         </div>

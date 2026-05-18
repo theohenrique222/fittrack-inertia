@@ -15,7 +15,7 @@ export default {
 import { Head, router, usePage } from '@inertiajs/vue3';
 import {
     ChevronRight,
-    Mail,
+    GraduationCap,
     Plus,
     Search,
     UserPlus,
@@ -23,14 +23,14 @@ import {
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CreateStudentSheet from '@/pages/students/components/CreateStudentSheet.vue';
@@ -105,7 +105,7 @@ const handleDeleteClick = (id: number) => {
         return;
     }
 
-    router.delete(destroy.url(id), {
+    router.delete(destroy.url({ student: id }), {
         onSuccess: () => {
             selectedStudent.value = null;
         },
@@ -117,7 +117,7 @@ const handleResetPasswordClick = (id: number) => {
         return;
     }
 
-    router.post(resetPassword.url(id), {});
+    router.post(resetPassword.url({ student: id }));
 };
 
 const closeCreateSheet = () => {
@@ -138,11 +138,11 @@ function getInitials(name: string): string {
 }
 
 const avatarColors = [
-    'from-emerald-400 to-emerald-600',
-    'from-teal-400 to-teal-600',
-    'from-cyan-400 to-cyan-600',
-    'from-green-400 to-green-600',
-    'from-lime-400 to-lime-600',
+    'from-blue-400 to-blue-600',
+    'from-indigo-400 to-indigo-600',
+    'from-violet-400 to-violet-600',
+    'from-purple-400 to-purple-600',
+    'from-sky-400 to-sky-600',
 ];
 
 function getAvatarColor(id: number): string {
@@ -157,57 +157,57 @@ function getAvatarColor(id: number): string {
 
     <div class="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
         <div
-            class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 py-8 text-white"
+            class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 px-6 py-8 text-white"
         >
             <div class="mb-6 flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold">Alunos</h1>
-                    <p class="mt-1 text-sm text-emerald-100">
+                    <p class="mt-1 text-sm text-blue-100">
                         Gerencie seus alunos cadastrados
                     </p>
                 </div>
 
-                <Dialog v-if="canCreateStudent" v-model:open="isCreateOpen">
-                    <DialogTrigger as-child>
+                <Sheet v-if="canCreateStudent" v-model:open="isCreateOpen">
+                    <SheetTrigger as-child>
                         <Button
-                            class="border-0 bg-white text-emerald-700 shadow-lg hover:bg-emerald-50"
+                            class="border-0 bg-white text-blue-700 shadow-lg hover:bg-blue-50"
                         >
                             <Plus class="mr-2 h-4 w-4" />
                             Novo Aluno
                         </Button>
-                    </DialogTrigger>
+                    </SheetTrigger>
 
-                    <DialogContent class="max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Cadastro de Aluno</DialogTitle>
-                        </DialogHeader>
+                    <SheetContent side="right" class="sm:max-w-md">
+                        <SheetHeader>
+                            <SheetTitle>Cadastro de Aluno</SheetTitle>
+                        </SheetHeader>
 
                         <CreateStudentSheet @change="closeCreateSheet" />
-                    </DialogContent>
-                </Dialog>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="rounded-xl bg-white/15 px-4 py-3 backdrop-blur-sm">
                     <div class="mb-1 flex items-center gap-2">
-                        <Users class="h-4 w-4 text-emerald-100" />
-                        <span class="text-xs text-emerald-100">Total</span>
+                        <Users class="h-4 w-4 text-blue-100" />
+                        <span class="text-xs text-blue-100">Total</span>
                     </div>
                     <p class="text-2xl font-bold">{{ stats.total }}</p>
                 </div>
 
                 <div class="rounded-xl bg-white/15 px-4 py-3 backdrop-blur-sm">
                     <div class="mb-1 flex items-center gap-2">
-                        <UserPlus class="h-4 w-4 text-emerald-100" />
-                        <span class="text-xs text-emerald-100">Ativos</span>
+                        <UserPlus class="h-4 w-4 text-blue-100" />
+                        <span class="text-xs text-blue-100">Ativos</span>
                     </div>
                     <p class="text-2xl font-bold">{{ stats.total }}</p>
                 </div>
 
                 <div class="rounded-xl bg-white/15 px-4 py-3 backdrop-blur-sm">
                     <div class="mb-1 flex items-center gap-2">
-                        <Mail class="h-4 w-4 text-emerald-100" />
-                        <span class="text-xs text-emerald-100"
+                        <GraduationCap class="h-4 w-4 text-blue-100" />
+                        <span class="text-xs text-blue-100"
                             >Cadastrados</span
                         >
                     </div>
@@ -234,7 +234,7 @@ function getAvatarColor(id: number): string {
                 <div
                     v-for="student in filteredStudents"
                     :key="student.id"
-                    class="group cursor-pointer overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:border-emerald-300 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
+                    class="group cursor-pointer overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:border-blue-300 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-blue-600"
                     @click="router.visit(`/students/${student.id}`)"
                 >
                     <div class="flex items-center gap-4 p-4">
@@ -256,7 +256,7 @@ function getAvatarColor(id: number): string {
                                 </h3>
                                 <span
                                     v-if="student.nickname"
-                                    class="inline-flex shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                    class="inline-flex shrink-0 items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                                 >
                                     {{ student.nickname }}
                                 </span>
@@ -269,7 +269,7 @@ function getAvatarColor(id: number): string {
                         </div>
 
                         <ChevronRight
-                            class="h-5 w-5 shrink-0 text-neutral-300 transition-colors group-hover:text-emerald-500 dark:text-neutral-600"
+                            class="h-5 w-5 shrink-0 text-neutral-300 transition-colors group-hover:text-blue-500 dark:text-neutral-600"
                         />
                     </div>
 
@@ -386,17 +386,17 @@ function getAvatarColor(id: number): string {
         </div>
     </div>
 
-    <Dialog v-model:open="isEditOpen">
-        <DialogContent class="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>Editar Aluno</DialogTitle>
-            </DialogHeader>
+    <Sheet v-model:open="isEditOpen">
+        <SheetContent side="right" class="sm:max-w-md">
+            <SheetHeader>
+                <SheetTitle>Editar Aluno</SheetTitle>
+            </SheetHeader>
 
             <EditStudentSheet
                 v-if="selectedStudent"
                 :student="selectedStudent"
                 @close="closeEditSheet"
             />
-        </DialogContent>
-    </Dialog>
+        </SheetContent>
+    </Sheet>
 </template>
