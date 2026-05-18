@@ -8,6 +8,7 @@ use App\Http\Controllers\Clients\ResetPasswordClientController;
 use App\Http\Controllers\Clients\StoreClientController;
 use App\Http\Controllers\Clients\UpdateClientController;
 use App\Http\Controllers\Context\ChangeContextController;
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Exercises\DestroyExerciseController;
 use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
@@ -97,7 +98,7 @@ $router
     ->middleware('auth');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
 require __DIR__.'/settings.php';
