@@ -4,13 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Exercise;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class ExerciseTest extends TestCase
 {
-    use LazilyRefreshDatabase;
-
     public function test_exercises_table_exists(): void
     {
         $this->assertTrue(

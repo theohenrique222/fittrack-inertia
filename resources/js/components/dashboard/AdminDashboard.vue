@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Users, UserCheck, Dumbbell, FolderOpen, TrendingUp, ArrowUpRight, ArrowDownRight, UserPlus, Activity, Server, Database, BarChart3, Star, Shield, Zap } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
+import { Users, UserCheck, Dumbbell, FolderOpen, TrendingUp, ArrowUpRight, ArrowDownRight, UserPlus, Activity, Server, Database, BarChart3, Star, Shield, Zap } from 'lucide-vue-next';
+import { computed } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
-import LineChart from '@/components/dashboard/LineChart.vue';
 import DonutChart from '@/components/dashboard/DonutChart.vue';
+import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 
 interface Props {
@@ -37,9 +37,13 @@ const iconMap: Record<string, any> = {
 };
 
 const userGrowthRate = computed(() => {
-    if (props.monthlyGrowth.length < 2) return 0;
+    if (props.monthlyGrowth.length < 2) {
+return 0;
+}
+
     const current = props.monthlyGrowth[props.monthlyGrowth.length - 1].users;
     const previous = props.monthlyGrowth[props.monthlyGrowth.length - 2].users;
+
     return Math.round(((current - previous) / previous) * 100);
 });
 

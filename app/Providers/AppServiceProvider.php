@@ -51,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
             $this->app->isLocal() === false,
         );
 
+        $this->preventTestingDatabaseCollision();
+
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)
                 ->mixedCase()
@@ -60,5 +62,20 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    /**
+     * Prevent testing database from using the development database.
+     */
+    protected function preventTestingDatabaseCollision(): void
+    {
+        if (app()->environment('testing')) {
+            $testingDatabase = config('database.connections.mysql.database');
+            $developmentDatabase = env('DB_DATABASE');
+
+            if ($testingDatabase === $developmentDatabase) {
+                abort(500, 'Testing database cannot be the same as development database.');
+            }
+        }
     }
 }

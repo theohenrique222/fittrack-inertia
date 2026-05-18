@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Dumbbell, Flame, Trophy, Target, CheckCircle, User, Calendar, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
+import { computed } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
@@ -36,7 +36,10 @@ const iconMap: Record<string, any> = {
 };
 
 const completionRate = computed(() => {
-    if (props.stats.totalWorkouts === 0) return 0;
+    if (props.stats.totalWorkouts === 0) {
+return 0;
+}
+
     return Math.round((props.stats.completedWorkouts / props.stats.totalWorkouts) * 100);
 });
 

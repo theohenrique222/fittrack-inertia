@@ -7,13 +7,10 @@ use App\Models\Client;
 use App\Models\Exercise;
 use App\Models\User;
 use App\Models\Workout;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class WorkoutTest extends TestCase
 {
-    use LazilyRefreshDatabase;
-
     public function test_workouts_table_exists(): void
     {
         $this->assertTrue(

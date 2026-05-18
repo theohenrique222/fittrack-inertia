@@ -17,6 +17,7 @@ const segments = props.data.map((d) => {
     const percent = d.value / total;
     const offset = circumference * (1 - cumulativePercent);
     cumulativePercent += percent;
+
     return {
         ...d,
         percent,

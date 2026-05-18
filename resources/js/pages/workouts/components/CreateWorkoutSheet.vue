@@ -78,10 +78,14 @@ const form = useForm({
 });
 
 const selectedStudentName = computed(() => {
-    if (!form.client_id) return '';
+    if (!form.client_id) {
+return '';
+}
+
     const student = props.students.find(
         (s) => String(s.id) === form.client_id,
     );
+
     return student ? student.name : '';
 });
 

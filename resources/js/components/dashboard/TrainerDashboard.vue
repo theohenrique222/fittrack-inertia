@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { Users, Dumbbell, TrendingUp, FolderOpen, UserPlus, ClipboardList, BarChart3, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
+import { Users, Dumbbell, TrendingUp, FolderOpen, UserPlus, ClipboardList, BarChart3, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
+import { computed } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
-import LineChart from '@/components/dashboard/LineChart.vue';
 import DonutChart from '@/components/dashboard/DonutChart.vue';
+import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 
 interface Props {
@@ -38,12 +38,18 @@ const iconMap: Record<string, any> = {
 };
 
 const completionRate = computed(() => {
-    if (props.stats.totalClients === 0) return 0;
+    if (props.stats.totalClients === 0) {
+return 0;
+}
+
     return Math.round((props.stats.activeClients / props.stats.totalClients) * 100);
 });
 
 const clientGrowth = computed(() => {
-    if (props.stats.totalClients === 0) return 0;
+    if (props.stats.totalClients === 0) {
+return 0;
+}
+
     return Math.round(((props.stats.activeClients - (props.stats.totalClients - props.stats.activeClients)) / props.stats.totalClients) * 100);
 });
 </script>

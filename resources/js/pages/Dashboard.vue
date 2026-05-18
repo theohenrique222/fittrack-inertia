@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { dashboard } from '@/routes';
 import AdminDashboard from '@/components/dashboard/AdminDashboard.vue';
-import TrainerDashboard from '@/components/dashboard/TrainerDashboard.vue';
 import ClientDashboard from '@/components/dashboard/ClientDashboard.vue';
+import TrainerDashboard from '@/components/dashboard/TrainerDashboard.vue';
+import { dashboard } from '@/routes';
 
 const page = usePage();
 

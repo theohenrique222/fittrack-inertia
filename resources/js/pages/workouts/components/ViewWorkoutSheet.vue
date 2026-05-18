@@ -44,8 +44,10 @@ function formatRest(seconds: number): string {
     if (seconds >= 60) {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
+
         return secs > 0 ? `${mins}m${secs}s` : `${mins}min`;
     }
+
     return `${seconds}s`;
 }
 
@@ -65,7 +67,10 @@ const categoryColors: Record<string, string> = {
 };
 
 function getCategoryColor(categoryName?: string): string {
-    if (!categoryName) return 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300';
+    if (!categoryName) {
+return 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300';
+}
+
     return categoryColors[categoryName] || 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300';
 }
 
