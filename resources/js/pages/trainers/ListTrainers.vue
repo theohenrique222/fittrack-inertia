@@ -16,6 +16,7 @@ import { Head, router, usePage } from '@inertiajs/vue3';
 import {
     ChevronRight,
     Dumbbell,
+    Eye,
     Plus,
     Search,
     UserPlus,
@@ -35,7 +36,7 @@ import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CreateTrainerSheet from '@/pages/trainers/components/CreateTrainerSheet.vue';
 import EditTrainerSheet from '@/pages/trainers/components/EditTrainerSheet.vue';
-import { destroy } from '@/routes/trainers';
+import { destroy, impersonate } from '@/routes/trainers';
 
 interface Trainer {
     id: number;
@@ -55,6 +56,7 @@ const page = usePage();
 const { toasts, success, error } = useToast();
 
 const canCreateTrainer = page.props.auth.can.create_trainer ?? true;
+const canImpersonate = page.props.auth.can.impersonate ?? false;
 
 const searchQuery = ref('');
 
@@ -110,6 +112,14 @@ const handleDeleteClick = (id: number) => {
             selectedTrainer.value = null;
         },
     });
+};
+
+const handleImpersonateClick = (trainer: Trainer) => {
+    if (!confirm(`Deseja personificar ${trainer.name}?`)) {
+        return;
+    }
+
+    router.post(impersonate.url(trainer.id));
 };
 
 const closeCreateSheet = () => {
@@ -267,6 +277,16 @@ function getAvatarColor(id: number): string {
                     <div
                         class="flex items-center justify-end gap-1 border-t border-neutral-100 px-4 py-2 dark:border-neutral-700"
                     >
+                        <Button
+                            v-if="canImpersonate"
+                            size="sm"
+                            variant="ghost"
+                            class="h-8 px-3 text-xs"
+                            @click.stop="handleImpersonateClick(trainer)"
+                        >
+                            <Eye class="mr-1 h-3.5 w-3.5 text-amber-500" />
+                            Personificar
+                        </Button>
                         <Button
                             size="sm"
                             variant="ghost"

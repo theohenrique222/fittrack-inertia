@@ -33,5 +33,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('view-trainers', function ($user) {
             return $user?->role !== UserRole::CLIENT;
         });
+
+        Gate::define('impersonate', function ($user) {
+            return $user?->role === UserRole::ADMIN;
+        });
     }
 }

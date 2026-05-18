@@ -38,7 +38,10 @@ class HandleInertiaRequests extends Middleware
                     'create_client' => $request->user()?->can('create-client'),
                     'view_clients' => $request->user()?->role !== UserRole::CLIENT,
                     'view_trainers' => $request->user()?->role !== UserRole::CLIENT && $request->user()?->role !== UserRole::PERSONAL,
+                    'impersonate' => $request->user()?->can('impersonate'),
                 ],
+                'impersonating' => session('impersonating', false),
+                'impersonator_name' => session('impersonator_name'),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [

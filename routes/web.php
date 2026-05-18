@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\StopImpersonationController;
 use App\Http\Controllers\Authentication\LoginController;
 use App\Http\Controllers\Categories\ListCategoriesController;
 use App\Http\Controllers\Context\ChangeContextController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Students\ShowStudentController;
 use App\Http\Controllers\Students\StoreStudentController;
 use App\Http\Controllers\Students\UpdateStudentController;
 use App\Http\Controllers\Trainers\DestroyTrainerController;
+use App\Http\Controllers\Trainers\ImpersonateTrainerController;
 use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
@@ -85,6 +87,16 @@ $router
 $router
     ->delete(uri: '/trainers/{trainer}', action: DestroyTrainerController::class)
     ->name('trainers.destroy');
+
+$router
+    ->post(uri: '/trainers/{trainer}/impersonate', action: ImpersonateTrainerController::class)
+    ->name('trainers.impersonate')
+    ->middleware(['auth', 'can:isAdmin']);
+
+$router
+    ->post(uri: '/stop-impersonate', action: StopImpersonationController::class)
+    ->name('stop-impersonate')
+    ->middleware('auth');
 
 $router
     ->get(uri: '/exercises', action: ListExercisesController::class)
