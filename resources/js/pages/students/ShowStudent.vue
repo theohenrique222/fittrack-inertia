@@ -79,7 +79,7 @@ function formatRestSeconds(seconds: number): string {
                 <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <div class="flex flex-col items-center text-center">
                         <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-2xl font-bold text-white shadow-lg">
-                            {{ student.name.charAt(0).toUpperCase() }}
+                            {{ student.name ? student.name.charAt(0).toUpperCase() : '?' }}
                         </div>
                         <h2 class="text-xl font-bold text-neutral-900 dark:text-white">{{ student.name }}</h2>
                         <p v-if="student.nickname" class="text-sm text-neutral-500 dark:text-neutral-400">
