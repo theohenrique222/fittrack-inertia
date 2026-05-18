@@ -20,6 +20,10 @@ import {
     Search,
     Trophy,
     Zap,
+    ArmFlex,
+    Footprints,
+    Activity,
+    Target,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -101,6 +105,63 @@ const stats = computed(() => ({
     active: props.exercises.data.filter((e) => e.is_active).length,
     categories: new Set(props.exercises.data.map((e) => e.category_id)).size,
 }));
+
+const groupedExercises = computed(() => {
+    const exercises = filteredExercises.value;
+    const groups: Record<string, { category: Category | null; exercises: Exercise[] }> = {};
+
+    const categoryOrder = ['chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms', 'abs', 'quadriceps', 'hamstrings', 'glutes', 'calves', 'full-body'];
+
+    for (const exercise of exercises) {
+        const slug = exercise.category?.slug || 'uncategorized';
+        const key = exercise.category ? `cat-${exercise.category.id}` : 'uncategorized';
+
+        if (!groups[key]) {
+            groups[key] = {
+                category: exercise.category || null,
+                exercises: [],
+            };
+        }
+
+        groups[key].exercises.push(exercise);
+    }
+
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+        if (a === 'uncategorized') {
+return 1;
+}
+
+        if (b === 'uncategorized') {
+return -1;
+}
+
+        const slugA = groups[a].category?.slug || '';
+        const slugB = groups[b].category?.slug || '';
+
+        const indexA = categoryOrder.indexOf(slugA);
+        const indexB = categoryOrder.indexOf(slugB);
+
+        if (indexA === -1 && indexB === -1) {
+return slugA.localeCompare(slugB);
+}
+
+        if (indexA === -1) {
+return 1;
+}
+
+        if (indexB === -1) {
+return -1;
+}
+
+        return indexA - indexB;
+    });
+
+    return sortedKeys.map((key) => ({
+        key,
+        category: groups[key].category,
+        exercises: groups[key].exercises,
+    }));
+});
 
 watch(
     () => page.props.flash,
@@ -191,6 +252,124 @@ const avatarColors = [
     'from-green-400 to-green-600',
     'from-lime-400 to-lime-600',
 ];
+
+const muscleGroupColors: Record<string, { bg: string; text: string; border: string; badge: string; icon: string }> = {
+    chest: {
+        bg: 'bg-red-50 dark:bg-red-950/30',
+        text: 'text-red-700 dark:text-red-300',
+        border: 'border-red-200 dark:border-red-800',
+        badge: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+        icon: 'text-red-500',
+    },
+    back: {
+        bg: 'bg-blue-50 dark:bg-blue-950/30',
+        text: 'text-blue-700 dark:text-blue-300',
+        border: 'border-blue-200 dark:border-blue-800',
+        badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+        icon: 'text-blue-500',
+    },
+    shoulders: {
+        bg: 'bg-yellow-50 dark:bg-yellow-950/30',
+        text: 'text-yellow-700 dark:text-yellow-300',
+        border: 'border-yellow-200 dark:border-yellow-800',
+        badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+        icon: 'text-yellow-500',
+    },
+    biceps: {
+        bg: 'bg-purple-50 dark:bg-purple-950/30',
+        text: 'text-purple-700 dark:text-purple-300',
+        border: 'border-purple-200 dark:border-purple-800',
+        badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+        icon: 'text-purple-500',
+    },
+    triceps: {
+        bg: 'bg-pink-50 dark:bg-pink-950/30',
+        text: 'text-pink-700 dark:text-pink-300',
+        border: 'border-pink-200 dark:border-pink-800',
+        badge: 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300',
+        icon: 'text-pink-500',
+    },
+    forearms: {
+        bg: 'bg-indigo-50 dark:bg-indigo-950/30',
+        text: 'text-indigo-700 dark:text-indigo-300',
+        border: 'border-indigo-200 dark:border-indigo-800',
+        badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+        icon: 'text-indigo-500',
+    },
+    abs: {
+        bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+        text: 'text-emerald-700 dark:text-emerald-300',
+        border: 'border-emerald-200 dark:border-emerald-800',
+        badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+        icon: 'text-emerald-500',
+    },
+    quadriceps: {
+        bg: 'bg-orange-50 dark:bg-orange-950/30',
+        text: 'text-orange-700 dark:text-orange-300',
+        border: 'border-orange-200 dark:border-orange-800',
+        badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+        icon: 'text-orange-500',
+    },
+    hamstrings: {
+        bg: 'bg-amber-50 dark:bg-amber-950/30',
+        text: 'text-amber-700 dark:text-amber-300',
+        border: 'border-amber-200 dark:border-amber-800',
+        badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+        icon: 'text-amber-500',
+    },
+    glutes: {
+        bg: 'bg-rose-50 dark:bg-rose-950/30',
+        text: 'text-rose-700 dark:text-rose-300',
+        border: 'border-rose-200 dark:border-rose-800',
+        badge: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
+        icon: 'text-rose-500',
+    },
+    calves: {
+        bg: 'bg-teal-50 dark:bg-teal-950/30',
+        text: 'text-teal-700 dark:text-teal-300',
+        border: 'border-teal-200 dark:border-teal-800',
+        badge: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
+        icon: 'text-teal-500',
+    },
+    'full-body': {
+        bg: 'bg-cyan-50 dark:bg-cyan-950/30',
+        text: 'text-cyan-700 dark:text-cyan-300',
+        border: 'border-cyan-200 dark:border-cyan-800',
+        badge: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300',
+        icon: 'text-cyan-500',
+    },
+};
+
+const muscleGroupIcons: Record<string, any> = {
+    chest: Target,
+    back: ArmFlex,
+    shoulders: Zap,
+    biceps: ArmFlex,
+    triceps: ArmFlex,
+    forearms: ArmFlex,
+    abs: Activity,
+    quadriceps: Footprints,
+    hamstrings: Footprints,
+    glutes: Footprints,
+    calves: Footprints,
+    'full-body': Dumbbell,
+};
+
+function getMuscleGroupColor(slug: string | undefined) {
+    if (!slug) {
+return muscleGroupColors['full-body'];
+}
+
+    return muscleGroupColors[slug] || muscleGroupColors['full-body'];
+}
+
+function getMuscleGroupIcon(slug: string | undefined) {
+    if (!slug) {
+return Dumbbell;
+}
+
+    return muscleGroupIcons[slug] || Dumbbell;
+}
 
 function getAvatarColor(id: number): string {
     return avatarColors[id % avatarColors.length];
@@ -295,111 +474,137 @@ function getAvatarColor(id: number): string {
                 </div>
             </div>
 
-            <div v-if="filteredExercises.length" class="space-y-3">
+            <div v-if="groupedExercises.length" class="space-y-6">
                 <div
-                    v-for="exercise in filteredExercises"
-                    :key="exercise.id"
-                    class="group cursor-pointer overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:border-emerald-300 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
-                    @click="handleViewClick(exercise)"
+                    v-for="group in groupedExercises"
+                    :key="group.key"
                 >
-                    <div class="flex items-center gap-4 p-4">
-                        <div
+                    <div class="mb-3 flex items-center gap-3">
+                        <component
+                            :is="getMuscleGroupIcon(group.category?.slug)"
                             :class="[
-                                'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br font-bold text-white shadow-sm',
-                                getAvatarColor(exercise.id),
+                                'h-5 w-5',
+                                getMuscleGroupColor(group.category?.slug).icon,
+                            ]"
+                        />
+                        <h2
+                            :class="[
+                                'text-lg font-semibold',
+                                getMuscleGroupColor(group.category?.slug).text,
                             ]"
                         >
-                            <Dumbbell class="h-5 w-5" />
-                        </div>
+                            {{ group.category?.name || 'Sem Categoria' }}
+                        </h2>
+                        <span
+                            :class="[
+                                'ml-auto rounded-full px-2.5 py-0.5 text-xs font-medium',
+                                getMuscleGroupColor(group.category?.slug).badge,
+                            ]"
+                        >
+                            {{ group.exercises.length }}
+                        </span>
+                    </div>
 
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2">
-                                <h3
-                                    class="truncate font-semibold text-neutral-900 dark:text-white"
-                                >
-                                    {{ exercise.name }}
-                                </h3>
-                                <span
+                    <div class="space-y-2">
+                        <div
+                            v-for="exercise in group.exercises"
+                            :key="exercise.id"
+                            class="group cursor-pointer overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:border-emerald-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
+                            @click="handleViewClick(exercise)"
+                        >
+                            <div class="flex items-center gap-4 p-4">
+                                <div
                                     :class="[
-                                        'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                                        getDifficultyColor(exercise.difficulty),
+                                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br font-semibold text-white shadow-sm',
+                                        getAvatarColor(exercise.id),
                                     ]"
                                 >
-                                    {{
-                                        getDifficultyLabel(exercise.difficulty)
-                                    }}
-                                </span>
-                            </div>
-                            <div class="mt-1 flex items-center gap-2">
-                                <span
-                                    class="text-sm text-neutral-500 dark:text-neutral-400"
-                                    >{{
-                                        exercise.category?.name ||
-                                        exercise.muscle_group
-                                    }}</span
-                                >
-                                <span
-                                    v-if="exercise.equipment"
-                                    class="text-xs text-neutral-400 dark:text-neutral-500"
-                                >
-                                    • {{ exercise.equipment }}
-                                </span>
-                            </div>
-                        </div>
+                                    <Dumbbell class="h-4 w-4" />
+                                </div>
 
-                        <div class="flex shrink-0 items-center gap-1">
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                class="h-8 w-8 p-0"
-                                @click.stop="handleEditClick(exercise)"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 text-neutral-500"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <path
-                                        d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <h3
+                                            class="truncate font-medium text-neutral-900 dark:text-white"
+                                        >
+                                            {{ exercise.name }}
+                                        </h3>
+                                        <span
+                                            :class="[
+                                                'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                                                getDifficultyColor(exercise.difficulty),
+                                            ]"
+                                        >
+                                            {{
+                                                getDifficultyLabel(exercise.difficulty)
+                                            }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-0.5 flex items-center gap-2">
+                                        <span
+                                            v-if="exercise.equipment"
+                                            class="text-xs text-neutral-500 dark:text-neutral-400"
+                                        >
+                                            {{ exercise.equipment }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="flex shrink-0 items-center gap-1">
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        class="h-8 w-8 p-0"
+                                        @click.stop="handleEditClick(exercise)"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 text-neutral-500"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path
+                                                d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
+                                            />
+                                            <path d="m15 5 4 4" />
+                                        </svg>
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        class="h-8 w-8 p-0"
+                                        @click.stop="handleDeleteClick(exercise.id)"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 text-red-500"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M3 6h18" />
+                                            <path
+                                                d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"
+                                            />
+                                            <path
+                                                d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+                                            />
+                                            <line x1="10" x2="10" y1="11" y2="17" />
+                                            <line x1="14" x2="14" y1="11" y2="17" />
+                                        </svg>
+                                    </Button>
+                                    <ChevronRight
+                                        class="h-5 w-5 text-neutral-300 transition-colors group-hover:text-emerald-500 dark:text-neutral-600"
                                     />
-                                    <path d="m15 5 4 4" />
-                                </svg>
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                class="h-8 w-8 p-0"
-                                @click.stop="handleDeleteClick(exercise.id)"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 text-red-500"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <path d="M3 6h18" />
-                                    <path
-                                        d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"
-                                    />
-                                    <path
-                                        d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-                                    />
-                                    <line x1="10" x2="10" y1="11" y2="17" />
-                                    <line x1="14" x2="14" y1="11" y2="17" />
-                                </svg>
-                            </Button>
-                            <ChevronRight
-                                class="h-5 w-5 text-neutral-300 transition-colors group-hover:text-emerald-500 dark:text-neutral-600"
-                            />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Exercise;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -10,12 +11,17 @@ class ExerciseSeeder extends Seeder
 {
     public function run(): void
     {
+        $categoryMap = [];
+        foreach (Category::all() as $cat) {
+            $categoryMap[$cat->slug] = $cat->id;
+        }
+
         $exercises = [
-            // Peitoral (category_id: 1)
+            // Peitoral
             [
                 'name' => 'Supino Reto com Barra',
                 'muscle_group' => 'Peitoral',
-                'category_id' => 1,
+                'category_slug' => 'chest',
                 'equipment' => 'Barra',
                 'difficulty' => 'Beginner',
                 'description' => 'Exercício clássico para desenvolvimento do peitoral maior.',
@@ -25,7 +31,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Supino Inclinado com Halteres',
                 'muscle_group' => 'Peitoral',
-                'category_id' => 1,
+                'category_slug' => 'chest',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Foco na porção superior do peitoral.',
@@ -35,7 +41,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Crossover na Polia',
                 'muscle_group' => 'Peitoral',
-                'category_id' => 1,
+                'category_slug' => 'chest',
                 'equipment' => 'Cabo',
                 'difficulty' => 'Intermediate',
                 'description' => 'Excelente para isolamento e definição do peitoral.',
@@ -45,7 +51,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Flexão de Braço',
                 'muscle_group' => 'Peitoral',
-                'category_id' => 1,
+                'category_slug' => 'chest',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Beginner',
                 'description' => 'Exercício funcional que pode ser feito em qualquer lugar.',
@@ -55,7 +61,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Crucifixo com Halteres',
                 'muscle_group' => 'Peitoral',
-                'category_id' => 1,
+                'category_slug' => 'chest',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Isolamento completo do peitoral maior.',
@@ -63,11 +69,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop',
             ],
 
-            // Costas (category_id: 2)
+            // Costas
             [
                 'name' => 'Barra Fixa',
                 'muscle_group' => 'Costas',
-                'category_id' => 2,
+                'category_slug' => 'back',
                 'equipment' => 'Barra Fixa',
                 'difficulty' => 'Advanced',
                 'description' => 'Um dos melhores exercícios para costas e bíceps.',
@@ -77,7 +83,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Remada Curvada com Barra',
                 'muscle_group' => 'Costas',
-                'category_id' => 2,
+                'category_slug' => 'back',
                 'equipment' => 'Barra',
                 'difficulty' => 'Intermediate',
                 'description' => 'Excelente para espessura das costas.',
@@ -87,7 +93,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Puxada Frontal',
                 'muscle_group' => 'Costas',
-                'category_id' => 2,
+                'category_slug' => 'back',
                 'equipment' => 'Cabo',
                 'difficulty' => 'Beginner',
                 'description' => 'Alternativa à barra fixa para iniciantes.',
@@ -97,7 +103,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Remada Unilateral com Halter',
                 'muscle_group' => 'Costas',
-                'category_id' => 2,
+                'category_slug' => 'back',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Trabalha cada lado das costas independentemente.',
@@ -107,7 +113,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Remada Baixa',
                 'muscle_group' => 'Costas',
-                'category_id' => 2,
+                'category_slug' => 'back',
                 'equipment' => 'Cabo',
                 'difficulty' => 'Beginner',
                 'description' => 'Foco na porção inferior e média das costas.',
@@ -115,11 +121,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1598971639058-fab3c3109e00?w=400&h=300&fit=crop',
             ],
 
-            // Ombros (category_id: 3)
+            // Ombros
             [
                 'name' => 'Desenvolvimento Militar',
                 'muscle_group' => 'Ombros',
-                'category_id' => 3,
+                'category_slug' => 'shoulders',
                 'equipment' => 'Barra',
                 'difficulty' => 'Intermediate',
                 'description' => 'Exercício composto para ombros e tríceps.',
@@ -129,7 +135,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Elevação Lateral',
                 'muscle_group' => 'Ombros',
-                'category_id' => 3,
+                'category_slug' => 'shoulders',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Isolamento da porção lateral do deltoide.',
@@ -139,7 +145,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Elevação Frontal',
                 'muscle_group' => 'Ombros',
-                'category_id' => 3,
+                'category_slug' => 'shoulders',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Foco na porção anterior do deltoide.',
@@ -149,7 +155,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Face Pull',
                 'muscle_group' => 'Ombros',
-                'category_id' => 3,
+                'category_slug' => 'shoulders',
                 'equipment' => 'Cabo',
                 'difficulty' => 'Intermediate',
                 'description' => 'Excelente para saúde do ombro e deltoide posterior.',
@@ -159,7 +165,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Arnold Press',
                 'muscle_group' => 'Ombros',
-                'category_id' => 3,
+                'category_slug' => 'shoulders',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Variação do desenvolvimento que trabalha todas as porções do deltoide.',
@@ -167,11 +173,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop',
             ],
 
-            // Bíceps (category_id: 4)
+            // Bíceps
             [
                 'name' => 'Rosca Direta com Barra',
                 'muscle_group' => 'Bíceps',
-                'category_id' => 4,
+                'category_slug' => 'biceps',
                 'equipment' => 'Barra',
                 'difficulty' => 'Beginner',
                 'description' => 'Exercício fundamental para desenvolvimento do bíceps.',
@@ -181,7 +187,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Rosca Alternada com Halteres',
                 'muscle_group' => 'Bíceps',
-                'category_id' => 4,
+                'category_slug' => 'biceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Permite maior amplitude e controle do movimento.',
@@ -191,7 +197,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Rosca Martelo',
                 'muscle_group' => 'Bíceps',
-                'category_id' => 4,
+                'category_slug' => 'biceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Trabalha o bíceps e o braquiorradial.',
@@ -201,7 +207,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Rosca Scott',
                 'muscle_group' => 'Bíceps',
-                'category_id' => 4,
+                'category_slug' => 'biceps',
                 'equipment' => 'Barra EZ',
                 'difficulty' => 'Intermediate',
                 'description' => 'Isolamento completo do bíceps sem auxílio de outros músculos.',
@@ -211,7 +217,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Rosca Concentrada',
                 'muscle_group' => 'Bíceps',
-                'category_id' => 4,
+                'category_slug' => 'biceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Máximo isolamento do pico do bíceps.',
@@ -219,11 +225,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop',
             ],
 
-            // Tríceps (category_id: 5)
+            // Tríceps
             [
                 'name' => 'Tríceps Pulley',
                 'muscle_group' => 'Tríceps',
-                'category_id' => 5,
+                'category_slug' => 'triceps',
                 'equipment' => 'Cabo',
                 'difficulty' => 'Beginner',
                 'description' => 'Exercício básico para desenvolvimento do tríceps.',
@@ -233,7 +239,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Tríceps Testa',
                 'muscle_group' => 'Tríceps',
-                'category_id' => 5,
+                'category_slug' => 'triceps',
                 'equipment' => 'Barra EZ',
                 'difficulty' => 'Intermediate',
                 'description' => 'Foco na cabeça longa do tríceps.',
@@ -243,7 +249,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Tríceps Francês',
                 'muscle_group' => 'Tríceps',
-                'category_id' => 5,
+                'category_slug' => 'triceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Excelente para alongamento e contração do tríceps.',
@@ -253,7 +259,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Mergulho em Paralelas',
                 'muscle_group' => 'Tríceps',
-                'category_id' => 5,
+                'category_slug' => 'triceps',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Advanced',
                 'description' => 'Exercício composto para tríceps e peitoral.',
@@ -263,7 +269,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Tríceps Kickback',
                 'muscle_group' => 'Tríceps',
-                'category_id' => 5,
+                'category_slug' => 'triceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Isolamento do tríceps com movimento controlado.',
@@ -271,11 +277,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop',
             ],
 
-            // Abdômen (category_id: 7)
+            // Abdômen
             [
                 'name' => 'Abdominal Crunch',
                 'muscle_group' => 'Abdômen',
-                'category_id' => 7,
+                'category_slug' => 'abs',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Beginner',
                 'description' => 'Exercício clássico para abdominais.',
@@ -285,7 +291,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Prancha Frontal',
                 'muscle_group' => 'Abdômen',
-                'category_id' => 7,
+                'category_slug' => 'abs',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Beginner',
                 'description' => 'Excelente para fortalecimento do core.',
@@ -295,7 +301,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Abdominal Infra',
                 'muscle_group' => 'Abdômen',
-                'category_id' => 7,
+                'category_slug' => 'abs',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Intermediate',
                 'description' => 'Foco na porção inferior do abdômen.',
@@ -305,7 +311,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Russian Twist',
                 'muscle_group' => 'Abdômen',
-                'category_id' => 7,
+                'category_slug' => 'abs',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Intermediate',
                 'description' => 'Trabalha os oblíquos e o core.',
@@ -315,7 +321,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Mountain Climber',
                 'muscle_group' => 'Abdômen',
-                'category_id' => 7,
+                'category_slug' => 'abs',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Intermediate',
                 'description' => 'Exercício dinâmico para core e condicionamento.',
@@ -323,11 +329,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
             ],
 
-            // Quadríceps (category_id: 8)
+            // Quadríceps
             [
                 'name' => 'Agachamento Livre',
                 'muscle_group' => 'Quadríceps',
-                'category_id' => 8,
+                'category_slug' => 'quadriceps',
                 'equipment' => 'Barra',
                 'difficulty' => 'Intermediate',
                 'description' => 'O rei dos exercícios para pernas.',
@@ -337,7 +343,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Leg Press 45°',
                 'muscle_group' => 'Quadríceps',
-                'category_id' => 8,
+                'category_slug' => 'quadriceps',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Excelente para quadríceps com menor impacto na lombar.',
@@ -347,7 +353,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Cadeira Extensora',
                 'muscle_group' => 'Quadríceps',
-                'category_id' => 8,
+                'category_slug' => 'quadriceps',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Isolamento completo do quadríceps.',
@@ -357,7 +363,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Avanço com Halteres',
                 'muscle_group' => 'Quadríceps',
-                'category_id' => 8,
+                'category_slug' => 'quadriceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Trabalha quadríceps, glúteos e equilíbrio.',
@@ -367,7 +373,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Agachamento Búlgaro',
                 'muscle_group' => 'Quadríceps',
-                'category_id' => 8,
+                'category_slug' => 'quadriceps',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Advanced',
                 'description' => 'Exercício unilateral avançado para pernas.',
@@ -375,11 +381,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop',
             ],
 
-            // Posterior de Coxa (category_id: 9)
+            // Posterior de Coxa
             [
                 'name' => 'Stiff',
                 'muscle_group' => 'Posterior de Coxa',
-                'category_id' => 9,
+                'category_slug' => 'hamstrings',
                 'equipment' => 'Barra',
                 'difficulty' => 'Intermediate',
                 'description' => 'Excelente para posteriores e glúteos.',
@@ -389,7 +395,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Mesa Flexora',
                 'muscle_group' => 'Posterior de Coxa',
-                'category_id' => 9,
+                'category_slug' => 'hamstrings',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Isolamento dos isquiotibiais.',
@@ -399,7 +405,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Cadeira Flexora',
                 'muscle_group' => 'Posterior de Coxa',
-                'category_id' => 9,
+                'category_slug' => 'hamstrings',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Variação sentada da flexora.',
@@ -409,7 +415,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Levantamento Terra Romeno',
                 'muscle_group' => 'Posterior de Coxa',
-                'category_id' => 9,
+                'category_slug' => 'hamstrings',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Intermediate',
                 'description' => 'Foco nos isquiotibiais e glúteos.',
@@ -419,7 +425,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Good Morning',
                 'muscle_group' => 'Posterior de Coxa',
-                'category_id' => 9,
+                'category_slug' => 'hamstrings',
                 'equipment' => 'Barra',
                 'difficulty' => 'Advanced',
                 'description' => 'Exercício avançado para cadeia posterior.',
@@ -427,11 +433,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
             ],
 
-            // Glúteos (category_id: 10)
+            // Glúteos
             [
                 'name' => 'Hip Thrust',
                 'muscle_group' => 'Glúteos',
-                'category_id' => 10,
+                'category_slug' => 'glutes',
                 'equipment' => 'Barra',
                 'difficulty' => 'Intermediate',
                 'description' => 'O melhor exercício para ativação dos glúteos.',
@@ -441,7 +447,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Elevação Pélvica',
                 'muscle_group' => 'Glúteos',
-                'category_id' => 10,
+                'category_slug' => 'glutes',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Beginner',
                 'description' => 'Versão simplificada do hip thrust.',
@@ -451,7 +457,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Abdução de Quadril na Máquina',
                 'muscle_group' => 'Glúteos',
-                'category_id' => 10,
+                'category_slug' => 'glutes',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Isolamento do glúteo médio.',
@@ -461,7 +467,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Agachamento Sumô',
                 'muscle_group' => 'Glúteos',
-                'category_id' => 10,
+                'category_slug' => 'glutes',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Beginner',
                 'description' => 'Foco nos glúteos e adutores.',
@@ -471,7 +477,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Coice (Glúteo na Polia)',
                 'muscle_group' => 'Glúteos',
-                'category_id' => 10,
+                'category_slug' => 'glutes',
                 'equipment' => 'Cabo',
                 'difficulty' => 'Intermediate',
                 'description' => 'Isolamento do glúteo máximo.',
@@ -479,11 +485,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1598971639058-fab3c3109e00?w=400&h=300&fit=crop',
             ],
 
-            // Panturrilhas (category_id: 11)
+            // Panturrilhas
             [
                 'name' => 'Panturrilha em Pé na Máquina',
                 'muscle_group' => 'Panturrilhas',
-                'category_id' => 11,
+                'category_slug' => 'calves',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Exercício básico para gastrocnêmio.',
@@ -493,7 +499,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Panturrilha Sentado',
                 'muscle_group' => 'Panturrilhas',
-                'category_id' => 11,
+                'category_slug' => 'calves',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Beginner',
                 'description' => 'Foco no sóleo.',
@@ -503,7 +509,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Panturrilha no Leg Press',
                 'muscle_group' => 'Panturrilhas',
-                'category_id' => 11,
+                'category_slug' => 'calves',
                 'equipment' => 'Máquina',
                 'difficulty' => 'Intermediate',
                 'description' => 'Variação usando o leg press.',
@@ -513,7 +519,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Panturrilha Unilateral',
                 'muscle_group' => 'Panturrilhas',
-                'category_id' => 11,
+                'category_slug' => 'calves',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Intermediate',
                 'description' => 'Trabalha cada perna individualmente.',
@@ -523,7 +529,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Panturrilha no Smith',
                 'muscle_group' => 'Panturrilhas',
-                'category_id' => 11,
+                'category_slug' => 'calves',
                 'equipment' => 'Barra',
                 'difficulty' => 'Intermediate',
                 'description' => 'Permite maior carga com segurança.',
@@ -531,11 +537,11 @@ class ExerciseSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
             ],
 
-            // Corpo Inteiro (category_id: 12)
+            // Corpo Inteiro
             [
                 'name' => 'Burpee',
                 'muscle_group' => 'Corpo Inteiro',
-                'category_id' => 12,
+                'category_slug' => 'full-body',
                 'equipment' => 'Peso Corporal',
                 'difficulty' => 'Advanced',
                 'description' => 'Exercício completo para condicionamento físico.',
@@ -545,7 +551,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Thruster',
                 'muscle_group' => 'Corpo Inteiro',
-                'category_id' => 12,
+                'category_slug' => 'full-body',
                 'equipment' => 'Halteres',
                 'difficulty' => 'Advanced',
                 'description' => 'Combina agachamento com desenvolvimento.',
@@ -555,7 +561,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Clean and Press',
                 'muscle_group' => 'Corpo Inteiro',
-                'category_id' => 12,
+                'category_slug' => 'full-body',
                 'equipment' => 'Barra',
                 'difficulty' => 'Advanced',
                 'description' => 'Exercício olímpico para força total.',
@@ -565,7 +571,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Kettlebell Swing',
                 'muscle_group' => 'Corpo Inteiro',
-                'category_id' => 12,
+                'category_slug' => 'full-body',
                 'equipment' => 'Kettlebell',
                 'difficulty' => 'Intermediate',
                 'description' => 'Excelente para potência e condicionamento.',
@@ -575,7 +581,7 @@ class ExerciseSeeder extends Seeder
             [
                 'name' => 'Remada Alta com Salto',
                 'muscle_group' => 'Corpo Inteiro',
-                'category_id' => 12,
+                'category_slug' => 'full-body',
                 'equipment' => 'Barra',
                 'difficulty' => 'Advanced',
                 'description' => 'Combina força e explosão.',
@@ -585,9 +591,20 @@ class ExerciseSeeder extends Seeder
         ];
 
         foreach ($exercises as $exercise) {
+            $categoryId = $categoryMap[$exercise['category_slug']] ?? null;
+
+            if (! $categoryId) {
+                continue;
+            }
+
+            $data = $exercise;
+            $data['category_id'] = $categoryId;
+            unset($data['category_slug']);
+            $data['is_active'] = true;
+
             Exercise::updateOrCreate(
                 ['slug' => Str::slug($exercise['name'])],
-                array_merge($exercise, ['is_active' => true]),
+                $data,
             );
         }
     }
