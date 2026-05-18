@@ -2,6 +2,7 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { dashboard } from '@/routes';
+import AdminDashboard from '@/components/dashboard/AdminDashboard.vue';
 import TrainerDashboard from '@/components/dashboard/TrainerDashboard.vue';
 import ClientDashboard from '@/components/dashboard/ClientDashboard.vue';
 
@@ -11,14 +12,22 @@ const user = computed(() => page.props.auth.user);
 
 const props = defineProps<{
     stats?: {
+        totalUsers?: number;
         totalClients?: number;
-        activeClients?: number;
+        totalTrainers?: number;
         totalExercises?: number;
+        activeClients?: number;
         totalCategories?: number;
         totalWorkouts?: number;
         completedWorkouts?: number;
         currentStreak?: number;
     };
+    usersByRole?: { role: string; count: number; color: string }[];
+    monthlyGrowth?: { month: string; users?: number; trainers?: number; clients?: number; workouts?: number }[];
+    systemActivity?: { day: string; logins: number; registrations: number }[];
+    recentUsers?: { id: number; name: string; email: string; role: string; created_at: string | null }[];
+    topTrainers?: { name: string; clients: number; specialty: string; rating: number }[];
+    platformMetrics?: { label: string; value: string; change: string; trend: string }[];
     recentClients?: {
         id: number;
         name: string;
@@ -28,7 +37,6 @@ const props = defineProps<{
     }[];
     weeklyActivity?: { day: string; value: number }[];
     muscleGroupDistribution?: { name: string; value: number; color: string }[];
-    monthlyGrowth?: { month: string; clients: number; workouts: number }[];
     upcomingWorkouts?: any[];
     quickActions?: { label: string; route: string; icon: string }[];
     weeklyWorkouts?: { day: string; completed: boolean; type: string }[];
@@ -44,9 +52,7 @@ const props = defineProps<{
     trainer?: { name: string; specialty: string; email: string };
 }>();
 
-const isTrainer = computed(() => {
-    return user.value?.role === 'personal' || user.value?.role === 'admin' || user.value?.role === 'self';
-});
+const userRole = computed(() => user.value?.role);
 
 defineOptions({
     layout: {
@@ -64,8 +70,25 @@ defineOptions({
     <Head title="Painel de controle" />
 
     <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6 overflow-x-auto">
+        <AdminDashboard
+            v-if="userRole === 'admin'"
+            :stats="{
+                totalUsers: stats?.totalUsers ?? 0,
+                totalClients: stats?.totalClients ?? 0,
+                totalTrainers: stats?.totalTrainers ?? 0,
+                totalExercises: stats?.totalExercises ?? 0,
+            }"
+            :users-by-role="usersByRole ?? []"
+            :monthly-growth="(monthlyGrowth ?? []).map(m => ({ month: m.month, users: m.users ?? 0, trainers: m.trainers ?? 0 }))"
+            :system-activity="systemActivity ?? []"
+            :recent-users="recentUsers ?? []"
+            :top-trainers="topTrainers ?? []"
+            :platform-metrics="platformMetrics ?? []"
+            :quick-actions="quickActions ?? []"
+        />
+
         <TrainerDashboard
-            v-if="isTrainer"
+            v-else-if="userRole === 'personal' || userRole === 'self'"
             :stats="{
                 totalClients: stats?.totalClients ?? 0,
                 activeClients: stats?.activeClients ?? 0,
@@ -75,7 +98,7 @@ defineOptions({
             :recent-clients="recentClients ?? []"
             :weekly-activity="weeklyActivity ?? []"
             :muscle-group-distribution="muscleGroupDistribution ?? []"
-            :monthly-growth="monthlyGrowth ?? []"
+            :monthly-growth="(monthlyGrowth ?? []).map(m => ({ month: m.month, clients: m.clients ?? 0, workouts: m.workouts ?? 0 }))"
             :upcoming-workouts="upcomingWorkouts ?? []"
             :quick-actions="quickActions ?? []"
         />
