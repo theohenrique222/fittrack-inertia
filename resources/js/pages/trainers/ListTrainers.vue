@@ -24,12 +24,12 @@ import {
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
@@ -159,24 +159,24 @@ function getAvatarColor(id: number): string {
                     </p>
                 </div>
 
-                <Dialog v-if="canCreateTrainer" v-model:open="isCreateOpen">
-                    <DialogTrigger as-child>
+                <Sheet v-if="canCreateTrainer" v-model:open="isCreateOpen">
+                    <SheetTrigger as-child>
                         <Button
                             class="border-0 bg-white text-emerald-700 shadow-lg hover:bg-emerald-50"
                         >
                             <Plus class="mr-2 h-4 w-4" />
                             Novo Treinador
                         </Button>
-                    </DialogTrigger>
+                    </SheetTrigger>
 
-                    <DialogContent class="max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Cadastro de Treinador</DialogTitle>
-                        </DialogHeader>
+                    <SheetContent side="right" class="sm:max-w-md">
+                        <SheetHeader>
+                            <SheetTitle>Cadastro de Treinador</SheetTitle>
+                        </SheetHeader>
 
                         <CreateTrainerSheet @change="closeCreateSheet" />
-                    </DialogContent>
-                </Dialog>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div class="grid grid-cols-3 gap-3">
@@ -349,17 +349,17 @@ function getAvatarColor(id: number): string {
         </div>
     </div>
 
-    <Dialog v-model:open="isEditOpen">
-        <DialogContent class="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>Editar Treinador</DialogTitle>
-            </DialogHeader>
+    <Sheet v-model:open="isEditOpen">
+        <SheetContent side="right" class="sm:max-w-md">
+            <SheetHeader>
+                <SheetTitle>Editar Treinador</SheetTitle>
+            </SheetHeader>
 
             <EditTrainerSheet
                 v-if="selectedTrainer"
                 :trainer="selectedTrainer"
                 @close="closeEditSheet"
             />
-        </DialogContent>
-    </Dialog>
+        </SheetContent>
+    </Sheet>
 </template>
