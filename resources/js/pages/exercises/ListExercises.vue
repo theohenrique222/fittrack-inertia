@@ -20,10 +20,10 @@ import {
     Search,
     Trophy,
     Zap,
-    ArmFlex,
     Footprints,
     Activity,
     Target,
+    MoveHorizontal,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -62,10 +62,10 @@ interface Exercise {
 
 const props = defineProps<{
     title: string;
-    exercises: {
+    exercises?: {
         data: Exercise[];
     };
-    categories: {
+    categories?: {
         data: Category[];
     };
 }>();
@@ -77,7 +77,7 @@ const searchQuery = ref('');
 const selectedDifficulty = ref<string>('all');
 
 const filteredExercises = computed(() => {
-    let result = props.exercises.data;
+    let result = props.exercises?.data || [];
 
     if (selectedDifficulty.value !== 'all') {
         result = result.filter(
@@ -92,7 +92,7 @@ const filteredExercises = computed(() => {
                 e.name.toLowerCase().includes(query) ||
                 e.description?.toLowerCase().includes(query) ||
                 e.category?.name.toLowerCase().includes(query) ||
-                e.muscle_group.toLowerCase().includes(query) ||
+                e.muscle_group?.toLowerCase().includes(query) ||
                 e.equipment?.toLowerCase().includes(query),
         );
     }
@@ -100,11 +100,15 @@ const filteredExercises = computed(() => {
     return result;
 });
 
-const stats = computed(() => ({
-    total: props.exercises.data.length,
-    active: props.exercises.data.filter((e) => e.is_active).length,
-    categories: new Set(props.exercises.data.map((e) => e.category_id)).size,
-}));
+const stats = computed(() => {
+    const exercises = props.exercises?.data || [];
+
+    return {
+        total: exercises.length,
+        active: exercises.filter((e) => e.is_active).length,
+        categories: new Set(exercises.map((e) => e.category_id)).size,
+    };
+});
 
 const groupedExercises = computed(() => {
     const exercises = filteredExercises.value;
@@ -342,11 +346,11 @@ const muscleGroupColors: Record<string, { bg: string; text: string; border: stri
 
 const muscleGroupIcons: Record<string, any> = {
     chest: Target,
-    back: ArmFlex,
+    back: MoveHorizontal,
     shoulders: Zap,
-    biceps: ArmFlex,
-    triceps: ArmFlex,
-    forearms: ArmFlex,
+    biceps: MoveHorizontal,
+    triceps: MoveHorizontal,
+    forearms: MoveHorizontal,
     abs: Activity,
     quadriceps: Footprints,
     hamstrings: Footprints,
