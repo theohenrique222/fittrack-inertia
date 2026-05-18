@@ -14,6 +14,7 @@ export default {
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Dumbbell, Mail, Plus } from 'lucide-vue-next';
+import { workouts } from '@/routes';
 
 interface Student {
     id: number;
@@ -98,7 +99,7 @@ function formatRestSeconds(seconds: number): string {
 
                     <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
                         <Link
-                            :href="`/workouts?client_id=${student.id}`"
+                            :href="workouts.url({ query: { client_id: student.id } })"
                             class="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
                         >
                             <Dumbbell class="w-4 h-4" />
@@ -187,7 +188,7 @@ function formatRestSeconds(seconds: number): string {
                         Este aluno ainda não possui um treino ativo
                     </p>
                     <Link
-                        :href="`/workouts?client_id=${student.id}&create=true`"
+                        :href="workouts.url({ query: { client_id: student.id, create: 'true' } })"
                         class="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
                     >
                         <Plus class="w-4 h-4" />

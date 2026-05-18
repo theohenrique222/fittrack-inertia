@@ -13,6 +13,7 @@ use App\Http\Resources\StudentResource;
 use App\Http\Resources\WorkoutResource;
 use App\Models\Category;
 use App\Models\Workout;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,7 +26,7 @@ class DestroyWorkoutController extends Controller
         ListExercisesAction $exercisesAction
     ): Response {
         $action->execute($workout);
-        $workouts = (new ListWorkoutsAction)->execute();
+        $workouts = (new ListWorkoutsAction)->execute(['trainer_id' => Auth::id()]);
         $students = $studentsAction->execute();
         $exercises = $exercisesAction->execute();
         $categories = Category::where('is_active', true)->orderBy('name')->get();

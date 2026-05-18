@@ -13,6 +13,7 @@ use App\Http\Resources\ExerciseResource;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\WorkoutResource;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,7 +28,7 @@ class StoreWorkoutController extends Controller
         $validated = $request->validated();
 
         $action->execute($validated);
-        $workouts = (new ListWorkoutsAction)->execute();
+        $workouts = (new ListWorkoutsAction)->execute(['trainer_id' => Auth::id()]);
         $students = $studentsAction->execute();
         $exercises = $exercisesAction->execute();
         $categories = Category::where('is_active', true)->orderBy('name')->get();

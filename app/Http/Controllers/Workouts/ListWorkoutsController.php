@@ -11,6 +11,7 @@ use App\Http\Resources\ExerciseResource;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\WorkoutResource;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +23,8 @@ class ListWorkoutsController extends Controller
         ListExercisesAction $exercisesAction
     ): Response {
         $filters = request()->only(['search', 'client_id', 'is_active']);
+        $filters['trainer_id'] = Auth::id();
+
         $workouts = $action->execute($filters);
         $students = $studentsAction->execute();
         $exercises = $exercisesAction->execute();
