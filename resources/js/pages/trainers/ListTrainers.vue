@@ -107,7 +107,7 @@ const handleDeleteClick = (id: number) => {
         return;
     }
 
-    router.delete(destroy.url(id), {
+    router.delete(destroy.url({ trainer: id }), {
         onSuccess: () => {
             selectedTrainer.value = null;
         },
@@ -119,7 +119,7 @@ const handleImpersonateClick = (trainer: Trainer) => {
         return;
     }
 
-    router.post(impersonate.url(trainer.id));
+    router.post(impersonate.url({ trainer: trainer.id }));
 };
 
 const closeCreateSheet = () => {
