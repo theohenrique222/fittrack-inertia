@@ -16,6 +16,6 @@ class ResetPasswordStudentController extends Controller
         $action->execute($student);
 
         return to_route('students')
-            ->with('message', 'Senha redefinida com sucesso!');
+            ->with('success', 'Senha redefinida com sucesso!');
     }
 }

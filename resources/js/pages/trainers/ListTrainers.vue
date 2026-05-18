@@ -31,6 +31,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ToastContainer } from '@/components/ui/toast';
+import { useToast } from '@/composables/useToast';
 import CreateTrainerSheet from '@/pages/trainers/components/CreateTrainerSheet.vue';
 import EditTrainerSheet from '@/pages/trainers/components/EditTrainerSheet.vue';
 import { destroy } from '@/routes/trainers';
@@ -50,10 +52,10 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
+const { toasts, success, error } = useToast();
 
 const canCreateTrainer = page.props.auth.can.create_trainer ?? true;
 
-const successMessage = ref('');
 const searchQuery = ref('');
 
 const filteredTrainers = computed(() => {
@@ -79,10 +81,11 @@ watch(
     () => page.props.flash,
     (flash: any) => {
         if (flash?.success) {
-            successMessage.value = flash.success;
-            setTimeout(() => {
-                successMessage.value = '';
-            }, 3000);
+            success(flash.success);
+        }
+
+        if (flash?.error) {
+            error(flash.error);
         }
     },
     { immediate: true },
@@ -142,12 +145,7 @@ function getAvatarColor(id: number): string {
 <template>
     <Head title="Treinadores" />
 
-    <div
-        v-if="successMessage"
-        class="fixed top-4 right-4 z-50 rounded-lg bg-emerald-500 px-4 py-2 text-white shadow-lg"
-    >
-        {{ successMessage }}
-    </div>
+    <ToastContainer v-model="toasts" />
 
     <div class="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
         <div

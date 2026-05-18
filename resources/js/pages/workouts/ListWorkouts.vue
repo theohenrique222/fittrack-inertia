@@ -31,6 +31,8 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
+import { ToastContainer } from '@/components/ui/toast';
+import { useToast } from '@/composables/useToast';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
 import ViewWorkoutSheet from '@/pages/workouts/components/ViewWorkoutSheet.vue';
@@ -109,8 +111,8 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
+const { toasts, success, error } = useToast();
 
-const successMessage = ref('');
 const selectedStudentId = ref<string>('all');
 const searchQuery = ref('');
 
@@ -144,10 +146,11 @@ watch(
     () => page.props.flash,
     (flash: any) => {
         if (flash?.success) {
-            successMessage.value = flash.success;
-            setTimeout(() => {
-                successMessage.value = '';
-            }, 3000);
+            success(flash.success);
+        }
+
+        if (flash?.error) {
+            error(flash.error);
         }
     },
     { immediate: true },
@@ -235,12 +238,7 @@ function getAvatarColor(id: number): string {
 <template>
     <Head title="Treinos" />
 
-    <div
-        v-if="successMessage"
-        class="fixed top-4 right-4 z-50 rounded-lg bg-emerald-500 px-4 py-2 text-white shadow-lg"
-    >
-        {{ successMessage }}
-    </div>
+    <ToastContainer v-model="toasts" />
 
     <div class="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
         <div class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 py-8 text-white">
