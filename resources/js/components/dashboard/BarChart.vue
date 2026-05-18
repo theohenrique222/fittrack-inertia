@@ -22,7 +22,7 @@ const maxValue = Math.max(...props.data.map((d) => d.value));
                 {{ item.value }}
             </span>
             <div
-                class="w-full rounded-t-md bg-gradient-to-t from-indigo-600 to-indigo-400 transition-all duration-500 hover:from-indigo-700 hover:to-indigo-500"
+                class="w-full rounded-t-md bg-gradient-to-t from-emerald-600 to-emerald-400 transition-all duration-500 hover:from-emerald-700 hover:to-emerald-500"
                 :style="{
                     height: `${(item.value / maxValue) * (height - 40)}px`,
                     animationDelay: `${index * 100}ms`,

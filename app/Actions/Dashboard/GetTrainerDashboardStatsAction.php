@@ -66,12 +66,12 @@ class GetTrainerDashboardStatsAction
     private function generateMuscleGroupDistribution(): array
     {
         return [
-            ['name' => 'Peito', 'value' => 18, 'color' => '#6366f1'],
-            ['name' => 'Costas', 'value' => 15, 'color' => '#8b5cf6'],
-            ['name' => 'Pernas', 'value' => 22, 'color' => '#a855f7'],
-            ['name' => 'Ombros', 'value' => 12, 'color' => '#d946ef'],
-            ['name' => 'Braços', 'value' => 14, 'color' => '#ec4899'],
-            ['name' => 'Core', 'value' => 9, 'color' => '#f43f5e'],
+            ['name' => 'Peito', 'value' => 18, 'color' => '#10b981'],
+            ['name' => 'Costas', 'value' => 15, 'color' => '#14b8a6'],
+            ['name' => 'Pernas', 'value' => 22, 'color' => '#059669'],
+            ['name' => 'Ombros', 'value' => 12, 'color' => '#0d9488'],
+            ['name' => 'Braços', 'value' => 14, 'color' => '#047857'],
+            ['name' => 'Core', 'value' => 9, 'color' => '#065f46'],
         ];
     }
 

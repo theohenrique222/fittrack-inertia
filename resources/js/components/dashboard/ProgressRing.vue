@@ -9,7 +9,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     size: 80,
     strokeWidth: 6,
-    color: '#6366f1',
+    color: '#10b981',
 });
 
 const radius = (props.size - props.strokeWidth) / 2;

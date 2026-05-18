@@ -27,19 +27,19 @@ const workoutsPoints = props.data
         <svg :viewBox="`0 0 ${width} ${chartHeight}`" class="w-full" :style="{ height: `${chartHeight}px` }">
             <defs>
                 <linearGradient id="clientsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3" />
-                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
-                </linearGradient>
-                <linearGradient id="workoutsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#10b981" stop-opacity="0.3" />
                     <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="workoutsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.3" />
+                    <stop offset="100%" stop-color="#14b8a6" stop-opacity="0" />
                 </linearGradient>
             </defs>
 
             <polyline
                 :points="clientsPoints"
                 fill="none"
-                stroke="#6366f1"
+                stroke="#10b981"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -47,7 +47,7 @@ const workoutsPoints = props.data
             <polyline
                 :points="workoutsPoints"
                 fill="none"
-                stroke="#10b981"
+                stroke="#14b8a6"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -59,7 +59,7 @@ const workoutsPoints = props.data
                 :cx="(i / (data.length - 1)) * width"
                 :cy="chartHeight - (d.clients / maxClients) * (chartHeight - 40) - 20"
                 r="3"
-                fill="#6366f1"
+                fill="#10b981"
             />
             <circle
                 v-for="(d, i) in data"
@@ -67,7 +67,7 @@ const workoutsPoints = props.data
                 :cx="(i / (data.length - 1)) * width"
                 :cy="chartHeight - (d.workouts / maxWorkouts) * (chartHeight - 40) - 20"
                 r="3"
-                fill="#10b981"
+                fill="#14b8a6"
             />
         </svg>
 
@@ -83,11 +83,11 @@ const workoutsPoints = props.data
 
         <div class="flex items-center gap-4 mt-4">
             <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-indigo-500" />
+                <div class="w-3 h-3 rounded-full bg-emerald-500" />
                 <span class="text-xs text-neutral-600 dark:text-neutral-400">Clientes</span>
             </div>
             <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-emerald-500" />
+                <div class="w-3 h-3 rounded-full bg-teal-500" />
                 <span class="text-xs text-neutral-600 dark:text-neutral-400">Treinos</span>
             </div>
         </div>

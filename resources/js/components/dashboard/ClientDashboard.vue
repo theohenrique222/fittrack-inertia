@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Dumbbell, Flame, Trophy, Target, CheckCircle, User, Calendar, Clock } from 'lucide-vue-next';
+import { Dumbbell, Flame, Trophy, Target, CheckCircle, User, Calendar, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
 import BarChart from '@/components/dashboard/BarChart.vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
@@ -47,127 +47,157 @@ const progressChartData = computed(() => {
         workouts: d.bodyFat * 5,
     }));
 });
+
+const completedThisWeek = computed(() => {
+    return props.weeklyWorkouts.filter((w) => w.completed).length;
+});
 </script>
 
 <template>
     <div class="flex flex-col gap-6">
         <!-- Welcome Header -->
-        <div class="rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-500 p-6 text-white shadow-lg">
-            <h1 class="text-2xl font-bold">
-                Meu Progresso
-            </h1>
-            <p class="text-sm opacity-90 mt-1">
-                Continue assim! Você está no caminho certo 💪
-            </p>
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 p-6 md:p-8 text-white shadow-xl">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
+            <div class="relative z-10">
+                <h1 class="text-2xl md:text-3xl font-bold">
+                    Meu Progresso
+                </h1>
+                <p class="text-sm md:text-base opacity-90 mt-2 max-w-xl">
+                    Continue assim! Você está no caminho certo para alcançar seus objetivos 💪
+                </p>
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                        <Flame class="w-4 h-4" />
+                        <span class="text-sm font-medium">{{ stats.currentStreak }} dias de sequência</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                        <CheckCircle class="w-4 h-4" />
+                        <span class="text-sm font-medium">{{ completedThisWeek }}/{{ weeklyWorkouts.length }} esta semana</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Stats Cards -->
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+            <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
+                <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Treinos Total</p>
-                        <h2 class="text-3xl font-bold mt-1">{{ stats.totalWorkouts }}</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Treinos Total</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.totalWorkouts }}</h2>
+                        <div class="flex items-center gap-1 mt-2">
+                            <ArrowUpRight class="w-4 h-4 text-emerald-500" />
+                            <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">{{ completionRate }}%</span>
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">concluídos</span>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <Dumbbell class="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                 </div>
-                <div class="mt-3 flex items-center gap-2">
-                    <ProgressRing :percentage="completionRate" :size="32" :stroke-width="4" color="#10b981" />
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ completionRate }}% concluídos</span>
-                </div>
             </div>
 
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+            <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
+                <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Sequência Atual</p>
-                        <h2 class="text-3xl font-bold mt-1">{{ stats.currentStreak }} dias</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Sequência Atual</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.currentStreak }} dias</h2>
+                        <div class="flex items-center gap-1 mt-2">
+                            <Flame class="w-4 h-4 text-orange-500" />
+                            <span class="text-xs font-medium text-orange-600 dark:text-orange-400">Recorde!</span>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <Flame class="w-6 h-6 text-orange-600 dark:text-orange-400" />
                     </div>
                 </div>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-3">
-                    Recorde pessoal!
-                </p>
             </div>
 
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+            <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
+                <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Concluídos</p>
-                        <h2 class="text-3xl font-bold mt-1">{{ stats.completedWorkouts }}</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Concluídos</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.completedWorkouts }}</h2>
+                        <div class="flex items-center gap-1 mt-2">
+                            <ArrowDownRight class="w-4 h-4 text-neutral-400" />
+                            <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ stats.totalWorkouts - stats.completedWorkouts }} restantes</span>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <CheckCircle class="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <CheckCircle class="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                 </div>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-3">
-                    {{ stats.totalWorkouts - stats.completedWorkouts }} restantes
-                </p>
             </div>
 
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+            <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
+                <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Exercícios</p>
-                        <h2 class="text-3xl font-bold mt-1">{{ stats.totalExercises }}</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Exercícios</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.totalExercises }}</h2>
+                        <div class="flex items-center gap-1 mt-2">
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">Disponíveis</span>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                        <Target class="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Target class="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                 </div>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-3">
-                    Disponíveis
-                </p>
             </div>
         </div>
 
         <!-- Body Metrics -->
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div
-                v-for="metric in bodyMetrics"
-                :key="metric.label"
-                class="rounded-xl border bg-white dark:bg-neutral-900 p-4 shadow-sm"
-            >
-                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ metric.label }}</p>
-                <p class="text-xl font-bold mt-1">{{ metric.value }}</p>
-                <p
-                    class="text-xs mt-1"
-                    :class="metric.trend === 'up' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'"
+        <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+            <h3 class="font-semibold mb-4 text-neutral-900 dark:text-white">Métricas Corporais</h3>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div
+                    v-for="metric in bodyMetrics"
+                    :key="metric.label"
+                    class="group rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 p-4 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-200"
                 >
-                    {{ metric.change }}
-                </p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">{{ metric.label }}</p>
+                    <p class="text-2xl font-bold mt-1 text-neutral-900 dark:text-white">{{ metric.value }}</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <ArrowUpRight v-if="metric.trend === 'up'" class="w-3 h-3 text-emerald-500" />
+                        <ArrowDownRight v-else class="w-3 h-3 text-emerald-500" />
+                        <p class="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                            {{ metric.change }}
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Weekly Workouts -->
-        <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm">
-            <h3 class="font-semibold mb-4">Treinos da Semana</h3>
-            <div class="grid grid-cols-7 gap-2">
+        <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-neutral-900 dark:text-white">Treinos da Semana</h3>
+                <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium">
+                    {{ completedThisWeek }}/{{ weeklyWorkouts.length }} concluídos
+                </span>
+            </div>
+            <div class="grid grid-cols-7 gap-2 md:gap-3">
                 <div
                     v-for="workout in weeklyWorkouts"
                     :key="workout.day"
-                    class="flex flex-col items-center gap-2 p-3 rounded-lg"
+                    class="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl transition-all duration-200"
                     :class="workout.completed
-                        ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                        ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800'
                         : workout.type === 'Descanso'
-                            ? 'bg-neutral-100 dark:bg-neutral-800'
-                            : 'bg-orange-100 dark:bg-orange-900/20'"
+                            ? 'bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700'
+                            : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'"
                 >
-                    <span class="text-xs font-medium">{{ workout.day }}</span>
+                    <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">{{ workout.day }}</span>
                     <div
-                        class="w-8 h-8 rounded-full flex items-center justify-center"
+                        class="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
                         :class="workout.completed
                             ? 'bg-emerald-500 text-white'
                             : workout.type === 'Descanso'
-                                ? 'bg-neutral-300 dark:bg-neutral-600 text-neutral-600 dark:text-neutral-300'
+                                ? 'bg-neutral-200 dark:bg-neutral-600 text-neutral-500 dark:text-neutral-300'
                                 : 'bg-orange-500 text-white'"
                     >
-                        <CheckCircle v-if="workout.completed" class="w-4 h-4" />
-                        <span v-else class="text-xs">{{ workout.type.charAt(0) }}</span>
+                        <CheckCircle v-if="workout.completed" class="w-5 h-5" />
+                        <span v-else class="text-sm font-bold">{{ workout.type.charAt(0) }}</span>
                     </div>
                     <span class="text-xs text-neutral-500 dark:text-neutral-400 text-center leading-tight">
                         {{ workout.type }}
@@ -179,67 +209,84 @@ const progressChartData = computed(() => {
         <!-- Nutrition & Progress Row -->
         <div class="grid gap-4 lg:grid-cols-2">
             <!-- Nutrition -->
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm">
-                <h3 class="font-semibold mb-4">Nutrição do Dia</h3>
+            <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-neutral-900 dark:text-white">Nutrição do Dia</h3>
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium">
+                        {{ nutritionData.calories.consumed }} / {{ nutritionData.calories.target }} kcal
+                    </span>
+                </div>
                 <div class="space-y-4">
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-800">
                         <ProgressRing
                             :percentage="nutritionData.calories.percentage"
                             :size="60"
                             :stroke-width="5"
                             color="#10b981"
                         >
-                            <span class="text-xs font-bold">{{ nutritionData.calories.consumed }}</span>
+                            <span class="text-xs font-bold">{{ nutritionData.calories.percentage }}%</span>
                         </ProgressRing>
                         <div>
-                            <p class="text-sm font-medium">Calorias</p>
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white">Calorias</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                                {{ nutritionData.calories.consumed }} / {{ nutritionData.calories.target }} kcal
+                                {{ nutritionData.calories.consumed }} kcal consumidas
                             </p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-3">
-                        <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                        <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
                             <ProgressRing
                                 :percentage="nutritionData.protein.percentage"
                                 :size="50"
                                 :stroke-width="4"
                                 color="#3b82f6"
                             >
-                                <span class="text-xs font-bold">{{ nutritionData.protein.consumed }}</span>
+                                <span class="text-xs font-bold">{{ nutritionData.protein.consumed }}{{ nutritionData.protein.unit }}</span>
                             </ProgressRing>
-                            <span class="text-xs">Proteína</span>
+                            <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Proteína</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                        <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800">
                             <ProgressRing
                                 :percentage="nutritionData.carbs.percentage"
                                 :size="50"
                                 :stroke-width="4"
                                 color="#f59e0b"
                             >
-                                <span class="text-xs font-bold">{{ nutritionData.carbs.consumed }}</span>
+                                <span class="text-xs font-bold">{{ nutritionData.carbs.consumed }}{{ nutritionData.carbs.unit }}</span>
                             </ProgressRing>
-                            <span class="text-xs">Carbos</span>
+                            <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Carbos</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-rose-50 dark:bg-rose-900/20">
+                        <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800">
                             <ProgressRing
                                 :percentage="nutritionData.fat.percentage"
                                 :size="50"
                                 :stroke-width="4"
                                 color="#f43f5e"
                             >
-                                <span class="text-xs font-bold">{{ nutritionData.fat.consumed }}</span>
+                                <span class="text-xs font-bold">{{ nutritionData.fat.consumed }}{{ nutritionData.fat.unit }}</span>
                             </ProgressRing>
-                            <span class="text-xs">Gordura</span>
+                            <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Gordura</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Progress Chart -->
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm">
-                <h3 class="font-semibold mb-4">Evolução de Peso</h3>
+            <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-neutral-900 dark:text-white">Evolução de Peso</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-emerald-500" />
+                            <span class="text-xs text-neutral-600 dark:text-neutral-400">Peso</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-teal-400" />
+                            <span class="text-xs text-neutral-600 dark:text-neutral-400">Gordura x5</span>
+                        </div>
+                    </div>
+                </div>
                 <LineChart :data="progressChartData" :height="200" />
             </div>
         </div>
@@ -247,20 +294,20 @@ const progressChartData = computed(() => {
         <!-- Upcoming Workouts & Achievements -->
         <div class="grid gap-4 lg:grid-cols-2">
             <!-- Upcoming Workouts -->
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm">
-                <h3 class="font-semibold mb-4">Próximos Treinos</h3>
-                <div class="space-y-3">
+            <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+                <h3 class="font-semibold mb-4 text-neutral-900 dark:text-white">Próximos Treinos</h3>
+                <div class="space-y-1">
                     <div
                         v-for="(workout, index) in upcomingWorkouts"
                         :key="index"
-                        class="flex items-center justify-between py-3 border-b last:border-b-0"
+                        class="flex items-center justify-between py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                     >
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm">
                                 <Dumbbell class="w-5 h-5" />
                             </div>
                             <div>
-                                <p class="text-sm font-medium">{{ workout.name }}</p>
+                                <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ workout.name }}</p>
                                 <div class="flex items-center gap-3 mt-1">
                                     <span class="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
                                         <Calendar class="w-3 h-3" />
@@ -281,19 +328,19 @@ const progressChartData = computed(() => {
             </div>
 
             <!-- Recent Achievements -->
-            <div class="rounded-xl border bg-white dark:bg-neutral-900 p-5 shadow-sm">
-                <h3 class="font-semibold mb-4">Conquistas Recentes</h3>
-                <div class="space-y-3">
+            <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+                <h3 class="font-semibold mb-4 text-neutral-900 dark:text-white">Conquistas Recentes</h3>
+                <div class="space-y-1">
                     <div
                         v-for="(achievement, index) in recentAchievements"
                         :key="index"
-                        class="flex items-start gap-3 py-2 border-b last:border-b-0"
+                        class="flex items-start gap-3 py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                     >
-                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white flex-shrink-0">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white flex-shrink-0 shadow-sm">
                             <component :is="iconMap[achievement.icon]" class="w-5 h-5" />
                         </div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium">{{ achievement.title }}</p>
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ achievement.title }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ achievement.description }}</p>
                             <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">{{ achievement.date }}</p>
                         </div>
@@ -303,14 +350,14 @@ const progressChartData = computed(() => {
         </div>
 
         <!-- Trainer Info -->
-        <div class="rounded-xl border bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-5">
+        <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-5">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xl font-bold">
+                <div class="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xl font-bold shadow-lg">
                     {{ trainer.name.charAt(0).toUpperCase() }}
                 </div>
                 <div>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Seu Personal Trainer</p>
-                    <p class="text-lg font-bold">{{ trainer.name }}</p>
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium uppercase tracking-wide">Seu Personal Trainer</p>
+                    <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ trainer.name }}</p>
                     <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ trainer.specialty }}</p>
                 </div>
             </div>
