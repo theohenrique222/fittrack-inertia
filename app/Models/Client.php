@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Client extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'nickname',
@@ -20,5 +24,10 @@ class Client extends Model
     public function personal(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trainer_id');
+    }
+
+    public function workouts(): HasMany
+    {
+        return $this->hasMany(Workout::class);
     }
 }

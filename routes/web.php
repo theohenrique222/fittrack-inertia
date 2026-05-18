@@ -17,6 +17,10 @@ use App\Http\Controllers\Trainers\DestroyTrainerController;
 use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
+use App\Http\Controllers\Workouts\DestroyWorkoutController;
+use App\Http\Controllers\Workouts\ListWorkoutsController;
+use App\Http\Controllers\Workouts\StoreWorkoutController;
+use App\Http\Controllers\Workouts\UpdateWorkoutController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -96,6 +100,23 @@ $router
     ->get(uri: '/categories', action: ListCategoriesController::class)
     ->name('categories')
     ->middleware('auth');
+
+$router
+    ->get(uri: '/workouts', action: ListWorkoutsController::class)
+    ->name('workouts')
+    ->middleware('auth');
+
+$router
+    ->post(uri: '/workouts', action: StoreWorkoutController::class)
+    ->name('workouts.store');
+
+$router
+    ->put(uri: '/workouts/{workout}', action: UpdateWorkoutController::class)
+    ->name('workouts.update');
+
+$router
+    ->delete(uri: '/workouts/{workout}', action: DestroyWorkoutController::class)
+    ->name('workouts.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
