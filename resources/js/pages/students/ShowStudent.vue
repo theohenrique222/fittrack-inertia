@@ -187,7 +187,7 @@ function formatRestSeconds(seconds: number): string {
                         Este aluno ainda não possui um treino ativo
                     </p>
                     <Link
-                        :href="`/workouts`"
+                        :href="`/workouts?client_id=${student.id}&create=true`"
                         class="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
                     >
                         <Plus class="w-4 h-4" />

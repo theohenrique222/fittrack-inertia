@@ -14,7 +14,7 @@ export default {
 <script setup lang="ts">
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { ChevronRight, Dumbbell, Plus, Search, Users } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -23,13 +23,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
     SheetHeader,
     SheetTitle,
+    SheetTrigger,
 } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
 import ViewWorkoutSheet from '@/pages/workouts/components/ViewWorkoutSheet.vue';
@@ -156,6 +157,7 @@ const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
 const isViewOpen = ref(false);
 const selectedWorkout = ref<Workout | null>(null);
+const preSelectedClientId = ref<string>('');
 
 const handleViewClick = (workout: Workout) => {
     selectedWorkout.value = workout;
@@ -181,6 +183,7 @@ const handleDeleteClick = (id: number) => {
 
 const closeCreateSheet = () => {
     isCreateOpen.value = false;
+    preSelectedClientId.value = '';
 };
 
 const closeEditSheet = () => {
@@ -191,6 +194,21 @@ const closeViewSheet = () => {
     isViewOpen.value = false;
     selectedWorkout.value = null;
 };
+
+onMounted(() => {
+    const url = new URL(window.location.href);
+    const clientId = url.searchParams.get('client_id');
+    const shouldCreate = url.searchParams.get('create');
+
+    if (clientId) {
+        selectedStudentId.value = clientId;
+        preSelectedClientId.value = clientId;
+
+        if (shouldCreate === 'true') {
+            isCreateOpen.value = true;
+        }
+    }
+});
 
 function getInitials(name: string): string {
     return name
@@ -232,27 +250,28 @@ function getAvatarColor(id: number): string {
                     <p class="text-sm text-emerald-100 mt-1">Gerencie os treinos dos seus alunos</p>
                 </div>
 
-                <Dialog v-model:open="isCreateOpen">
-                    <DialogTrigger as-child>
+                <Sheet v-model:open="isCreateOpen">
+                    <SheetTrigger as-child>
                         <Button class="bg-white text-emerald-700 hover:bg-emerald-50 border-0 shadow-lg">
                             <Plus class="w-4 h-4 mr-2" />
                             Novo Treino
                         </Button>
-                    </DialogTrigger>
+                    </SheetTrigger>
 
-                    <DialogContent class="max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Criar Treino</DialogTitle>
-                        </DialogHeader>
+                    <SheetContent side="right" class="w-full sm:max-w-xl p-0">
+                        <SheetHeader class="sr-only">
+                            <SheetTitle>Criar Treino</SheetTitle>
+                        </SheetHeader>
 
                         <CreateWorkoutSheet
                             :students="students.data"
                             :exercises="exercises.data"
                             :categories="categories.data"
+                            :pre-selected-client-id="preSelectedClientId"
                             @close="closeCreateSheet"
                         />
-                    </DialogContent>
-                </Dialog>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div class="grid grid-cols-3 gap-3">
