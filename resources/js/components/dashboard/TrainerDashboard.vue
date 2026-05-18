@@ -203,7 +203,7 @@ const clientGrowth = computed(() => {
             <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-semibold text-neutral-900 dark:text-white">Clientes Recentes</h3>
-                    <Link href="/clients" class="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium">
+                    <Link href="/students" class="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium">
                         Ver todos →
                     </Link>
                 </div>

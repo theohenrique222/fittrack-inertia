@@ -15,7 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { generate, store } from '@/routes/workouts';
 
-interface Client {
+interface Student {
     id: number;
     name: string;
     nickname?: string;
@@ -37,7 +37,7 @@ interface Category {
 }
 
 const props = defineProps<{
-    clients: Client[];
+    students: Student[];
     exercises: Exercise[];
     categories: Category[];
 }>();
@@ -197,11 +197,11 @@ function getExercisesByCategory(categoryId: number): Exercise[] {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem
-                            v-for="client in clients"
-                            :key="client.id"
-                            :value="String(client.id)"
+                            v-for="student in students"
+                            :key="student.id"
+                            :value="String(student.id)"
                         >
-                            {{ client.name }}{{ client.nickname ? ` (${client.nickname})` : '' }}
+                            {{ student.name }}{{ student.nickname ? ` (${student.nickname})` : '' }}
                         </SelectItem>
                     </SelectContent>
                 </Select>

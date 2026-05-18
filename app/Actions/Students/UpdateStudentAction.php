@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Actions\Clients;
+namespace App\Actions\Students;
 
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 
-class UpdateClientAction
+class UpdateStudentAction
 {
     public function execute(Client $client, array $data): Client
     {

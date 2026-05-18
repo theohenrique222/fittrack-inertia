@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Actions\Clients;
+namespace App\Actions\Students;
 
 use App\Models\Client;
 use Illuminate\Database\Eloquent\Collection;
 
-class ListClientsAction
+class ListStudentsAction
 {
     public function execute(): Collection
     {

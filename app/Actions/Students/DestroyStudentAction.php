@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Actions\Clients;
+namespace App\Actions\Students;
 
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 
-class DestroyClientAction
+class DestroyStudentAction
 {
     public function execute(Client $client): void
     {

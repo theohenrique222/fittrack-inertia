@@ -15,7 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { update } from '@/routes/workouts';
 
-interface Client {
+interface Student {
     id: number;
     name: string;
     nickname?: string;
@@ -60,7 +60,7 @@ interface Workout {
 
 interface Props {
     workout: Workout;
-    clients: Client[];
+    students: Student[];
     exercises: Exercise[];
 }
 
@@ -153,11 +153,11 @@ function handleCancel() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem
-                            v-for="client in clients"
-                            :key="client.id"
-                            :value="String(client.id)"
+                            v-for="student in students"
+                            :key="student.id"
+                            :value="String(student.id)"
                         >
-                            {{ client.name }}{{ client.nickname ? ` (${client.nickname})` : '' }}
+                            {{ student.name }}{{ student.nickname ? ` (${student.nickname})` : '' }}
                         </SelectItem>
                     </SelectContent>
                 </Select>

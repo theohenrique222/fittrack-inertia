@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Clients;
+namespace App\Http\Controllers\Students;
 
-use App\Actions\Clients\ListClientsAction;
-use App\Actions\Clients\StoreClientAction;
+use App\Actions\Students\ListStudentsAction;
+use App\Actions\Students\StoreStudentAction;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ClientResource;
+use App\Http\Resources\StudentResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class StoreClientController extends Controller
+class StoreStudentController extends Controller
 {
     public function __invoke(
         Request $request,
-        StoreClientAction $action
+        StoreStudentAction $action
     ): Response {
         Gate::authorize('create-client');
 
@@ -27,11 +27,11 @@ class StoreClientController extends Controller
         ]);
 
         $action->execute($validated);
-        $clients = (new ListClientsAction)->execute();
+        $students = (new ListStudentsAction)->execute();
 
-        return Inertia::render('clients/ListClients', [
-            'title' => 'Lista de Clientes',
-            'clients' => ClientResource::collection($clients),
-        ])->with('success', 'Client created successfully');
+        return Inertia::render('students/ListStudents', [
+            'title' => 'Lista de Alunos',
+            'students' => StudentResource::collection($students),
+        ])->with('success', 'Student created successfully');
     }
 }

@@ -28,10 +28,10 @@ class WorkoutResource extends JsonResource
             'exercises' => $this->whenLoaded('exercises', fn () => $this->exercises->map(fn ($exercise) => [
                 'id' => $exercise->id,
                 'name' => $exercise->name,
-                'category' => $this->whenLoaded('category', fn () => [
-                    'id' => $exercise->category?->id,
-                    'name' => $exercise->category?->name,
-                ]),
+                'category' => $exercise->category ? [
+                    'id' => $exercise->category->id,
+                    'name' => $exercise->category->name,
+                ] : null,
                 'pivot' => [
                     'sets' => $exercise->pivot->sets,
                     'reps' => $exercise->pivot->reps,

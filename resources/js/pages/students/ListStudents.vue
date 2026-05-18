@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,11 +10,11 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { SidebarMenuButton } from '@/components/ui/sidebar';
-import CreateClientSheet from '@/pages/clients/components/CreateClientSheet.vue';
-import EditClientSheet from '@/pages/clients/components/EditClientSheet.vue';
-import { destroy, resetPassword } from '@/routes/clients';
+import CreateStudentSheet from '@/pages/students/components/CreateStudentSheet.vue';
+import EditStudentSheet from '@/pages/students/components/EditStudentSheet.vue';
+import { destroy, resetPassword } from '@/routes/students';
 
-interface Client {
+interface Student {
     id: number;
     name: string;
     email: string;
@@ -23,16 +23,14 @@ interface Client {
 
 const props = defineProps<{
     title: string;
-    clients: {
-        data: Client[];
+    students: {
+        data: Student[];
     };
 }>();
 
 const page = usePage();
 
-const canCreateClient = page.props.auth.can.create_client;
-
-console.log(page.props.auth.can);
+const canCreateStudent = page.props.auth.can.create_client;
 
 const successMessage = ref('');
 
@@ -51,21 +49,21 @@ watch(
 
 const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
-const selectedClient = ref<Client | null>(null);
+const selectedStudent = ref<Student | null>(null);
 
-const handleEditClick = (client: Client) => {
-    selectedClient.value = client;
+const handleEditClick = (student: Student) => {
+    selectedStudent.value = student;
     isEditOpen.value = true;
 };
 
 const handleDeleteClick = (id: number) => {
-    if (!confirm('Tem certeza que deseja deletar este cliente?')) {
+    if (!confirm('Tem certeza que deseja deletar este aluno?')) {
         return;
     }
 
     router.delete(destroy.url(id), {
         onSuccess: () => {
-            selectedClient.value = null;
+            selectedStudent.value = null;
         },
     });
 };
@@ -90,8 +88,8 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Clientes',
-                href: '/clients',
+                title: 'Alunos',
+                href: '/students',
             },
         ],
     },
@@ -99,7 +97,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Clientes" />
+    <Head title="Alunos" />
 
     <div
         v-if="successMessage"
@@ -112,27 +110,29 @@ defineOptions({
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
         <div class="py-5 font-extrabold">
-            <h1>Lista de Clientes</h1>
+            <h1>Lista de Alunos</h1>
         </div>
 
         <div class="flex flex-col gap-4">
             <div
-                v-for="client in props.clients.data"
-                :key="client.id"
-                class="flex items-center justify-between rounded-lg border  bg-neutral-100 dark:bg-neutral-900 p-4"
+                v-for="student in props.students.data"
+                :key="student.id"
+                class="flex items-center justify-between rounded-lg border bg-neutral-100 dark:bg-neutral-900 p-4"
             >
                 <div class="flex flex-col">
-                    <h3 class="font-semibold">{{ client.name }}</h3>
-                    <p class="text-sm text-neutral-500">{{ client.email }}</p>
-                    <p v-if="client.nickname" class="text-sm text-neutral-500">
-                        {{ client.nickname }}
+                    <Link :href="`/students/${student.id}`" class="font-semibold text-emerald-600 hover:underline">
+                        {{ student.name }}
+                    </Link>
+                    <p class="text-sm text-neutral-500">{{ student.email }}</p>
+                    <p v-if="student.nickname" class="text-sm text-neutral-500">
+                        {{ student.nickname }}
                     </p>
                 </div>
                 <div class="flex gap-2">
                     <Button
                         size="sm"
                         variant="outline"
-                        @click="handleEditClick(client)"
+                        @click="handleEditClick(student)"
                     >
                         Editar
                     </Button>
@@ -140,14 +140,14 @@ defineOptions({
                         size="sm"
                         variant="secondary"
                         class="cursor-pointer"
-                        @click="handleResetPasswordClick(client.id)"
+                        @click="handleResetPasswordClick(student.id)"
                     >
                         Redefinir Senha
                     </Button>
                     <Button
                         size="sm"
                         variant="destructive"
-                        @click="handleDeleteClick(client.id)"
+                        @click="handleDeleteClick(student.id)"
                     >
                         Deletar
                     </Button>
@@ -156,13 +156,13 @@ defineOptions({
         </div>
 
         <div
-            v-if="!props.clients.data.length"
+            v-if="!props.students.data.length"
             class="py-8 text-center text-neutral-500"
         >
-            Nenhum cliente cadastrado
+            Nenhum aluno cadastrado
         </div>
 
-        <div v-if="canCreateClient" class="m-auto mt-4 w-1/2 text-center">
+        <div v-if="canCreateStudent" class="m-auto mt-4 w-1/2 text-center">
             <Sheet v-model:open="isCreateOpen">
                 <SheetTrigger as-child>
                     <SidebarMenuButton
@@ -170,18 +170,18 @@ defineOptions({
                         class="cursor-pointer bg-emerald-500 text-white hover:bg-emerald-600 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                         <div class="w-full text-center">
-                            <span>Cadastrar Cliente</span>
+                            <span>Cadastrar Aluno</span>
                         </div>
                     </SidebarMenuButton>
                 </SheetTrigger>
 
                 <SheetContent @interactOutside.prevent>
                     <SheetHeader>
-                        <SheetTitle>Cadastro de Cliente</SheetTitle>
+                        <SheetTitle>Cadastro de Aluno</SheetTitle>
                     </SheetHeader>
 
                     <div class="px-4">
-                        <CreateClientSheet @change="closeCreateSheet" />
+                        <CreateStudentSheet @change="closeCreateSheet" />
                     </div>
                 </SheetContent>
             </Sheet>
@@ -190,13 +190,13 @@ defineOptions({
         <Sheet v-model:open="isEditOpen">
             <SheetContent @interactOutside.prevent>
                 <SheetHeader>
-                    <SheetTitle>Editar Cliente</SheetTitle>
+                    <SheetTitle>Editar Aluno</SheetTitle>
                 </SheetHeader>
 
                 <div class="px-4">
-                    <EditClientSheet
-                        v-if="selectedClient"
-                        :client="selectedClient"
+                    <EditStudentSheet
+                        v-if="selectedStudent"
+                        :student="selectedStudent"
                         @change="closeEditSheet"
                     />
                 </div>

@@ -40,8 +40,6 @@ defineProps<{
     workout: Workout;
 }>();
 
-const emit = defineEmits(['close']);
-
 function formatRest(seconds: number): string {
     if (seconds >= 60) {
         const mins = Math.floor(seconds / 60);

@@ -3,7 +3,7 @@ import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { store } from '@/routes/clients';
+import { store } from '@/routes/students';
 
 const emit = defineEmits(['change']);
 
@@ -33,9 +33,9 @@ function handleCancel() {
     <form @submit.prevent="handleSubmit">
         <div>
             <div class="mb-5">
-                <h1 class="text-xl font-extrabold">Cadastrar Cliente</h1>
+                <h1 class="text-xl font-extrabold">Cadastrar Aluno</h1>
                 <p class="text-xs font-extralight">
-                    Insira os dados do cliente
+                    Insira os dados do aluno
                 </p>
             </div>
 

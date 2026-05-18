@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Clients;
+namespace App\Actions\Students;
 
 use App\Enums\UserRole;
 use App\Models\Client;
@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class StoreClientAction
+class StoreStudentAction
 {
     public function execute(array $data): Client
     {

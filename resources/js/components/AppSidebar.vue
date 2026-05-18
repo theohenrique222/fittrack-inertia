@@ -15,7 +15,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { clients, dashboard, exercises, trainers } from '@/routes';
+import { students, dashboard, exercises, trainers } from '@/routes';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -32,8 +32,8 @@ const mainNavItems: NavItem[] = [
     ...(can.view_clients
         ? [
               {
-                  title: 'Clientes',
-                  href: clients(),
+                  title: 'Alunos',
+                  href: students(),
                   icon: LayoutGrid,
               },
           ]
@@ -66,7 +66,7 @@ const mainNavItems: NavItem[] = [
                         <Link :href="dashboard()">
                             <AppLogo />
                         </Link>
-                        <Link :href="clients()" />
+                        <Link :href="students()" />
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>

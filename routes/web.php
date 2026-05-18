@@ -2,17 +2,18 @@
 
 use App\Http\Controllers\Authentication\LoginController;
 use App\Http\Controllers\Categories\ListCategoriesController;
-use App\Http\Controllers\Clients\DestroyClientController;
-use App\Http\Controllers\Clients\ListClientsController;
-use App\Http\Controllers\Clients\ResetPasswordClientController;
-use App\Http\Controllers\Clients\StoreClientController;
-use App\Http\Controllers\Clients\UpdateClientController;
 use App\Http\Controllers\Context\ChangeContextController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Exercises\DestroyExerciseController;
 use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
+use App\Http\Controllers\Students\DestroyStudentController;
+use App\Http\Controllers\Students\ListStudentsController;
+use App\Http\Controllers\Students\ResetPasswordStudentController;
+use App\Http\Controllers\Students\ShowStudentController;
+use App\Http\Controllers\Students\StoreStudentController;
+use App\Http\Controllers\Students\UpdateStudentController;
 use App\Http\Controllers\Trainers\DestroyTrainerController;
 use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
@@ -43,25 +44,30 @@ $router
     ->name('change-context');
 
 $router
-    ->get(uri: '/clients', action: ListClientsController::class)
-    ->name('clients')
+    ->get(uri: '/students', action: ListStudentsController::class)
+    ->name('students')
     ->middleware('auth');
 
 $router
-    ->post(uri: '/clients', action: StoreClientController::class)
-    ->name('clients.store');
+    ->get(uri: '/students/{student}', action: ShowStudentController::class)
+    ->name('students.show')
+    ->middleware('auth');
 
 $router
-    ->put(uri: '/clients/{client}', action: UpdateClientController::class)
-    ->name('clients.update');
+    ->post(uri: '/students', action: StoreStudentController::class)
+    ->name('students.store');
 
 $router
-    ->delete(uri: '/clients/{client}', action: DestroyClientController::class)
-    ->name('clients.destroy');
+    ->put(uri: '/students/{student}', action: UpdateStudentController::class)
+    ->name('students.update');
 
 $router
-    ->post(uri: '/clients/{client}/reset-password', action: ResetPasswordClientController::class)
-    ->name('clients.reset-password');
+    ->delete(uri: '/students/{student}', action: DestroyStudentController::class)
+    ->name('students.destroy');
+
+$router
+    ->post(uri: '/students/{student}/reset-password', action: ResetPasswordStudentController::class)
+    ->name('students.reset-password');
 
 $router
     ->get(uri: '/trainers', action: ListTrainersController::class)

@@ -3,9 +3,9 @@ import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { update } from '@/routes/clients';
+import { update } from '@/routes/students';
 
-interface Client {
+interface Student {
     id: number;
     name: string;
     email: string;
@@ -13,19 +13,19 @@ interface Client {
 }
 
 const props = defineProps<{
-    client: Client;
+    student: Student;
 }>();
 
 const emit = defineEmits(['change']);
 
 const form = useForm({
-    name: props.client.name,
-    email: props.client.email,
-    nickname: props.client.nickname || '',
+    name: props.student.name,
+    email: props.student.email,
+    nickname: props.student.nickname || '',
 });
 
 function handleSubmit() {
-    form.put(update.url(props.client.id), {
+    form.put(update.url(props.student.id), {
         onSuccess: () => {
             form.reset();
             emit('change');
@@ -44,9 +44,9 @@ function handleCancel() {
     <form @submit.prevent="handleSubmit">
         <div>
             <div class="mb-5">
-                <h1 class="text-xl font-extrabold">Editar Cliente</h1>
+                <h1 class="text-xl font-extrabold">Editar Aluno</h1>
                 <p class="text-xs font-extralight">
-                    Atualize os dados do cliente
+                    Atualize os dados do aluno
                 </p>
             </div>
 
