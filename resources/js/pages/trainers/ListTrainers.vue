@@ -24,6 +24,7 @@ import {
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
@@ -31,7 +32,6 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CreateTrainerSheet from '@/pages/trainers/components/CreateTrainerSheet.vue';

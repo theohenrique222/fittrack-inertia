@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, Eye } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
-import { stopImpersonate } from '@/routes/stop-impersonate';
 
 const page = usePage();
 
@@ -11,7 +10,7 @@ const impersonating = computed(() => page.props.auth.impersonating ?? false);
 const impersonatorName = computed(() => page.props.auth.impersonator_name ?? '');
 
 function handleStopImpersonate() {
-    stopImpersonate.post();
+    router.post('/stop-impersonate');
 }
 </script>
 
