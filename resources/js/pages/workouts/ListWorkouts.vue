@@ -11,6 +11,12 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -19,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
+import ViewWorkoutSheet from '@/pages/workouts/components/ViewWorkoutSheet.vue';
 import { destroy } from '@/routes/workouts';
 
 interface Client {
@@ -34,6 +41,12 @@ interface Exercise {
         id: number;
         name: string;
     } | null;
+}
+
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
 }
 
 interface WorkoutExercise {
@@ -81,6 +94,9 @@ const props = defineProps<{
     };
     exercises: {
         data: Exercise[];
+    };
+    categories: {
+        data: Category[];
     };
 }>();
 
@@ -144,6 +160,11 @@ const closeEditSheet = () => {
     isEditOpen.value = false;
 };
 
+const closeViewSheet = () => {
+    isViewOpen.value = false;
+    selectedWorkout.value = null;
+};
+
 defineOptions({
     layout: {
         breadcrumbs: [
@@ -189,6 +210,7 @@ defineOptions({
                     <CreateWorkoutSheet
                         :clients="clients.data"
                         :exercises="exercises.data"
+                        :categories="categories.data"
                         @close="closeCreateSheet"
                     />
                 </DialogContent>
@@ -215,29 +237,36 @@ defineOptions({
             </div>
         </div>
 
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-3">
             <div
                 v-for="workout in props.workouts.data"
                 :key="workout.id"
-                class="flex flex-col md:flex-row md:items-center md:justify-between rounded-lg border bg-neutral-100 dark:bg-neutral-900 p-4 cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+                class="group flex flex-col md:flex-row md:items-center md:justify-between rounded-xl border border-neutral-200 bg-white p-5 cursor-pointer transition-all hover:border-emerald-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
                 @click="handleViewClick(workout)"
             >
-                <div class="flex flex-col flex-1 mb-4 md:mb-0">
-                    <h3 class="font-semibold">{{ workout.name }}</h3>
-                    <p class="text-sm text-neutral-500">
-                        Aluno: {{ workout.client?.name || 'N/A' }}
-                        <span v-if="workout.exercises?.length">
-                            • {{ workout.exercises.length }} exercício(s)
+                <div class="flex flex-col flex-1 mb-3 md:mb-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">
+                            <Dumbbell class="h-4 w-4 text-white" />
+                        </div>
+                        <h3 class="font-semibold text-neutral-900 dark:text-white">{{ workout.name }}</h3>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 pl-10">
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                            {{ workout.client?.name || 'N/A' }}
+                        </p>
+                        <span v-if="workout.exercises?.length" class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                            {{ workout.exercises.length }} exercício(s)
                         </span>
-                    </p>
+                    </div>
                     <p
                         v-if="workout.description"
-                        class="text-sm text-neutral-600 dark:text-neutral-400 mt-2"
+                        class="text-sm text-neutral-500 dark:text-neutral-400 mt-2 pl-10 line-clamp-1"
                     >
                         {{ workout.description }}
                     </p>
                 </div>
-                <div class="flex flex-col md:flex-row gap-2">
+                <div class="flex flex-row md:flex-col gap-2 pl-10 md:pl-0">
                     <Button
                         size="sm"
                         variant="outline"
@@ -258,66 +287,26 @@ defineOptions({
 
         <div
             v-if="!props.workouts.data.length"
-            class="py-8 text-center text-neutral-500"
+            class="flex flex-col items-center justify-center py-12 text-center"
         >
-            Nenhum treino cadastrado
+            <Dumbbell class="mb-3 h-12 w-12 text-neutral-300 dark:text-neutral-600" />
+            <p class="text-neutral-500 dark:text-neutral-400">Nenhum treino cadastrado</p>
+            <p class="text-sm text-neutral-400 dark:text-neutral-500 mt-1">Clique em "Novo Treino" para começar</p>
         </div>
 
-        <Dialog v-model:open="isViewOpen">
-            <DialogContent class="max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>{{ selectedWorkout?.name }}</DialogTitle>
-                </DialogHeader>
+        <Sheet v-model:open="isViewOpen">
+            <SheetContent side="right" class="w-full sm:max-w-md p-0">
+                <SheetHeader class="sr-only">
+                    <SheetTitle>{{ selectedWorkout?.name }}</SheetTitle>
+                </SheetHeader>
 
-                <div v-if="selectedWorkout" class="space-y-4">
-                    <div>
-                        <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Aluno</h4>
-                        <p class="text-sm mt-1">{{ selectedWorkout.client?.name || 'N/A' }}</p>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400">Descrição</h4>
-                        <p class="text-sm mt-1">{{ selectedWorkout.description || 'Sem descrição' }}</p>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-sm text-neutral-500 dark:text-neutral-400 mb-2">Exercícios</h4>
-                        <div v-if="selectedWorkout.exercises?.length" class="space-y-2">
-                            <div
-                                v-for="exercise in selectedWorkout.exercises"
-                                :key="exercise.id"
-                                class="p-3 border rounded-lg"
-                            >
-                                <div class="flex items-center justify-between">
-                                    <span class="font-medium">{{ exercise.name }}</span>
-                                    <span class="text-xs text-neutral-500">
-                                        {{ exercise.category?.name || '' }}
-                                    </span>
-                                </div>
-                                <div class="grid grid-cols-3 gap-2 mt-2 text-sm">
-                                    <div>
-                                        <span class="text-neutral-500">Séries:</span>
-                                        <span class="ml-1">{{ exercise.pivot.sets }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-neutral-500">Reps:</span>
-                                        <span class="ml-1">{{ exercise.pivot.reps }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-neutral-500">Descanso:</span>
-                                        <span class="ml-1">{{ exercise.pivot.rest_seconds }}s</span>
-                                    </div>
-                                </div>
-                                <p v-if="exercise.pivot.notes" class="text-xs text-neutral-500 mt-1">
-                                    {{ exercise.pivot.notes }}
-                                </p>
-                            </div>
-                        </div>
-                        <p v-else class="text-sm text-neutral-500">Nenhum exercício adicionado</p>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+                <ViewWorkoutSheet
+                    v-if="selectedWorkout"
+                    :workout="selectedWorkout"
+                    @close="closeViewSheet"
+                />
+            </SheetContent>
+        </Sheet>
 
         <Dialog v-model:open="isEditOpen">
             <DialogContent class="max-h-[90vh] overflow-y-auto">

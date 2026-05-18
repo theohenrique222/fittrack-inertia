@@ -18,6 +18,7 @@ use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
 use App\Http\Controllers\Workouts\DestroyWorkoutController;
+use App\Http\Controllers\Workouts\GenerateWorkoutController;
 use App\Http\Controllers\Workouts\ListWorkoutsController;
 use App\Http\Controllers\Workouts\StoreWorkoutController;
 use App\Http\Controllers\Workouts\UpdateWorkoutController;
@@ -109,6 +110,10 @@ $router
 $router
     ->post(uri: '/workouts', action: StoreWorkoutController::class)
     ->name('workouts.store');
+
+$router
+    ->post(uri: '/workouts/generate', action: GenerateWorkoutController::class)
+    ->name('workouts.generate');
 
 $router
     ->put(uri: '/workouts/{workout}', action: UpdateWorkoutController::class)

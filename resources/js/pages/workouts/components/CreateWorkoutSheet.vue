@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { Plus, Trash2 } from 'lucide-vue-next';
+import { Dumbbell, Plus, Sparkles, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { store } from '@/routes/workouts';
+import { generate, store } from '@/routes/workouts';
 
 interface Client {
     id: number;
@@ -30,12 +30,21 @@ interface Exercise {
     } | null;
 }
 
-defineProps<{
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+const props = defineProps<{
     clients: Client[];
     exercises: Exercise[];
+    categories: Category[];
 }>();
 
 const emit = defineEmits(['close']);
+
+const mode = ref<'manual' | 'auto'>('auto');
 
 interface WorkoutExercise {
     exercise_id: number;
@@ -47,14 +56,25 @@ interface WorkoutExercise {
 }
 
 const workoutExercises = ref<WorkoutExercise[]>([]);
+const selectedCategoryIds = ref<number[]>([]);
 
 const form = useForm({
     name: '',
     description: '',
     client_id: '',
     exercises: [] as WorkoutExercise[],
+    category_ids: [] as number[],
     is_active: true,
 });
+
+function toggleCategory(categoryId: number) {
+    const index = selectedCategoryIds.value.indexOf(categoryId);
+    if (index === -1) {
+        selectedCategoryIds.value.push(categoryId);
+    } else {
+        selectedCategoryIds.value.splice(index, 1);
+    }
+}
 
 function addExercise() {
     workoutExercises.value.push({
@@ -75,34 +95,85 @@ function removeExercise(index: number) {
 }
 
 function handleSubmit() {
-    form.exercises = workoutExercises.value.filter((e) => e.exercise_id > 0);
+    if (mode.value === 'auto') {
+        if (selectedCategoryIds.value.length === 0) {
+            return;
+        }
 
-    if (form.exercises.length === 0) {
-        return;
+        form.category_ids = selectedCategoryIds.value;
+
+        form.post(generate.url(), {
+            onSuccess: () => {
+                form.reset();
+                selectedCategoryIds.value = [];
+                emit('close');
+            },
+        });
+    } else {
+        form.exercises = workoutExercises.value.filter((e) => e.exercise_id > 0);
+
+        if (form.exercises.length === 0) {
+            return;
+        }
+
+        form.post(store.url(), {
+            onSuccess: () => {
+                form.reset();
+                workoutExercises.value = [];
+                emit('close');
+            },
+        });
     }
-
-    form.post(store.url(), {
-        onSuccess: () => {
-            form.reset();
-            workoutExercises.value = [];
-            emit('close');
-        },
-    });
 }
 
 function handleCancel() {
     form.reset();
     workoutExercises.value = [];
+    selectedCategoryIds.value = [];
     emit('close');
+}
+
+function getCategoryName(exercise: Exercise): string {
+    return exercise.category?.name || '';
+}
+
+function getExercisesByCategory(categoryId: number): Exercise[] {
+    return props.exercises.filter((ex) => ex.category?.id === categoryId);
 }
 </script>
 
 <template>
     <form @submit.prevent="handleSubmit">
         <div>
+            <div class="mb-4">
+                <Label class="mb-2">Modo de Criação</Label>
+                <div class="flex gap-2">
+                    <Button
+                        type="button"
+                        :variant="mode === 'auto' ? 'default' : 'outline'"
+                        size="sm"
+                        class="flex-1"
+                        @click="mode = 'auto'"
+                    >
+                        <Sparkles class="w-4 h-4 mr-1" />
+                        Automático
+                    </Button>
+                    <Button
+                        type="button"
+                        :variant="mode === 'manual' ? 'default' : 'outline'"
+                        size="sm"
+                        class="flex-1"
+                        @click="mode = 'manual'"
+                    >
+                        <Dumbbell class="w-4 h-4 mr-1" />
+                        Manual
+                    </Button>
+                </div>
+            </div>
+
             <div class="mb-2">
                 <Label class="mb-2">Nome do Treino *</Label>
-                <Input v-model="form.name" type="text" />
+                <Input v-model="form.name" type="text" placeholder="Opcional no modo automático" />
                 <span v-if="form.errors.name" class="text-xs text-red-500">{{
                     form.errors.name
                 }}</span>
@@ -141,7 +212,33 @@ function handleCancel() {
                 >
             </div>
 
-            <div class="mb-2">
+            <div v-if="mode === 'auto'" class="mb-2">
+                <Label class="mb-2">Grupos Musculares *</Label>
+                <p class="text-xs text-neutral-500 mb-2">
+                    Selecione 1 ou mais grupos musculares. O treino será gerado automaticamente com exercícios variados.
+                </p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button
+                        v-for="category in categories"
+                        :key="category.id"
+                        type="button"
+                        @click="toggleCategory(category.id)"
+                        :class="[
+                            'px-3 py-2 rounded-lg text-sm border transition-all',
+                            selectedCategoryIds.includes(category.id)
+                                ? 'bg-blue-500 text-white border-blue-500'
+                                : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-blue-300',
+                        ]"
+                    >
+                        {{ category.name }}
+                    </button>
+                </div>
+                <div v-if="selectedCategoryIds.length > 0" class="mt-2 text-xs text-neutral-600 dark:text-neutral-400">
+                    {{ selectedCategoryIds.length }} grupo(s) selecionado(s)
+                </div>
+            </div>
+
+            <div v-if="mode === 'manual'" class="mb-2">
                 <div class="flex items-center justify-between mb-2">
                     <Label>Exercícios</Label>
                     <Button
@@ -194,6 +291,9 @@ function handleCancel() {
                                     :value="String(ex.id)"
                                 >
                                     {{ ex.name }}
+                                    <span v-if="ex.category" class="text-xs text-neutral-500">
+                                        ({{ ex.category.name }})
+                                    </span>
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -263,7 +363,7 @@ function handleCancel() {
                     class="w-1/2 cursor-pointer"
                     :disabled="form.processing"
                 >
-                    {{ form.processing ? 'Salvando...' : 'Salvar' }}
+                    {{ form.processing ? 'Salvando...' : (mode === 'auto' ? 'Gerar Treino' : 'Salvar') }}
                 </Button>
             </div>
         </div>

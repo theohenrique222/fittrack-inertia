@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Workouts;
 
 use App\Actions\Clients\ListClientsAction;
 use App\Actions\Exercises\ListExercisesAction;
+use App\Actions\Workouts\GenerateWorkoutAction;
 use App\Actions\Workouts\ListWorkoutsAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Workouts\GenerateWorkoutRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ClientResource;
 use App\Http\Resources\ExerciseResource;
@@ -14,15 +16,18 @@ use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ListWorkoutsController extends Controller
+class GenerateWorkoutController extends Controller
 {
     public function __invoke(
-        ListWorkoutsAction $action,
+        GenerateWorkoutRequest $request,
+        GenerateWorkoutAction $action,
         ListClientsAction $clientsAction,
         ListExercisesAction $exercisesAction
     ): Response {
-        $filters = request()->only(['search', 'client_id', 'is_active']);
-        $workouts = $action->execute($filters);
+        $validated = $request->validated();
+
+        $action->execute($validated);
+        $workouts = (new ListWorkoutsAction)->execute();
         $clients = $clientsAction->execute();
         $exercises = $exercisesAction->execute();
         $categories = Category::where('is_active', true)->orderBy('name')->get();
@@ -33,6 +38,6 @@ class ListWorkoutsController extends Controller
             'clients' => ClientResource::collection($clients),
             'exercises' => ExerciseResource::collection($exercises),
             'categories' => CategoryResource::collection($categories),
-        ]);
+        ])->with('success', 'Treino gerado automaticamente com sucesso');
     }
 }
