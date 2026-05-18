@@ -16,6 +16,7 @@ import { Head, router, usePage } from '@inertiajs/vue3';
 import {
     ChevronRight,
     Dumbbell,
+    Play,
     Plus,
     Search,
     Trophy,
@@ -34,6 +35,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
@@ -641,15 +648,15 @@ function getAvatarColor(id: number): string {
         </div>
     </div>
 
-    <Dialog v-model:open="isViewOpen">
-        <DialogContent class="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>{{ selectedExercise?.name }}</DialogTitle>
-            </DialogHeader>
+    <Sheet v-model:open="isViewOpen">
+        <SheetContent class="w-full sm:max-w-lg overflow-y-auto">
+            <SheetHeader class="px-6 pt-6 pb-4">
+                <SheetTitle class="text-xl">{{ selectedExercise?.name }}</SheetTitle>
+            </SheetHeader>
 
-            <div v-if="selectedExercise" class="space-y-4">
+            <div v-if="selectedExercise" class="px-6 pb-6 space-y-6">
                 <div
-                    class="h-48 w-full overflow-hidden rounded-lg bg-neutral-200 dark:bg-neutral-700"
+                    class="h-56 w-full overflow-hidden rounded-xl bg-neutral-200 dark:bg-neutral-700 shadow-md"
                 >
                     <img
                         :src="exerciseImageUrl"
@@ -664,49 +671,49 @@ function getAvatarColor(id: number): string {
 
                 <div>
                     <h4
-                        class="text-sm font-semibold text-neutral-500 dark:text-neutral-400"
+                        class="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
                     >
                         Descrição
                     </h4>
-                    <p class="mt-1 text-sm">
+                    <p class="mt-2 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
                         {{ selectedExercise.description || 'Sem descrição' }}
                     </p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
                         <h4
-                            class="text-sm font-semibold text-neutral-500 dark:text-neutral-400"
+                            class="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
                         >
                             Categoria
                         </h4>
-                        <p class="mt-1 text-sm">
+                        <p class="mt-1.5 text-sm font-medium text-neutral-900 dark:text-white">
                             {{
                                 selectedExercise.category?.name ||
                                 selectedExercise.muscle_group
                             }}
                         </p>
                     </div>
-                    <div>
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
                         <h4
-                            class="text-sm font-semibold text-neutral-500 dark:text-neutral-400"
+                            class="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
                         >
                             Equipamento
                         </h4>
-                        <p class="mt-1 text-sm">
+                        <p class="mt-1.5 text-sm font-medium text-neutral-900 dark:text-white">
                             {{ selectedExercise.equipment || 'Não informado' }}
                         </p>
                     </div>
-                    <div>
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
                         <h4
-                            class="text-sm font-semibold text-neutral-500 dark:text-neutral-400"
+                            class="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
                         >
                             Dificuldade
                         </h4>
-                        <p class="mt-1 text-sm">
+                        <p class="mt-1.5">
                             <span
                                 :class="[
-                                    'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
+                                    'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium',
                                     getDifficultyColor(
                                         selectedExercise.difficulty,
                                     ),
@@ -720,36 +727,65 @@ function getAvatarColor(id: number): string {
                             </span>
                         </p>
                     </div>
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
+                        <h4
+                            class="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
+                        >
+                            Grupo Muscular
+                        </h4>
+                        <p class="mt-1.5 text-sm font-medium text-neutral-900 dark:text-white capitalize">
+                            {{ selectedExercise.muscle_group || 'Não informado' }}
+                        </p>
+                    </div>
                 </div>
 
-                <div v-if="selectedExercise.instructions">
+                <div v-if="selectedExercise.instructions" class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/30">
                     <h4
-                        class="text-sm font-semibold text-neutral-500 dark:text-neutral-400"
+                        class="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300"
                     >
                         Instruções
                     </h4>
-                    <p class="mt-1 text-sm whitespace-pre-line">
+                    <p class="mt-2 text-sm leading-relaxed whitespace-pre-line text-emerald-900 dark:text-emerald-100">
                         {{ selectedExercise.instructions }}
                     </p>
                 </div>
 
-                <div v-if="selectedExercise.video_url">
-                    <h4
-                        class="text-sm font-semibold text-neutral-500 dark:text-neutral-400"
-                    >
-                        Vídeo
-                    </h4>
+                <div v-if="selectedExercise.video_url" class="flex items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
+                    <div>
+                        <h4 class="text-sm font-semibold text-neutral-900 dark:text-white">
+                            Vídeo Demonstrativo
+                        </h4>
+                        <p class="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
+                            Assista a demonstração completa
+                        </p>
+                    </div>
                     <a
                         :href="selectedExercise.video_url"
                         target="_blank"
-                        class="mt-1 text-sm text-emerald-600 hover:underline"
+                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
                     >
-                        Assistir vídeo
+                        <Play class="h-4 w-4" />
+                        Assistir
                     </a>
                 </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button
+                        @click="handleEditClick(selectedExercise)"
+                        class="flex-1 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                    >
+                        Editar Exercício
+                    </button>
+                    <button
+                        @click="handleDeleteClick(selectedExercise.id)"
+                        class="rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-neutral-800 dark:text-red-400 dark:hover:bg-red-950/30"
+                    >
+                        Excluir
+                    </button>
+                </div>
             </div>
-        </DialogContent>
-    </Dialog>
+        </SheetContent>
+    </Sheet>
 
     <Dialog v-model:open="isEditOpen">
         <DialogContent class="max-h-[90vh] overflow-y-auto">
