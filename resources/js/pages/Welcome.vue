@@ -223,7 +223,7 @@ const pricingPlans = [
                             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
                         </span>
-                        Now com sugestões de treinos com IA
+                        Agora com sugestões de treinos com IA
                     </div>
 
                     <h1 class="mb-6 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
@@ -265,7 +265,7 @@ const pricingPlans = [
                                     <div class="h-3 w-3 rounded-full bg-yellow-500"></div>
                                     <div class="h-3 w-3 rounded-full bg-green-500"></div>
                                 </div>
-                                <div class="flex-1 text-center text-xs text-muted-foreground">app.fittrack.io/dashboard</div>
+                                <div class="flex-1 text-center text-xs text-muted-foreground">http://fittrack.com.br</div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 bg-background p-6 md:grid-cols-3">
                                 <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
