@@ -1,70 +1,104 @@
-# FitTrack 🚀
+# FitTrack
 
------
+> Plataforma completa de gestão fitness para personal trainers e entusiastas. Monte treinos, planeje dietas e acompanhe seu progresso — tudo em uma interface moderna.
 
-#### FitTrack é um sistema web em desenvolvimento que será futuramente expandido para React Native, transformando-se em um app completo de personal trainer e nutrição.
+![FitTrack Landing](public/img/previews/landing-preview.png)
 
-#### O diferencial do FitTrack é que qualquer usuário pode utilizar o sistema, informando suas medidas corporais, que serão usadas para gerar cálculos de metabolismo basal, macronutrientes e dietas personalizadas, além de treinos gerados por inteligência artificial.
+![FitTrack Dashboard](public/img/previews/dashboard-preview.png)
 
------
+## Visão Geral
 
-### Tecnologias Utilizadas:
-- **Backend**: Laravel 13
-- **Frontend**: Vue 3 + TypeScript + Inertia.js
-- **Banco de Dados**: MySQL/PostgreSQL
-- **UI**: Tailwind CSS + ShadCN + Componentes customizados (Sheets, DataTables, Buttons)
-- **Autenticação**: Laravel Fortify
+FitTrack é uma aplicação web moderna projetada para ajudar personal trainers a gerenciar seus clientes e entusiastas fitness a acompanhar seu progresso. A plataforma calcula metabolismo basal, macronutrientes e gera dietas personalizadas e sugestões de treino com inteligência artificial.
 
------
+## Funcionalidades
 
-### Funcionalidades:
-- Cadastro, listagem, edição e exclusão de **Clientes** e **Treinadores**
-- Cálculo automático de metabolismo basal e macronutrientes baseado nas medidas do usuário
-- Geração automática de dietas e treinos personalizados via Inteligência Artificial
-- Interface dinâmica com DataTables, incluindo ações de **Editar** e **Deletar**
-- Formulários em Sheets/Modais para criação e edição de dados
-- Controle de roles e permissões para diferentes tipos de usuários
-- Código modular e escalável, seguindo padrões de **Clean Code**
+- **Gestão de Clientes** — Cadastro, listagem, edição e exclusão de clientes com perfil completo
+- **Cálculos Inteligentes** — Cálculo automático de metabolismo basal e macronutrientes baseado nas medidas corporais
+- **Treinos com IA** — Geração de planos de treino personalizados utilizando inteligência artificial
+- **Controle de Acesso** — Dashboards e permissões separados para treinadores e clientes
+- **Interface Moderna** — Tema escuro construído com Tailwind CSS e componentes ShadCN
+- **DataTables** — Tabelas de dados reutilizáveis com ações de edição e exclusão
+- **Formulários em Sheets** — Modais limpos para criação e edição de dados
 
------
+## Tecnologias
 
-### Estrutura do Projeto:
+| Categoria | Tecnologia |
+|-----------|------------|
+| **Backend** | Laravel 13, PHP 8.4 |
+| **Frontend** | Vue 3, TypeScript, Inertia.js v3 |
+| **Banco de Dados** | MySQL / PostgreSQL |
+| **UI** | Tailwind CSS v4, ShadCN Vue |
+| **Autenticação** | Laravel Fortify |
+| **Testes** | Pest v4 |
+
+## Estrutura do Projeto
+
+```
 app/
-├─ Actions/          # Lógica de negócio separada (Store, Update, Destroy)
-├─ Http/Controllers/ # Controllers organizados por módulo
-├─ Http/Resources/   # Transformação de dados via Resources
+├── Actions/              # Lógica de negócio (Store, Update, Destroy)
+── Http/Controllers/     # Controllers enxutos organizados por módulo
+├── Http/Resources/       # Transformação de dados via Resources
+├── Models/               # Models Eloquent
+└── Contexts/             # Ações específicas por domínio
+
 resources/js/
-├─ pages/            # Views do Inertia.js + Vue 3
-└─ components/       # Componentes reutilizáveis (DataTable, Sheet, Buttons)
+── pages/                # Páginas Inertia.js + Vue 3
+├── components/           # Componentes reutilizáveis (DataTable, Sheet, Buttons)
+└── layouts/              # Componentes de layout
+```
 
+## Instalação
 
------
+1. Clone o repositório:
+   ```bash
+   git clone <repo-url>
+   cd fittrack
+   ```
 
-### Instalação:
-1. Clone o repositório: `git clone <repo-url>`
-2. Acesse a pasta do projeto: `cd fittrack`
-3. Instale as dependências do backend: `composer install`
-4. Configure o arquivo `.env` com as credenciais do banco de dados
-5. Crie sua chave de aplicativo: `php artisan key:generate`
-6. Execute as migrações: `php artisan migrate`
-7. Instale as dependências do frontend: `npm install`
-8. Inicialize o servidor de desenvolvimento: `npm run dev` ou `php artisan serve`
-9. Acesse `http://localhost:8000` para visualizar o sistema
-10. Crie uma conta como super admin com o comando: `php artisan app:create-super-admin`
+2. Instale as dependências do backend:
+   ```bash
+   composer install
+   ```
 
------
+3. Configure o ambiente:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-### Padrão de Desenvolvimento
-- **Clean Code**: Separação de responsabilidades, tipagem e modularidade
-- **Actions**: Lógica de negócio isolada em classes específicas (Store, Update, Destroy)
-- **Inertia.js**: Comunicação fluida entre backend e frontend, sem necessidade de APIs REST
-- **Vue 3 + TypeScript**: Tipagem completa e reatividade com `<script setup>`
-- **DataTables e Sheets**: Componentes reutilizáveis e escaláveis para listas e formulários
-- **IA**: Integração futura para geração automática de treinos e dietas
+4. Execute as migrações:
+   ```bash
+   php artisan migrate
+   ```
 
------
+5. Instale as dependências do frontend:
+   ```bash
+   npm install
+   ```
 
-### Contato
-- **Desenvolvido** por *Theo Henrique*
-- 📧 Email: theodoro222@hotmail.com
-- 💼 LinkedIn: [linkedin.com/in/theohenrique](https://linkedin.com/in/theohenrique)
+6. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+
+7. Crie uma conta de super admin:
+   ```bash
+   php artisan app:create-super-admin
+   ```
+
+8. Acesse a aplicação em `http://localhost:8000`
+
+## Padrões de Desenvolvimento
+
+- **Padrão de Actions** — Lógica de negócio isolada em classes Action dedicadas
+- **Controllers Enxutos** — Controllers delegam para Actions, mantendo-se mínimos
+- **Clean Code** — Nomenclatura clara, separação de responsabilidades e tipagem
+- **Inertia.js** — Comunicação fluida entre backend e frontend sem APIs REST
+- **Vue 3 Composition API** — Componentes reativos com `<script setup>` e TypeScript
+
+## Autor
+
+**Theo Henrique**
+
+- 📧 theodoro222@hotmail.com
+- 💼 [linkedin.com/in/theohenrique](https://linkedin.com/in/theohenrique)
