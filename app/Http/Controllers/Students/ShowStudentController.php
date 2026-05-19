@@ -18,6 +18,7 @@ class ShowStudentController extends Controller
             'title' => 'Aluno - '.$data['student']['name'],
             'student' => $data['student'],
             'workout' => $data['workout'],
+            'stats' => $data['stats'],
         ]);
     }
 }
