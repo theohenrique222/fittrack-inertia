@@ -13,5 +13,5 @@ defineProps<Props>();
 </script>
 
 <template>
-    <img src="logo.png" alt="logo" class="rounded-md">
+    <img src="/logo.png" alt="logo" class="rounded-md">
 </template>

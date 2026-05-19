@@ -26,9 +26,13 @@ import {
     Activity,
     TrendingUp,
     Clock,
+    ChevronRight,
+    Search,
+    Plus,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
     DropdownMenu,
@@ -37,14 +41,21 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import {
     Sheet,
     SheetContent,
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
 import { router } from '@inertiajs/vue3';
-import { destroy, resetPassword, workouts as studentsWorkouts } from '@/routes/students';
+import { destroy, resetPassword } from '@/routes/students';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
+import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
 
 interface Student {
     id: number;
@@ -89,6 +100,8 @@ interface Workout {
     name: string;
     description?: string;
     is_active: boolean;
+    client_id?: number;
+    student_id?: number;
     exercises?: Exercise[];
     created_at?: string;
 }
@@ -104,14 +117,29 @@ const props = defineProps<{
     title: string;
     student: Student;
     workout: Workout | null;
+    workouts: { data: Workout[] };
     stats: Stats;
     exercises: { data: ExerciseOption[] };
     categories: { data: CategoryOption[] };
 }>();
 
 const isCreateOpen = ref(false);
+const isEditOpen = ref(false);
+const searchQuery = ref('');
+const selectedWorkout = ref<Workout | null>(null);
 
 const activeTab = ref<'overview' | 'workout' | 'history'>('overview');
+
+const filteredWorkouts = computed(() => {
+    if (!searchQuery.value) return props.workouts.data;
+
+    const query = searchQuery.value.toLowerCase();
+    return props.workouts.data.filter(
+        (w) =>
+            w.name.toLowerCase().includes(query) ||
+            w.description?.toLowerCase().includes(query),
+    );
+});
 
 const tabs = computed(() => [
     { id: 'overview' as const, label: 'Visão Geral' },
@@ -156,6 +184,19 @@ function handleResetPassword() {
     }
 
     router.post(resetPassword.url({ student: props.student.id }));
+}
+
+function handleEditWorkout(workout: Workout) {
+    selectedWorkout.value = {
+        ...workout,
+        student_id: workout.client_id || props.student.id,
+    };
+    isEditOpen.value = true;
+}
+
+function closeEditSheet() {
+    isEditOpen.value = false;
+    selectedWorkout.value = null;
 }
 
 const avatarColors = [
@@ -217,10 +258,10 @@ function getAvatarColor(id: number): string {
                         v-if="student?.id"
                         variant="default"
                         class="bg-emerald-500 text-white hover:bg-emerald-600"
-                        @click="isCreateOpen = true"
+                        @click="workout ? handleEditWorkout(workout) : isCreateOpen = true"
                     >
                         <Dumbbell class="mr-2 h-4 w-4" />
-                        Novo Treino
+                        {{ workout ? 'Atualizar Treino' : 'Novo Treino' }}
                     </Button>
 
                     <DropdownMenu>
@@ -333,9 +374,20 @@ function getAvatarColor(id: number): string {
                                 </p>
                             </div>
                         </div>
-                        <Badge class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                            Ativo
-                        </Badge>
+                        <div class="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                                @click="handleEditWorkout(workout)"
+                            >
+                                <Edit class="mr-1.5 h-3.5 w-3.5" />
+                                Editar
+                            </Button>
+                            <Badge class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                                Ativo
+                            </Badge>
+                        </div>
                     </div>
                 </div>
 
@@ -389,10 +441,9 @@ function getAvatarColor(id: number): string {
 
                 <div class="border-t border-neutral-200 bg-neutral-50 px-6 py-4 dark:border-neutral-700 dark:bg-neutral-900/50">
                     <Button
-                        v-if="student?.id"
                         variant="default"
                         class="w-full bg-emerald-500 text-white hover:bg-emerald-600"
-                        @click="router.visit(studentsWorkouts.url({ student: student.id }))"
+                        @click="activeTab = 'workout'"
                     >
                         <Play class="mr-2 h-4 w-4" />
                         Ver Treino Completo
@@ -410,10 +461,11 @@ function getAvatarColor(id: number): string {
                 </p>
                 <Button
                     v-if="student?.id"
-                    class="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
+                    size="lg"
+                    class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
                     @click="isCreateOpen = true"
                 >
-                    <Dumbbell class="mr-2 h-4 w-4" />
+                    <Plus class="mr-2 h-5 w-5" />
                     Criar Primeiro Treino
                 </Button>
             </div>
@@ -435,9 +487,20 @@ function getAvatarColor(id: number): string {
                                 </p>
                             </div>
                         </div>
-                        <Badge class="bg-emerald-500 text-white">
-                            Ativo
-                        </Badge>
+                        <div class="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                                @click="handleEditWorkout(workout)"
+                            >
+                                <Edit class="mr-1.5 h-3.5 w-3.5" />
+                                Editar Treino
+                            </Button>
+                            <Badge class="bg-emerald-500 text-white">
+                                Ativo
+                            </Badge>
+                        </div>
                     </div>
                 </div>
 
@@ -501,10 +564,11 @@ function getAvatarColor(id: number): string {
                 </p>
                 <Button
                     v-if="student?.id"
-                    class="mt-6 bg-emerald-500 px-6 text-white hover:bg-emerald-600"
+                    size="lg"
+                    class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
                     @click="isCreateOpen = true"
                 >
-                    <Dumbbell class="mr-2 h-4 w-4" />
+                    <Plus class="mr-2 h-5 w-5" />
                     Criar Treino
                 </Button>
             </div>
@@ -512,14 +576,74 @@ function getAvatarColor(id: number): string {
 
         <!-- Tab Content: Histórico -->
         <div v-if="activeTab === 'history'" class="space-y-4">
-            <div class="rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <Clock class="h-8 w-8 text-neutral-400" />
+            <div class="relative">
+                <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Input
+                    v-model="searchQuery"
+                    placeholder="Buscar treino..."
+                    class="pl-9 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700"
+                />
+            </div>
+
+            <div v-if="filteredWorkouts.length > 0" class="space-y-3">
+                <div
+                    v-for="workout in filteredWorkouts"
+                    :key="workout.id"
+                    class="group bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden transition-all hover:border-emerald-300 hover:shadow-lg dark:hover:border-emerald-600"
+                >
+                    <div
+                        class="flex items-center gap-4 p-4 cursor-pointer"
+                        @click="activeTab = 'workout'"
+                    >
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-bold text-sm shadow-sm">
+                            {{ (workout.exercises?.length || 0).toString().padStart(2, '0') }}
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-semibold text-neutral-900 dark:text-white truncate">{{ workout.name }}</h3>
+                                <span
+                                    v-if="workout.is_active"
+                                    class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                >
+                                    Ativo
+                                </span>
+                            </div>
+                            <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">
+                                {{ workout.description }}
+                            </p>
+                            <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+                                {{ workout.exercises?.length || 0 }} exercícios
+                            </p>
+                        </div>
+
+                        <ChevronRight class="h-5 w-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors shrink-0" />
+                    </div>
                 </div>
-                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Histórico em breve</h3>
-                <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                    O histórico de treinos e progresso estará disponível em breve
+            </div>
+
+            <div
+                v-else
+                class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-16 text-center dark:border-neutral-700 dark:bg-neutral-900/50"
+            >
+                <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
+                    <Dumbbell class="h-8 w-8 text-neutral-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                    {{ searchQuery ? 'Nenhum treino encontrado' : 'Nenhum treino cadastrado' }}
+                </h3>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    {{ searchQuery ? 'Tente buscar com outros termos' : 'Crie o primeiro treino do aluno' }}
                 </p>
+                <Button
+                    v-if="student?.id && !searchQuery"
+                    size="lg"
+                    class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
+                    @click="isCreateOpen = true"
+                >
+                    <Plus class="mr-2 h-5 w-5" />
+                    Criar Primeiro Treino
+                </Button>
             </div>
         </div>
     </div>
@@ -540,4 +664,20 @@ function getAvatarColor(id: number): string {
             />
         </SheetContent>
     </Sheet>
+
+    <Dialog v-model:open="isEditOpen">
+        <DialogContent class="max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+                <DialogTitle>Editar Treino</DialogTitle>
+            </DialogHeader>
+
+            <EditWorkoutSheet
+                v-if="selectedWorkout && student"
+                :workout="selectedWorkout"
+                :student="student"
+                :exercises="exercises.data"
+                @close="closeEditSheet"
+            />
+        </DialogContent>
+    </Dialog>
 </template>

@@ -27,6 +27,7 @@ class ShowStudentController extends Controller
             'title' => 'Aluno - '.$data['student']['name'],
             'student' => $data['student'],
             'workout' => $data['workout'],
+            'workouts' => $data['workouts'],
             'stats' => $data['stats'],
             'exercises' => ExerciseResource::collection($exercises),
             'categories' => CategoryResource::collection($categories),

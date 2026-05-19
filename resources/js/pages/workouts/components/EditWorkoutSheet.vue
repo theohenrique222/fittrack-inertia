@@ -43,7 +43,8 @@ interface Workout {
     id: number;
     name: string;
     description?: string;
-    student_id: number;
+    student_id?: number;
+    client_id?: number;
     is_active: boolean;
     exercises?: {
         id: number;
@@ -82,7 +83,7 @@ const workoutExercises = ref<WorkoutExercise[]>(
 const form = useForm({
     name: props.workout.name,
     description: props.workout.description || '',
-    student_id: String(props.workout.student_id),
+    student_id: String(props.workout.student_id || props.workout.client_id || ''),
     exercises: [] as WorkoutExercise[],
     is_active: props.workout.is_active,
 });

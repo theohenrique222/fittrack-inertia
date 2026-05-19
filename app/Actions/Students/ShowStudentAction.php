@@ -11,7 +11,7 @@ class ShowStudentAction
 {
     public function execute(Client $student): array
     {
-        $student->load(['user', 'workouts.exercises.category']);
+        $student->loadMissing(['user', 'workouts.exercises.category']);
 
         $activeWorkout = $student->workouts
             ->where('is_active', true)
@@ -23,6 +23,7 @@ class ShowStudentAction
         return [
             'student' => new StudentResource($student),
             'workout' => $activeWorkout ? new WorkoutResource($activeWorkout) : null,
+            'workouts' => WorkoutResource::collection($student->workouts->sortByDesc('created_at')),
             'stats' => [
                 'total_workouts' => $totalWorkouts,
                 'active_workouts' => $activeWorkoutsCount,

@@ -22,7 +22,6 @@ use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
 use App\Http\Controllers\Workouts\DestroyWorkoutController;
 use App\Http\Controllers\Workouts\GenerateWorkoutController;
-use App\Http\Controllers\Workouts\ListWorkoutsController;
 use App\Http\Controllers\Workouts\StoreWorkoutController;
 use App\Http\Controllers\Workouts\UpdateWorkoutController;
 use Illuminate\Routing\Router;
@@ -121,7 +120,7 @@ $router
     ->middleware('auth');
 
 $router
-    ->get(uri: '/students/{student}/workouts', action: ListWorkoutsController::class)
+    ->redirect(uri: '/students/{student}/workouts', destination: '/students/{student}')
     ->name('students.workouts')
     ->middleware('auth');
 
