@@ -71,7 +71,7 @@ const selectedCategoryIds = ref<number[]>([]);
 const form = useForm({
     name: '',
     description: '',
-    client_id: props.student.id,
+    client_id: 0 as number,
     exercises: [] as WorkoutExercise[],
     category_ids: [] as number[],
     is_active: true,
@@ -114,19 +114,34 @@ function handleSubmit() {
             }
             selectedCategoryIds.value = [];
             emit('close');
-            if (props.redirectOnSuccess) {
-                window.location.href = props.redirectOnSuccess;
-            }
+        },
+        onError: (errors) => {
+            console.error('Validation errors:', errors);
         },
     };
 
+    console.log('handleSubmit called, mode:', mode.value);
+    console.log('props.student:', JSON.stringify(props.student));
+    console.log('props.student.id:', props.student?.id);
+    console.log('selectedCategoryIds:', selectedCategoryIds.value);
+    console.log('workoutExercises:', workoutExercises.value);
+
+    if (props.student?.id) {
+        form.client_id = props.student.id;
+    } else {
+        console.error('Student ID is missing!');
+        return;
+    }
+
     if (mode.value === 'auto') {
         if (selectedCategoryIds.value.length === 0) {
+            console.warn('No categories selected');
             return;
         }
 
         form.category_ids = selectedCategoryIds.value;
 
+        console.log('Submitting to generate:', form.data());
         form.post(generate.url(), submitOptions);
     } else {
         form.exercises = workoutExercises.value.filter(
@@ -134,9 +149,11 @@ function handleSubmit() {
         );
 
         if (form.exercises.length === 0) {
+            console.warn('No valid exercises');
             return;
         }
 
+        console.log('Submitting to store:', form.data());
         form.post(store.url(), submitOptions);
     }
 }
