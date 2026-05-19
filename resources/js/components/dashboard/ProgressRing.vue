@@ -14,7 +14,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const radius = (props.size - props.strokeWidth) / 2;
 const circumference = 2 * Math.PI * radius;
-const offset = circumference - (props.percentage / 100) * circumference;
+const validPercentage = Math.min(Math.max(props.percentage, 0), 100);
+const offset = circumference - (validPercentage / 100) * circumference;
 </script>
 
 <template>

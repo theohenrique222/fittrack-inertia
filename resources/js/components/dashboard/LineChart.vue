@@ -8,18 +8,22 @@ const props = withDefaults(defineProps<Props>(), {
     height: 200,
 });
 
-const maxStudents = Math.max(...props.data.map((d) => d.students));
-const maxWorkouts = Math.max(...props.data.map((d) => d.workouts));
+const maxStudents = Math.max(...props.data.map((d) => d.students), 1);
+const maxWorkouts = Math.max(...props.data.map((d) => d.workouts), 1);
 const width = 600;
 const chartHeight = props.height;
 
-const studentsPoints = props.data
-    .map((d, i) => `${(i / (props.data.length - 1)) * width},${chartHeight - (d.students / maxStudents) * (chartHeight - 40) - 20}`)
-    .join(' ');
+const studentsPoints = props.data.length > 1
+    ? props.data
+        .map((d, i) => `${(i / (props.data.length - 1)) * width},${chartHeight - (d.students / maxStudents) * (chartHeight - 40) - 20}`)
+        .join(' ')
+    : '';
 
-const workoutsPoints = props.data
-    .map((d, i) => `${(i / (props.data.length - 1)) * width},${chartHeight - (d.workouts / maxWorkouts) * (chartHeight - 40) - 20}`)
-    .join(' ');
+const workoutsPoints = props.data.length > 1
+    ? props.data
+        .map((d, i) => `${(i / (props.data.length - 1)) * width},${chartHeight - (d.workouts / maxWorkouts) * (chartHeight - 40) - 20}`)
+        .join(' ')
+    : '';
 </script>
 
 <template>

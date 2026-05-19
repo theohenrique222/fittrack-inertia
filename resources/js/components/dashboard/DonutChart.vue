@@ -10,11 +10,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const total = props.data.reduce((sum, d) => sum + d.value, 0);
 const radius = (props.size - 20) / 2;
-const circumference = 2 * Math.PI * radius;
+const circumference = total > 0 ? 2 * Math.PI * radius : 0;
 
 let cumulativePercent = 0;
 const segments = props.data.map((d) => {
-    const percent = d.value / total;
+    const percent = total > 0 ? d.value / total : 0;
     const offset = circumference * (1 - cumulativePercent);
     cumulativePercent += percent;
 
