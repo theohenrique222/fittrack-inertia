@@ -33,19 +33,19 @@ class DestroyWorkoutController extends Controller
             abort(403, 'Você não tem permissão para deletar este treino.');
         }
 
-        $clientId = $workout->client_id;
+        $studentId = $workout->client_id;
         $action->execute($workout);
         $workouts = (new ListWorkoutsAction)->execute(['trainer_id' => Auth::id()]);
         $students = $studentsAction->execute();
         $exercises = $exercisesAction->execute();
         $categories = Category::where('is_active', true)->orderBy('name')->get();
 
-        $client = Client::with('user')->find($clientId);
+        $student = Client::with('user')->find($studentId);
 
         return Inertia::render('workouts/ListWorkouts', [
             'title' => 'Treinos',
-            'clientId' => $client?->id,
-            'student' => $client ? new StudentResource($client) : null,
+            'studentId' => $student?->id,
+            'student' => $student ? new StudentResource($student) : null,
             'workouts' => WorkoutResource::collection($workouts),
             'students' => StudentResource::collection($students),
             'exercises' => ExerciseResource::collection($exercises),

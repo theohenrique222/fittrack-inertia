@@ -26,7 +26,7 @@ class AuthServiceProvider extends ServiceProvider
             return $user?->role === UserRole::SELF;
         });
 
-        Gate::define('create-client', function ($user) {
+        Gate::define('create-student', function ($user) {
             return $user?->role === UserRole::PERSONAL;
         });
 

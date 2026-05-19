@@ -11,7 +11,7 @@ import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 interface Props {
     stats: {
         totalUsers: number;
-        totalClients: number;
+        totalStudents: number;
         totalTrainers: number;
         totalExercises: number;
     };
@@ -19,7 +19,7 @@ interface Props {
     monthlyGrowth: { month: string; users: number; trainers: number }[];
     systemActivity: { day: string; logins: number; registrations: number }[];
     recentUsers: { id: number; name: string; email: string; role: string; created_at: string | null }[];
-    topTrainers: { name: string; clients: number; specialty: string; rating: number }[];
+    topTrainers: { name: string; students: number; specialty: string; rating: number }[];
     platformMetrics: { label: string; value: string; change: string; trend: string }[];
     quickActions: { label: string; route: string; icon: string }[];
 }
@@ -313,7 +313,7 @@ const activityChartData = computed(() => {
                                 <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">{{ trainer.rating }}</span>
                             </div>
                             <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium">
-                                {{ trainer.clients }} clientes
+                                {{ trainer.students }} alunos
                             </span>
                         </div>
                     </div>

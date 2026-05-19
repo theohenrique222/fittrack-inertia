@@ -70,14 +70,10 @@ const selectedCategoryIds = ref<number[]>([]);
 const form = useForm({
     name: '',
     description: '',
-    client_id: String(props.student.id),
+    student_id: String(props.student.id),
     exercises: [] as WorkoutExercise[],
     category_ids: [] as number[],
     is_active: true,
-});
-
-const selectedStudentName = computed(() => {
-    return props.student.name;
 });
 
 function toggleCategory(categoryId: number) {

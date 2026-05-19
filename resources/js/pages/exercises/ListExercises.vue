@@ -35,13 +35,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CreateExerciseSheet from '@/pages/exercises/components/CreateExerciseSheet.vue';

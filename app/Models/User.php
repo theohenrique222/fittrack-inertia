@@ -43,7 +43,7 @@ class User extends Authenticatable
         return $this->role === UserRole::PERSONAL;
     }
 
-    public function isClient(): bool
+    public function isStudent(): bool
     {
         return $this->role === UserRole::CLIENT;
     }
@@ -58,7 +58,7 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'trainer_id');
     }
 
-    public function clients(): HasMany
+    public function students(): HasMany
     {
         return $this->hasMany(User::class, 'trainer_id');
     }

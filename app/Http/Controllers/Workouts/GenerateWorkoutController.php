@@ -31,12 +31,12 @@ class GenerateWorkoutController extends Controller
         $user = Auth::user();
 
         if ($user?->role !== UserRole::ADMIN) {
-            $clientId = $validated['client_id'];
-            $clientOwnsWorkout = Client::where('id', $clientId)
+            $studentId = $validated['client_id'];
+            $studentOwnsWorkout = Client::where('id', $studentId)
                 ->whereHas('user', fn ($q) => $q->where('trainer_id', $user?->id))
                 ->exists();
 
-            if (! $clientOwnsWorkout) {
+            if (! $studentOwnsWorkout) {
                 abort(403, 'Você não tem permissão para gerar treinos para este aluno.');
             }
         }
@@ -47,12 +47,12 @@ class GenerateWorkoutController extends Controller
         $exercises = $exercisesAction->execute();
         $categories = Category::where('is_active', true)->orderBy('name')->get();
 
-        $client = Client::with('user')->find($validated['client_id']);
+        $student = Client::with('user')->find($validated['client_id']);
 
         return Inertia::render('workouts/ListWorkouts', [
             'title' => 'Treinos',
-            'clientId' => $client?->id,
-            'student' => $client ? new StudentResource($client) : null,
+            'studentId' => $student?->id,
+            'student' => $student ? new StudentResource($student) : null,
             'workouts' => WorkoutResource::collection($workouts),
             'students' => StudentResource::collection($students),
             'exercises' => ExerciseResource::collection($exercises),

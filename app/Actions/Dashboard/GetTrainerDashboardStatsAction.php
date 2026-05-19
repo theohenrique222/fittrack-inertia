@@ -19,12 +19,12 @@ class GetTrainerDashboardStatsAction
             ->latest()
             ->take(5)
             ->get()
-            ->map(fn ($client) => [
-                'id' => $client->id,
-                'name' => $client->user?->name ?? 'Sem nome',
-                'email' => $client->user?->email ?? '',
-                'nickname' => $client->nickname,
-                'created_at' => $client->created_at?->format('d/m/Y'),
+            ->map(fn ($student) => [
+                'id' => $student->id,
+                'name' => $student->user?->name ?? 'Sem nome',
+                'email' => $student->user?->email ?? '',
+                'nickname' => $student->nickname,
+                'created_at' => $student->created_at?->format('d/m/Y'),
             ]);
 
         $weeklyActivity = $this->generateWeeklyActivity();
@@ -78,12 +78,12 @@ class GetTrainerDashboardStatsAction
     private function generateMonthlyGrowth(): array
     {
         $months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        $clients = [4, 6, 8, 12, 15, 18, 22, 28, 32, 38, 42, 48];
+        $students = [4, 6, 8, 12, 15, 18, 22, 28, 32, 38, 42, 48];
         $workouts = [20, 35, 45, 60, 75, 90, 110, 135, 155, 180, 200, 230];
 
         return collect($months)->map(fn ($month, $i) => [
             'month' => $month,
-            'clients' => $clients[$i],
+            'students' => $students[$i],
             'workouts' => $workouts[$i],
         ])->all();
     }
@@ -92,25 +92,25 @@ class GetTrainerDashboardStatsAction
     {
         return [
             [
-                'client' => 'João Silva',
+                'student' => 'João Silva',
                 'type' => 'Treino A - Peito & Tríceps',
                 'time' => '08:00',
                 'status' => 'scheduled',
             ],
             [
-                'client' => 'Maria Santos',
+                'student' => 'Maria Santos',
                 'type' => 'Treino B - Costas & Bíceps',
                 'time' => '10:00',
                 'status' => 'scheduled',
             ],
             [
-                'client' => 'Pedro Oliveira',
+                'student' => 'Pedro Oliveira',
                 'type' => 'Treino C - Pernas',
                 'time' => '14:00',
                 'status' => 'scheduled',
             ],
             [
-                'client' => 'Ana Costa',
+                'student' => 'Ana Costa',
                 'type' => 'Treino D - Ombros & Core',
                 'time' => '16:00',
                 'status' => 'scheduled',

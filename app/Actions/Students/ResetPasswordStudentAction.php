@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Hash;
 
 class ResetPasswordStudentAction
 {
-    public function execute(Client $client): void
+    public function execute(Client $student): void
     {
-        $client->user()->update([
+        $student->user()->update([
             'password' => Hash::make('password'),
         ]);
     }

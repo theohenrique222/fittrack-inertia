@@ -18,12 +18,12 @@ class StoreWorkoutRequest extends FormRequest
             return true;
         }
 
-        $clientId = $this->input('client_id');
-        if (! $clientId) {
+        $studentId = $this->input('client_id');
+        if (! $studentId) {
             return false;
         }
 
-        return Client::where('id', $clientId)
+        return Client::where('id', $studentId)
             ->whereHas('user', fn ($q) => $q->where('trainer_id', $user?->id))
             ->exists();
     }

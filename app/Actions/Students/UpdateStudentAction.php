@@ -7,19 +7,19 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateStudentAction
 {
-    public function execute(Client $client, array $data): Client
+    public function execute(Client $student, array $data): Client
     {
-        return DB::transaction(function () use ($client, $data) {
-            $client->update([
-                'nickname' => $data['nickname'] ?? $client->nickname,
+        return DB::transaction(function () use ($student, $data) {
+            $student->update([
+                'nickname' => $data['nickname'] ?? $student->nickname,
             ]);
 
-            $client->user()->update([
-                'name' => $data['name'] ?? $client->user->name,
-                'email' => $data['email'] ?? $client->user->email,
+            $student->user()->update([
+                'name' => $data['name'] ?? $student->user->name,
+                'email' => $data['email'] ?? $student->user->email,
             ]);
 
-            return $client->fresh(['user']);
+            return $student->fresh(['user']);
         });
     }
 }

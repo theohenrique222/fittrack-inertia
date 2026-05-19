@@ -55,7 +55,7 @@ const props = defineProps<{
 const page = usePage();
 const { toasts, success, error } = useToast();
 
-const canCreateStudent = page.props.auth.can.create_client;
+const canCreateStudent = page.props.auth.can.create_student;
 
 const searchQuery = ref('');
 
@@ -123,7 +123,7 @@ const handleResetPasswordClick = (id: number) => {
 
 const handleCreateWorkoutClick = (id: number, event: Event) => {
     event.stopPropagation();
-    router.visit(`/workouts?client_id=${id}&create=true`);
+    router.visit(`/workouts?student_id=${id}&create=true`);
 };
 
 const closeCreateSheet = () => {

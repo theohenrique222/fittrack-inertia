@@ -22,27 +22,27 @@ class ListWorkoutsController extends Controller
         ListWorkoutsAction $action,
         ListExercisesAction $exercisesAction
     ): Response {
-        $clientId = request()->query('client_id');
+        $studentId = request()->query('student_id');
 
-        if (! $clientId) {
+        if (! $studentId) {
             abort(403, 'Selecione um aluno para visualizar os treinos.');
         }
 
-        $client = Client::with('user')->find($clientId);
+        $student = Client::with('user')->find($studentId);
 
-        if (! $client) {
+        if (! $student) {
             abort(404, 'Aluno não encontrado.');
         }
 
         $user = Auth::user();
 
-        if ($user?->role !== UserRole::ADMIN && $client->user?->trainer_id !== $user?->id) {
+        if ($user?->role !== UserRole::ADMIN && $student->user?->trainer_id !== $user?->id) {
             abort(403, 'Você não tem permissão para visualizar os treinos deste aluno.');
         }
 
         $filters = request()->only(['search', 'is_active']);
         $filters['trainer_id'] = Auth::id();
-        $filters['client_id'] = $clientId;
+        $filters['client_id'] = $studentId;
 
         $workouts = $action->execute($filters);
         $exercises = $exercisesAction->execute();
@@ -50,8 +50,8 @@ class ListWorkoutsController extends Controller
 
         return Inertia::render('workouts/ListWorkouts', [
             'title' => 'Treinos',
-            'clientId' => (int) $clientId,
-            'student' => new StudentResource($client),
+            'studentId' => (int) $studentId,
+            'student' => new StudentResource($student),
             'workouts' => WorkoutResource::collection($workouts),
             'exercises' => ExerciseResource::collection($exercises),
             'categories' => CategoryResource::collection($categories),

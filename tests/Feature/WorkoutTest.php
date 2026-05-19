@@ -30,32 +30,32 @@ class WorkoutTest extends TestCase
     public function test_workout_model_can_be_created(): void
     {
         $user = User::factory()->create();
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
 
         $workout = Workout::create([
             'name' => 'Treino A - Peito & Tríceps',
             'slug' => 'treino-a-peito-triceps',
             'description' => 'Treino focado em peito e tríceps',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
 
         $this->assertInstanceOf(Workout::class, $workout);
         $this->assertEquals('Treino A - Peito & Tríceps', $workout->name);
-        $this->assertEquals($client->id, $workout->client_id);
+        $this->assertEquals($student->id, $workout->client_id);
         $this->assertEquals($user->id, $workout->trainer_id);
     }
 
     public function test_workout_can_be_updated(): void
     {
         $user = User::factory()->create();
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
 
         $workout = Workout::create([
             'name' => 'Treino A',
             'slug' => 'treino-a',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
@@ -72,12 +72,12 @@ class WorkoutTest extends TestCase
     public function test_workout_can_be_deleted(): void
     {
         $user = User::factory()->create();
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
 
         $workout = Workout::create([
             'name' => 'Treino B',
             'slug' => 'treino-b',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
@@ -108,12 +108,12 @@ class WorkoutTest extends TestCase
     public function test_workout_is_active_casts_to_boolean(): void
     {
         $user = User::factory()->create();
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
 
         $workout = Workout::create([
             'name' => 'Treino C',
             'slug' => 'treino-c',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => 1,
         ]);
@@ -122,32 +122,32 @@ class WorkoutTest extends TestCase
         $this->assertTrue($workout->is_active);
     }
 
-    public function test_workout_belongs_to_client(): void
+    public function test_workout_belongs_to_student(): void
     {
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
         $user = User::factory()->create();
 
         $workout = Workout::create([
             'name' => 'Treino D',
             'slug' => 'treino-d',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
 
         $this->assertInstanceOf(Client::class, $workout->client);
-        $this->assertEquals($client->id, $workout->client->id);
+        $this->assertEquals($student->id, $workout->client->id);
     }
 
     public function test_workout_belongs_to_trainer(): void
     {
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
         $user = User::factory()->create();
 
         $workout = Workout::create([
             'name' => 'Treino E',
             'slug' => 'treino-e',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
@@ -159,7 +159,7 @@ class WorkoutTest extends TestCase
     public function test_workout_can_have_exercises(): void
     {
         $user = User::factory()->create();
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
         $category = Category::factory()->create();
 
         $exercise1 = Exercise::create([
@@ -181,7 +181,7 @@ class WorkoutTest extends TestCase
         $workout = Workout::create([
             'name' => 'Treino F',
             'slug' => 'treino-f',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
@@ -208,7 +208,7 @@ class WorkoutTest extends TestCase
     public function test_exercise_workout_pivot_has_correct_data(): void
     {
         $user = User::factory()->create();
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
         $category = Category::factory()->create();
 
         $exercise = Exercise::create([
@@ -222,7 +222,7 @@ class WorkoutTest extends TestCase
         $workout = Workout::create([
             'name' => 'Treino G',
             'slug' => 'treino-g',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
@@ -246,15 +246,15 @@ class WorkoutTest extends TestCase
         $this->assertEquals('Foco na contração', $pivot->notes);
     }
 
-    public function test_client_has_workouts_relationship(): void
+    public function test_student_has_workouts_relationship(): void
     {
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
         $user = User::factory()->create();
 
         Workout::create([
             'name' => 'Treino H',
             'slug' => 'treino-h',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
@@ -262,23 +262,23 @@ class WorkoutTest extends TestCase
         Workout::create([
             'name' => 'Treino I',
             'slug' => 'treino-i',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);
 
-        $this->assertEquals(2, $client->workouts->count());
+        $this->assertEquals(2, $student->workouts->count());
     }
 
     public function test_trainer_has_workouts_relationship(): void
     {
-        $client = Client::factory()->create();
+        $student = Client::factory()->create();
         $user = User::factory()->create();
 
         Workout::create([
             'name' => 'Treino J',
             'slug' => 'treino-j',
-            'client_id' => $client->id,
+            'client_id' => $student->id,
             'trainer_id' => $user->id,
             'is_active' => true,
         ]);

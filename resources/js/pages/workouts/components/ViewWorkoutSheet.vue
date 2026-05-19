@@ -21,12 +21,12 @@ interface Workout {
     id: number;
     name: string;
     description?: string;
-    client?: {
+    student?: {
         id: number;
         name: string;
         nickname?: string;
     };
-    client_id: number;
+    student_id: number;
     trainer?: {
         id: number;
         name: string;
@@ -98,7 +98,7 @@ function getExerciseIcon(index: number): string {
                 <div class="mt-4 flex flex-wrap items-center gap-3">
                     <div class="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm">
                         <User class="h-3.5 w-3.5" />
-                        <span>{{ workout.client?.name || workout.client?.nickname || 'N/A' }}</span>
+                        <span>{{ workout.student?.name || workout.student?.nickname || 'N/A' }}</span>
                     </div>
 
                     <div v-if="workout.exercises?.length" class="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm">

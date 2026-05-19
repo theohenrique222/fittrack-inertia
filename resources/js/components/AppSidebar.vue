@@ -29,7 +29,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
 
-    ...(can.view_clients
+    ...(can.view_students
         ? [
               {
                   title: 'Alunos',

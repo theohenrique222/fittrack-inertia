@@ -13,8 +13,8 @@ export type Auth = {
     user: User;
     can: {
         view_trainers: any;
-        view_clients: any;
-        create_client: boolean;
+        view_students: any;
+        create_student: boolean;
     };
 };
 

@@ -9,12 +9,12 @@ import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 
 interface Props {
     stats: {
-        totalClients: number;
-        activeClients: number;
+        totalStudents: number;
+        activeStudents: number;
         totalExercises: number;
         totalCategories: number;
     };
-    recentClients: {
+    recentStudents: {
         id: number;
         name: string;
         email: string;
@@ -23,8 +23,8 @@ interface Props {
     }[];
     weeklyActivity: { day: string; value: number }[];
     muscleGroupDistribution: { name: string; value: number; color: string }[];
-    monthlyGrowth: { month: string; clients: number; workouts: number }[];
-    upcomingWorkouts: { client: string; type: string; time: string; status: string }[];
+    monthlyGrowth: { month: string; students: number; workouts: number }[];
+    upcomingWorkouts: { student: string; type: string; time: string; status: string }[];
     quickActions: { label: string; route: string; icon: string }[];
 }
 
@@ -38,19 +38,11 @@ const iconMap: Record<string, any> = {
 };
 
 const completionRate = computed(() => {
-    if (props.stats.totalClients === 0) {
-return 0;
-}
+    if (props.stats.totalStudents === 0) {
+        return 0;
+    }
 
-    return Math.round((props.stats.activeClients / props.stats.totalClients) * 100);
-});
-
-const clientGrowth = computed(() => {
-    if (props.stats.totalClients === 0) {
-return 0;
-}
-
-    return Math.round(((props.stats.activeClients - (props.stats.totalClients - props.stats.activeClients)) / props.stats.totalClients) * 100);
+    return Math.round((props.stats.activeStudents / props.stats.totalStudents) * 100);
 });
 </script>
 
@@ -85,8 +77,8 @@ return 0;
             <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Total de Clientes</p>
-                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.totalClients }}</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Total de Alunos</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.totalStudents }}</h2>
                         <div class="flex items-center gap-1 mt-2">
                             <ArrowUpRight class="w-4 h-4 text-emerald-500" />
                             <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">{{ completionRate }}%</span>
@@ -102,11 +94,11 @@ return 0;
             <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Clientes Ativos</p>
-                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.activeClients }}</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Alunos Ativos</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.activeStudents }}</h2>
                         <div class="flex items-center gap-1 mt-2">
                             <ArrowDownRight class="w-4 h-4 text-neutral-400" />
-                            <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ stats.totalClients - stats.activeClients }} inativos</span>
+                            <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ stats.totalStudents - stats.activeStudents }} inativos</span>
                         </div>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -215,22 +207,22 @@ return 0;
                 </div>
                 <div class="space-y-1">
                     <div
-                        v-for="client in recentClients"
-                        :key="client.id"
+                        v-for="student in recentStudents"
+                        :key="student.id"
                         class="flex items-center justify-between py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                     >
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                                {{ client.name.charAt(0).toUpperCase() }}
+                                {{ student.name.charAt(0).toUpperCase() }}
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ client.name }}</p>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ client.email }}</p>
+                                <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ student.name }}</p>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ student.email }}</p>
                             </div>
                         </div>
-                        <span class="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-full">{{ client.created_at }}</span>
+                        <span class="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-full">{{ student.created_at }}</span>
                     </div>
-                    <div v-if="!recentClients.length" class="py-8 text-center text-neutral-500 dark:text-neutral-400">
+                    <div v-if="!recentStudents.length" class="py-8 text-center text-neutral-500 dark:text-neutral-400">
                         Nenhum cliente cadastrado
                     </div>
                 </div>
@@ -247,10 +239,10 @@ return 0;
                     >
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                                {{ workout.client.charAt(0).toUpperCase() }}
+                                {{ workout.student.charAt(0).toUpperCase() }}
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ workout.client }}</p>
+                                <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ workout.student }}</p>
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ workout.type }}</p>
                             </div>
                         </div>

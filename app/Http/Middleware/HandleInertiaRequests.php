@@ -35,8 +35,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'can' => [
-                    'create_client' => $request->user()?->can('create-client'),
-                    'view_clients' => $request->user()?->role !== UserRole::CLIENT,
+                    'create_student' => $request->user()?->can('create-student'),
+                    'view_students' => $request->user()?->role !== UserRole::CLIENT,
                     'view_trainers' => $request->user()?->role !== UserRole::CLIENT && $request->user()?->role !== UserRole::PERSONAL,
                     'impersonate' => $request->user()?->can('impersonate'),
                 ],

@@ -99,10 +99,10 @@ class GetAdminDashboardStatsAction
     private function generateTopTrainers(): array
     {
         return [
-            ['name' => 'Carlos Silva', 'clients' => 15, 'specialty' => 'Musculação', 'rating' => 4.9],
-            ['name' => 'Ana Santos', 'clients' => 12, 'specialty' => 'Funcional', 'rating' => 4.8],
-            ['name' => 'Pedro Oliveira', 'clients' => 10, 'specialty' => 'Crossfit', 'rating' => 4.7],
-            ['name' => 'Maria Costa', 'clients' => 8, 'specialty' => 'Yoga', 'rating' => 4.9],
+            ['name' => 'Carlos Silva', 'students' => 15, 'specialty' => 'Musculação', 'rating' => 4.9],
+            ['name' => 'Ana Santos', 'students' => 12, 'specialty' => 'Funcional', 'rating' => 4.8],
+            ['name' => 'Pedro Oliveira', 'students' => 10, 'specialty' => 'Crossfit', 'rating' => 4.7],
+            ['name' => 'Maria Costa', 'students' => 8, 'specialty' => 'Yoga', 'rating' => 4.9],
         ];
     }
 

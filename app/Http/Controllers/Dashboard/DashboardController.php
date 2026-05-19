@@ -15,7 +15,7 @@ class DashboardController extends Controller
         Request $request,
         GetAdminDashboardStatsAction $adminStats,
         GetTrainerDashboardStatsAction $trainerStats,
-        GetClientDashboardStatsAction $clientStats,
+        GetClientDashboardStatsAction $studentStats,
     ) {
         $user = $request->user();
 
@@ -24,7 +24,7 @@ class DashboardController extends Controller
         } elseif ($user->isPersonal() || $user->isSelf()) {
             $data = $trainerStats->execute($user);
         } else {
-            $data = $clientStats->execute($user);
+            $data = $studentStats->execute($user);
         }
 
         return Inertia::render('Dashboard', $data);

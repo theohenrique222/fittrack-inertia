@@ -15,7 +15,7 @@ class GenerateWorkoutAction
     {
         return DB::transaction(function () use ($data) {
             $categoryIds = $data['category_ids'];
-            $client_id = $data['client_id'];
+            $studentId = $data['client_id'];
             $name = $data['name'] ?? $this->generateName($categoryIds);
             $description = $data['description'] ?? null;
 
@@ -25,7 +25,7 @@ class GenerateWorkoutAction
                 'name' => $name,
                 'slug' => Str::slug($name),
                 'description' => $description,
-                'client_id' => $client_id,
+                'client_id' => $studentId,
                 'trainer_id' => auth()->id(),
                 'is_active' => true,
             ]);

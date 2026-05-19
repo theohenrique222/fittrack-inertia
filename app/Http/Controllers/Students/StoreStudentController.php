@@ -17,7 +17,7 @@ class StoreStudentController extends Controller
         Request $request,
         StoreStudentAction $action
     ): Response {
-        Gate::authorize('create-client');
+        Gate::authorize('create-student');
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],

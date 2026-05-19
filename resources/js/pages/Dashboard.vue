@@ -13,22 +13,22 @@ const user = computed(() => page.props.auth.user);
 const props = defineProps<{
     stats?: {
         totalUsers?: number;
-        totalClients?: number;
+        totalStudents?: number;
         totalTrainers?: number;
         totalExercises?: number;
-        activeClients?: number;
+        activeStudents?: number;
         totalCategories?: number;
         totalWorkouts?: number;
         completedWorkouts?: number;
         currentStreak?: number;
     };
     usersByRole?: { role: string; count: number; color: string }[];
-    monthlyGrowth?: { month: string; users?: number; trainers?: number; clients?: number; workouts?: number }[];
+    monthlyGrowth?: { month: string; users?: number; trainers?: number; students?: number; workouts?: number }[];
     systemActivity?: { day: string; logins: number; registrations: number }[];
     recentUsers?: { id: number; name: string; email: string; role: string; created_at: string | null }[];
-    topTrainers?: { name: string; clients: number; specialty: string; rating: number }[];
+    topTrainers?: { name: string; students: number; specialty: string; rating: number }[];
     platformMetrics?: { label: string; value: string; change: string; trend: string }[];
-    recentClients?: {
+    recentStudents?: {
         id: number;
         name: string;
         email: string;
@@ -74,7 +74,7 @@ defineOptions({
             v-if="userRole === 'admin'"
             :stats="{
                 totalUsers: stats?.totalUsers ?? 0,
-                totalClients: stats?.totalClients ?? 0,
+                totalStudents: stats?.totalStudents ?? 0,
                 totalTrainers: stats?.totalTrainers ?? 0,
                 totalExercises: stats?.totalExercises ?? 0,
             }"
@@ -90,15 +90,15 @@ defineOptions({
         <TrainerDashboard
             v-else-if="userRole === 'personal' || userRole === 'self'"
             :stats="{
-                totalClients: stats?.totalClients ?? 0,
-                activeClients: stats?.activeClients ?? 0,
+                totalStudents: stats?.totalStudents ?? 0,
+                activeStudents: stats?.activeStudents ?? 0,
                 totalExercises: stats?.totalExercises ?? 0,
                 totalCategories: stats?.totalCategories ?? 0,
             }"
-            :recent-clients="recentClients ?? []"
+            :recent-students="recentStudents ?? []"
             :weekly-activity="weeklyActivity ?? []"
             :muscle-group-distribution="muscleGroupDistribution ?? []"
-            :monthly-growth="(monthlyGrowth ?? []).map(m => ({ month: m.month, clients: m.clients ?? 0, workouts: m.workouts ?? 0 }))"
+            :monthly-growth="(monthlyGrowth ?? []).map(m => ({ month: m.month, students: m.students ?? 0, workouts: m.workouts ?? 0 }))"
             :upcoming-workouts="upcomingWorkouts ?? []"
             :quick-actions="quickActions ?? []"
         />

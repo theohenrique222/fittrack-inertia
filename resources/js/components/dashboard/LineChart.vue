@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Props {
-    data: { month: string; clients: number; workouts: number }[];
+    data: { month: string; students: number; workouts: number }[];
     height?: number;
 }
 
@@ -8,13 +8,13 @@ const props = withDefaults(defineProps<Props>(), {
     height: 200,
 });
 
-const maxClients = Math.max(...props.data.map((d) => d.clients));
+const maxStudents = Math.max(...props.data.map((d) => d.students));
 const maxWorkouts = Math.max(...props.data.map((d) => d.workouts));
 const width = 600;
 const chartHeight = props.height;
 
-const clientsPoints = props.data
-    .map((d, i) => `${(i / (props.data.length - 1)) * width},${chartHeight - (d.clients / maxClients) * (chartHeight - 40) - 20}`)
+const studentsPoints = props.data
+    .map((d, i) => `${(i / (props.data.length - 1)) * width},${chartHeight - (d.students / maxStudents) * (chartHeight - 40) - 20}`)
     .join(' ');
 
 const workoutsPoints = props.data
@@ -26,7 +26,7 @@ const workoutsPoints = props.data
     <div class="w-full">
         <svg :viewBox="`0 0 ${width} ${chartHeight}`" class="w-full" :style="{ height: `${chartHeight}px` }">
             <defs>
-                <linearGradient id="clientsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <linearGradient id="studentsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#10b981" stop-opacity="0.3" />
                     <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
                 </linearGradient>
@@ -37,7 +37,7 @@ const workoutsPoints = props.data
             </defs>
 
             <polyline
-                :points="clientsPoints"
+                :points="studentsPoints"
                 fill="none"
                 stroke="#10b981"
                 stroke-width="2"
@@ -55,9 +55,9 @@ const workoutsPoints = props.data
 
             <circle
                 v-for="(d, i) in data"
-                :key="`clients-${i}`"
+                :key="`students-${i}`"
                 :cx="(i / (data.length - 1)) * width"
-                :cy="chartHeight - (d.clients / maxClients) * (chartHeight - 40) - 20"
+                :cy="chartHeight - (d.students / maxStudents) * (chartHeight - 40) - 20"
                 r="3"
                 fill="#10b981"
             />

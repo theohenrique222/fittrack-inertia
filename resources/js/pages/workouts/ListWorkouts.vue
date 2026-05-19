@@ -79,12 +79,12 @@ interface Workout {
     id: number;
     name: string;
     description?: string;
-    client?: {
+    student?: {
         id: number;
         name: string;
         nickname?: string;
     };
-    client_id: number;
+    student_id: number;
     trainer?: {
         id: number;
         name: string;
@@ -96,7 +96,7 @@ interface Workout {
 
 const props = defineProps<{
     title: string;
-    clientId?: number;
+    studentId?: number;
     student?: Student;
     workouts: {
         data: Workout[];
@@ -122,7 +122,7 @@ const filteredWorkouts = computed(() => {
         result = result.filter(
             (w) =>
                 w.name.toLowerCase().includes(query) ||
-                w.client?.name.toLowerCase().includes(query) ||
+                w.student?.name.toLowerCase().includes(query) ||
                 w.description?.toLowerCase().includes(query),
         );
     }
@@ -153,7 +153,7 @@ const isCreateOpen = ref(false);
 const isEditOpen = ref(false);
 const isViewOpen = ref(false);
 const selectedWorkout = ref<Workout | null>(null);
-const preSelectedClientId = ref<string>('');
+const preSelectedStudentId = ref<string>('');
 
 const handleViewClick = (workout: Workout) => {
     selectedWorkout.value = workout;
@@ -179,7 +179,7 @@ const handleDeleteClick = (id: number) => {
 
 const closeCreateSheet = () => {
     isCreateOpen.value = false;
-    preSelectedClientId.value = '';
+    preSelectedStudentId.value = '';
 };
 
 const closeEditSheet = () => {
@@ -195,7 +195,7 @@ onMounted(() => {
     const url = new URL(window.location.href);
     const shouldCreate = url.searchParams.get('create');
 
-    preSelectedClientId.value = String(props.clientId);
+    preSelectedStudentId.value = String(props.studentId);
 
     if (shouldCreate === 'true') {
         isCreateOpen.value = true;
@@ -301,9 +301,9 @@ function getAvatarColor(id: number): string {
                 >
                     <div class="flex items-center gap-4 p-4">
                         <div
-                            :class="['flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white font-bold text-sm shadow-sm', getAvatarColor(workout.client_id || workout.id)]"
+                            :class="['flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white font-bold text-sm shadow-sm', getAvatarColor(workout.student_id || workout.id)]"
                         >
-                            {{ getInitials(workout.client?.name || workout.name) }}
+                            {{ getInitials(workout.student?.name || workout.name) }}
                         </div>
 
                         <div class="min-w-0 flex-1">
@@ -314,7 +314,7 @@ function getAvatarColor(id: number): string {
                                 </span>
                             </div>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ workout.client?.name || 'Sem aluno' }}</span>
+                                <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ workout.student?.name || 'Sem aluno' }}</span>
                                 <span v-if="workout.description" class="text-xs text-neutral-400 dark:text-neutral-500 truncate">
                                     • {{ workout.description }}
                                 </span>

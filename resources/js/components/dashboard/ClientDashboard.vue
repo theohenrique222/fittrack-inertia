@@ -46,7 +46,7 @@ return 0;
 const progressChartData = computed(() => {
     return props.progressData.map((d) => ({
         month: d.week,
-        clients: d.weight,
+        students: d.weight,
         workouts: d.bodyFat * 5,
     }));
 });
