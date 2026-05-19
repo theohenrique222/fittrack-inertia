@@ -36,14 +36,36 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
 import { router } from '@inertiajs/vue3';
 import { destroy, resetPassword, workouts as studentsWorkouts } from '@/routes/students';
+import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 
 interface Student {
     id: number;
     name: string;
     email: string;
     nickname?: string;
+}
+
+interface ExerciseOption {
+    id: number;
+    name: string;
+    category?: {
+        id: number;
+        name: string;
+    } | null;
+}
+
+interface CategoryOption {
+    id: number;
+    name: string;
+    slug: string;
 }
 
 interface Exercise {
@@ -83,7 +105,11 @@ const props = defineProps<{
     student: Student;
     workout: Workout | null;
     stats: Stats;
+    exercises: { data: ExerciseOption[] };
+    categories: { data: CategoryOption[] };
 }>();
+
+const isCreateOpen = ref(false);
 
 const activeTab = ref<'overview' | 'workout' | 'history'>('overview');
 
@@ -191,7 +217,7 @@ function getAvatarColor(id: number): string {
                         v-if="student?.id"
                         variant="default"
                         class="bg-emerald-500 text-white hover:bg-emerald-600"
-                        @click="router.visit(studentsWorkouts.url({ student: student.id }, { query: { create: 'true' } }))"
+                        @click="isCreateOpen = true"
                     >
                         <Dumbbell class="mr-2 h-4 w-4" />
                         Novo Treino
@@ -385,7 +411,7 @@ function getAvatarColor(id: number): string {
                 <Button
                     v-if="student?.id"
                     class="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
-                    @click="router.visit(studentsWorkouts.url({ student: student.id }, { query: { create: 'true' } }))"
+                    @click="isCreateOpen = true"
                 >
                     <Dumbbell class="mr-2 h-4 w-4" />
                     Criar Primeiro Treino
@@ -476,7 +502,7 @@ function getAvatarColor(id: number): string {
                 <Button
                     v-if="student?.id"
                     class="mt-6 bg-emerald-500 px-6 text-white hover:bg-emerald-600"
-                    @click="router.visit(studentsWorkouts.url({ student: student.id }, { query: { create: 'true' } }))"
+                    @click="isCreateOpen = true"
                 >
                     <Dumbbell class="mr-2 h-4 w-4" />
                     Criar Treino
@@ -497,4 +523,21 @@ function getAvatarColor(id: number): string {
             </div>
         </div>
     </div>
+
+    <Sheet v-model:open="isCreateOpen">
+        <SheetContent side="right" class="w-full sm:max-w-xl p-0">
+            <SheetHeader class="sr-only">
+                <SheetTitle>Criar Treino</SheetTitle>
+            </SheetHeader>
+
+            <CreateWorkoutSheet
+                v-if="student"
+                :student="student"
+                :exercises="exercises.data"
+                :categories="categories.data"
+                :redirect-on-success="`/students/${student.id}`"
+                @close="isCreateOpen = false"
+            />
+        </SheetContent>
+    </Sheet>
 </template>

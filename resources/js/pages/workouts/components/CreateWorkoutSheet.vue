@@ -49,6 +49,7 @@ const props = defineProps<{
     student: Student;
     exercises: Exercise[];
     categories: Category[];
+    redirectOnSuccess?: string;
 }>();
 
 const emit = defineEmits(['close']);
@@ -70,7 +71,7 @@ const selectedCategoryIds = ref<number[]>([]);
 const form = useForm({
     name: '',
     description: '',
-    student_id: String(props.student.id),
+    client_id: props.student.id,
     exercises: [] as WorkoutExercise[],
     category_ids: [] as number[],
     is_active: true,
@@ -105,6 +106,20 @@ function removeExercise(index: number) {
 }
 
 function handleSubmit() {
+    const submitOptions = {
+        onSuccess: () => {
+            form.reset();
+            if (mode.value === 'manual') {
+                workoutExercises.value = [];
+            }
+            selectedCategoryIds.value = [];
+            emit('close');
+            if (props.redirectOnSuccess) {
+                window.location.href = props.redirectOnSuccess;
+            }
+        },
+    };
+
     if (mode.value === 'auto') {
         if (selectedCategoryIds.value.length === 0) {
             return;
@@ -112,13 +127,7 @@ function handleSubmit() {
 
         form.category_ids = selectedCategoryIds.value;
 
-        form.post(generate.url(), {
-            onSuccess: () => {
-                form.reset();
-                selectedCategoryIds.value = [];
-                emit('close');
-            },
-        });
+        form.post(generate.url(), submitOptions);
     } else {
         form.exercises = workoutExercises.value.filter(
             (e) => e.exercise_id > 0,
@@ -128,13 +137,7 @@ function handleSubmit() {
             return;
         }
 
-        form.post(store.url(), {
-            onSuccess: () => {
-                form.reset();
-                workoutExercises.value = [];
-                emit('close');
-            },
-        });
+        form.post(store.url(), submitOptions);
     }
 }
 
