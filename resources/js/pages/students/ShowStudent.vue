@@ -255,7 +255,6 @@ function getAvatarColor(id: number): string {
 
                 <div class="flex items-center gap-2 lg:flex-col">
                     <Button
-                        v-if="student?.id"
                         variant="default"
                         class="bg-emerald-500 text-white hover:bg-emerald-600"
                         @click="workout ? handleEditWorkout(workout) : isCreateOpen = true"
@@ -460,7 +459,6 @@ function getAvatarColor(id: number): string {
                     Este aluno ainda não possui um treino ativo
                 </p>
                 <Button
-                    v-if="student?.id"
                     size="lg"
                     class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
                     @click="isCreateOpen = true"
@@ -563,7 +561,6 @@ function getAvatarColor(id: number): string {
                     Crie um treino para este aluno começar
                 </p>
                 <Button
-                    v-if="student?.id"
                     size="lg"
                     class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
                     @click="isCreateOpen = true"
@@ -636,7 +633,6 @@ function getAvatarColor(id: number): string {
                     {{ searchQuery ? 'Tente buscar com outros termos' : 'Crie o primeiro treino do aluno' }}
                 </p>
                 <Button
-                    v-if="student?.id && !searchQuery"
                     size="lg"
                     class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
                     @click="isCreateOpen = true"
