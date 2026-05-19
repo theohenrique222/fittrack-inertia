@@ -13,7 +13,7 @@ export default {
 
 <script setup lang="ts">
 import { Head, router, usePage } from '@inertiajs/vue3';
-import { ChevronRight, Dumbbell, Plus, Search, Users } from 'lucide-vue-next';
+import { ChevronRight, Dumbbell, Plus, Search } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -96,11 +96,10 @@ interface Workout {
 
 const props = defineProps<{
     title: string;
+    clientId: number;
+    student: Student;
     workouts: {
         data: Workout[];
-    };
-    students: {
-        data: Student[];
     };
     exercises: {
         data: Exercise[];
@@ -113,15 +112,10 @@ const props = defineProps<{
 const page = usePage();
 const { toasts, success, error } = useToast();
 
-const selectedStudentId = ref<string>('all');
 const searchQuery = ref('');
 
 const filteredWorkouts = computed(() => {
     let result = props.workouts.data;
-
-    if (selectedStudentId.value !== 'all') {
-        result = result.filter((w) => w.client_id === Number(selectedStudentId.value));
-    }
 
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
@@ -138,7 +132,6 @@ const filteredWorkouts = computed(() => {
 
 const stats = computed(() => ({
     total: props.workouts.data.length,
-    activeStudents: new Set(props.workouts.data.map((w) => w.client_id)).size,
     totalExercises: props.workouts.data.reduce((sum, w) => sum + (w.exercises?.length || 0), 0),
 }));
 
@@ -200,16 +193,12 @@ const closeViewSheet = () => {
 
 onMounted(() => {
     const url = new URL(window.location.href);
-    const clientId = url.searchParams.get('client_id');
     const shouldCreate = url.searchParams.get('create');
 
-    if (clientId) {
-        selectedStudentId.value = clientId;
-        preSelectedClientId.value = clientId;
+    preSelectedClientId.value = String(props.clientId);
 
-        if (shouldCreate === 'true') {
-            isCreateOpen.value = true;
-        }
+    if (shouldCreate === 'true') {
+        isCreateOpen.value = true;
     }
 });
 
@@ -244,8 +233,8 @@ function getAvatarColor(id: number): string {
         <div class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 py-8 text-white">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold">Meus Treinos</h1>
-                    <p class="text-sm text-emerald-100 mt-1">Gerencie os treinos dos seus alunos</p>
+                    <h1 class="text-2xl font-bold">Treinos de {{ props.student.name }}</h1>
+                    <p class="text-sm text-emerald-100 mt-1">Gerencie os treinos do aluno</p>
                 </div>
 
                 <Sheet v-model:open="isCreateOpen">
@@ -262,31 +251,22 @@ function getAvatarColor(id: number): string {
                         </SheetHeader>
 
                         <CreateWorkoutSheet
-                            :students="students.data"
+                            :student="student"
                             :exercises="exercises.data"
                             :categories="categories.data"
-                            :pre-selected-client-id="preSelectedClientId"
                             @close="closeCreateSheet"
                         />
                     </SheetContent>
                 </Sheet>
             </div>
 
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 gap-3">
                 <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3">
                     <div class="flex items-center gap-2 mb-1">
                         <Dumbbell class="h-4 w-4 text-emerald-100" />
                         <span class="text-xs text-emerald-100">Total</span>
                     </div>
                     <p class="text-2xl font-bold">{{ stats.total }}</p>
-                </div>
-
-                <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3">
-                    <div class="flex items-center gap-2 mb-1">
-                        <Users class="h-4 w-4 text-emerald-100" />
-                        <span class="text-xs text-emerald-100">Alunos</span>
-                    </div>
-                    <p class="text-2xl font-bold">{{ stats.activeStudents }}</p>
                 </div>
 
                 <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3">
@@ -305,25 +285,9 @@ function getAvatarColor(id: number): string {
                     <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
                     <Input
                         v-model="searchQuery"
-                        placeholder="Buscar treino ou aluno..."
+                        placeholder="Buscar treino..."
                         class="pl-9 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700"
                     />
-                </div>
-
-                <div class="w-full sm:w-56">
-                    <select
-                        v-model="selectedStudentId"
-                        class="w-full h-10 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
-                    >
-                        <option value="all">Todos os alunos</option>
-                        <option
-                            v-for="student in students.data"
-                            :key="student.id"
-                            :value="String(student.id)"
-                        >
-                            {{ student.name }}{{ student.nickname ? ` (${student.nickname})` : '' }}
-                        </option>
-                    </select>
                 </div>
             </div>
 
@@ -418,7 +382,7 @@ function getAvatarColor(id: number): string {
             <EditWorkoutSheet
                 v-if="selectedWorkout"
                 :workout="selectedWorkout"
-                :students="students.data"
+                :student="student"
                 :exercises="exercises.data"
                 @close="closeEditSheet"
             />

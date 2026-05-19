@@ -10,7 +10,7 @@ import {
     Trash2,
     User,
 } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,10 +46,9 @@ interface Category {
 }
 
 const props = defineProps<{
-    students: Student[];
+    student: Student;
     exercises: Exercise[];
     categories: Category[];
-    preSelectedClientId?: string;
 }>();
 
 const emit = defineEmits(['close']);
@@ -71,32 +70,15 @@ const selectedCategoryIds = ref<number[]>([]);
 const form = useForm({
     name: '',
     description: '',
-    client_id: props.preSelectedClientId || '',
+    client_id: String(props.student.id),
     exercises: [] as WorkoutExercise[],
     category_ids: [] as number[],
     is_active: true,
 });
 
 const selectedStudentName = computed(() => {
-    if (!form.client_id) {
-return '';
-}
-
-    const student = props.students.find(
-        (s) => String(s.id) === form.client_id,
-    );
-
-    return student ? student.name : '';
+    return props.student.name;
 });
-
-watch(
-    () => props.preSelectedClientId,
-    (newVal) => {
-        if (newVal) {
-            form.client_id = newVal;
-        }
-    },
-);
 
 function toggleCategory(categoryId: number) {
     const index = selectedCategoryIds.value.indexOf(categoryId);
@@ -186,26 +168,9 @@ function handleCancel() {
                         <User class="w-3.5 h-3.5 text-neutral-400" />
                         Aluno *
                     </Label>
-                    <Select v-model="form.client_id">
-                        <SelectTrigger>
-                            <SelectValue placeholder="Selecione o aluno..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="student in students"
-                                :key="student.id"
-                                :value="String(student.id)"
-                            >
-                                {{ student.name
-                                }}{{ student.nickname ? ` (${student.nickname})` : '' }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <span
-                        v-if="form.errors.client_id"
-                        class="text-xs text-red-500 mt-1"
-                        >{{ form.errors.client_id }}</span
-                    >
+                    <div class="h-10 px-3 py-2 rounded-md border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-sm text-neutral-700 dark:text-neutral-300">
+                        {{ props.student.name }}{{ props.student.nickname ? ` (${props.student.nickname})` : '' }}
+                    </div>
                 </div>
 
                 <div>

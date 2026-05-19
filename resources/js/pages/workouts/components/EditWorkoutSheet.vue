@@ -60,7 +60,7 @@ interface Workout {
 
 interface Props {
     workout: Workout;
-    students: Student[];
+    student: Student;
     exercises: Exercise[];
 }
 
@@ -147,25 +147,9 @@ function handleCancel() {
 
             <div class="mb-2">
                 <Label class="mb-2">Aluno *</Label>
-                <Select v-model="form.client_id">
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecione o aluno..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem
-                            v-for="student in students"
-                            :key="student.id"
-                            :value="String(student.id)"
-                        >
-                            {{ student.name }}{{ student.nickname ? ` (${student.nickname})` : '' }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <span
-                    v-if="form.errors.client_id"
-                    class="text-xs text-red-500"
-                    >{{ form.errors.client_id }}</span
-                >
+                <div class="h-10 px-3 py-2 rounded-md border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-sm text-neutral-700 dark:text-neutral-300">
+                    {{ props.student.name }}{{ props.student.nickname ? ` (${props.student.nickname})` : '' }}
+                </div>
             </div>
 
             <div class="mb-2">
