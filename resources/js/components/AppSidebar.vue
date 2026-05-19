@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Dumbbell } from 'lucide-vue-next';
+import { LayoutGrid, Dumbbell, BarChart3 } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,7 +15,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { students, dashboard, exercises, trainers } from '@/routes';
+import { students, dashboard, exercises, trainers, reports } from '@/routes';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -54,6 +54,16 @@ const mainNavItems: NavItem[] = [
         href: exercises(),
         icon: Dumbbell,
     },
+
+    ...(can.view_students
+        ? [
+              {
+                  title: 'Relatórios',
+                  href: reports(),
+                  icon: BarChart3,
+              },
+          ]
+        : []),
 ];
 </script>
 

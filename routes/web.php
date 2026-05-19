@@ -9,6 +9,7 @@ use App\Http\Controllers\Exercises\DestroyExerciseController;
 use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
+use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Students\DestroyStudentController;
 use App\Http\Controllers\Students\ListStudentsController;
 use App\Http\Controllers\Students\ResetPasswordStudentController;
@@ -142,6 +143,7 @@ $router
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('reports', ReportsController::class)->name('reports');
 });
 
 require __DIR__.'/settings.php';
