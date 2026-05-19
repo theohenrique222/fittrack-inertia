@@ -25,19 +25,31 @@ class ListWorkoutsController extends Controller
         $studentId = request()->query('student_id');
 
         if (! $studentId) {
-            abort(403, 'Selecione um aluno para visualizar os treinos.');
+            return Inertia::render('errors/Error', [
+                'title' => 'Erro',
+                'message' => 'Selecione um aluno para visualizar os treinos.',
+                'status' => 403,
+            ]);
         }
 
         $student = Client::with('user')->find($studentId);
 
         if (! $student) {
-            abort(404, 'Aluno não encontrado.');
+            return Inertia::render('errors/Error', [
+                'title' => 'Erro',
+                'message' => 'Aluno não encontrado.',
+                'status' => 404,
+            ]);
         }
 
         $user = Auth::user();
 
         if ($user?->role !== UserRole::ADMIN && $student->user?->trainer_id !== $user?->id) {
-            abort(403, 'Você não tem permissão para visualizar os treinos deste aluno.');
+            return Inertia::render('errors/Error', [
+                'title' => 'Erro',
+                'message' => 'Você não tem permissão para visualizar os treinos deste aluno.',
+                'status' => 403,
+            ]);
         }
 
         $filters = request()->only(['search', 'is_active']);

@@ -94,7 +94,8 @@ const tabs = computed(() => [
     { id: 'history' as const, label: 'Histórico' },
 ]);
 
-function getInitials(name: string): string {
+function getInitials(name?: string): string {
+    if (!name) return '';
     return name
         .split(' ')
         .map((n) => n[0])
