@@ -128,6 +128,13 @@ function formatRestSeconds(seconds: number): string {
                             <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                                 Ativo
                             </span>
+                            <Link
+                                :href="workouts.url({ query: { client_id: student.id } })"
+                                class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 transition-colors"
+                            >
+                                <Dumbbell class="w-3.5 h-3.5" />
+                                <span>Ver Treino</span>
+                            </Link>
                         </div>
                     </div>
 

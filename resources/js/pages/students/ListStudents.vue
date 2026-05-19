@@ -15,6 +15,7 @@ export default {
 import { Head, router, usePage } from '@inertiajs/vue3';
 import {
     ChevronRight,
+    Dumbbell,
     GraduationCap,
     Plus,
     Search,
@@ -118,6 +119,11 @@ const handleResetPasswordClick = (id: number) => {
     }
 
     router.post(resetPassword.url({ student: id }));
+};
+
+const handleCreateWorkoutClick = (id: number, event: Event) => {
+    event.stopPropagation();
+    router.visit(`/workouts?client_id=${id}&create=true`);
 };
 
 const closeCreateSheet = () => {
@@ -276,6 +282,15 @@ function getAvatarColor(id: number): string {
                     <div
                         class="flex items-center justify-end gap-1 border-t border-neutral-100 px-4 py-2 dark:border-neutral-700"
                     >
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            class="h-8 px-3 text-xs"
+                            @click.stop="handleCreateWorkoutClick(student.id, $event)"
+                        >
+                            <Dumbbell class="mr-1 h-3.5 w-3.5 text-emerald-600" />
+                            Novo Treino
+                        </Button>
                         <Button
                             size="sm"
                             variant="ghost"
