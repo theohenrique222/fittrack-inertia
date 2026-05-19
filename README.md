@@ -51,7 +51,7 @@ resources/js/
 
 1. Clone o repositório:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/theohenrique222/fittrack-inertia.git
    cd fittrack
    ```
 
@@ -78,7 +78,7 @@ resources/js/
 
 6. Inicie o servidor de desenvolvimento:
    ```bash
-   npm run dev
+   composer run dev
    ```
 
 7. Crie uma conta de super admin:
