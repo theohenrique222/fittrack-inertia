@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Workouts;
 
 use App\Actions\Exercises\ListExercisesAction;
 use App\Actions\Workouts\ListWorkoutsAction;
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ExerciseResource;
@@ -31,6 +32,12 @@ class ListWorkoutsController extends Controller
 
         if (! $client) {
             abort(404, 'Aluno não encontrado.');
+        }
+
+        $user = Auth::user();
+
+        if ($user?->role !== UserRole::ADMIN && $client->user?->trainer_id !== $user?->id) {
+            abort(403, 'Você não tem permissão para visualizar os treinos deste aluno.');
         }
 
         $filters = request()->only(['search', 'is_active']);

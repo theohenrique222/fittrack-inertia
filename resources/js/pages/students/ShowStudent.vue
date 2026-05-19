@@ -99,6 +99,7 @@ function formatRestSeconds(seconds: number): string {
 
                     <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
                         <Link
+                            v-if="student?.id"
                             :href="workouts.url({ query: { client_id: student.id } })"
                             class="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
                         >
@@ -188,6 +189,7 @@ function formatRestSeconds(seconds: number): string {
                         Este aluno ainda não possui um treino ativo
                     </p>
                     <Link
+                        v-if="student?.id"
                         :href="workouts.url({ query: { client_id: student.id, create: 'true' } })"
                         class="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
                     >

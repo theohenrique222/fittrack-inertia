@@ -13,6 +13,7 @@ use App\Http\Resources\ExerciseResource;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\WorkoutResource;
 use App\Models\Category;
+use App\Models\Client;
 use App\Models\Workout;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -35,8 +36,12 @@ class UpdateWorkoutController extends Controller
         $exercises = $exercisesAction->execute();
         $categories = Category::where('is_active', true)->orderBy('name')->get();
 
+        $client = Client::with('user')->find($validated['client_id'] ?? $workout->client_id);
+
         return Inertia::render('workouts/ListWorkouts', [
             'title' => 'Treinos',
+            'clientId' => $client?->id,
+            'student' => $client ? new StudentResource($client) : null,
             'workouts' => WorkoutResource::collection($workouts),
             'students' => StudentResource::collection($students),
             'exercises' => ExerciseResource::collection($exercises),

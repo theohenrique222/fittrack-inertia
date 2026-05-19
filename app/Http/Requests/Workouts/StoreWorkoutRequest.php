@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Workouts;
 
+use App\Enums\UserRole;
 use App\Models\Client;
 use App\Models\Exercise;
 use Illuminate\Foundation\Http\FormRequest;
@@ -11,7 +12,20 @@ class StoreWorkoutRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+
+        if ($user?->role === UserRole::ADMIN) {
+            return true;
+        }
+
+        $clientId = $this->input('client_id');
+        if (! $clientId) {
+            return false;
+        }
+
+        return Client::where('id', $clientId)
+            ->whereHas('user', fn ($q) => $q->where('trainer_id', $user?->id))
+            ->exists();
     }
 
     public function rules(): array

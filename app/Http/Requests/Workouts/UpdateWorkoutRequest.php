@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Workouts;
 
+use App\Enums\UserRole;
 use App\Models\Client;
 use App\Models\Exercise;
+use App\Models\Workout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -11,7 +13,18 @@ class UpdateWorkoutRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+        $workout = $this->route('workout');
+
+        if (! $workout instanceof Workout) {
+            return false;
+        }
+
+        if ($user?->role === UserRole::ADMIN) {
+            return true;
+        }
+
+        return $workout->trainer_id === $user?->id;
     }
 
     public function rules(): array

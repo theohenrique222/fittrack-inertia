@@ -96,8 +96,8 @@ interface Workout {
 
 const props = defineProps<{
     title: string;
-    clientId: number;
-    student: Student;
+    clientId?: number;
+    student?: Student;
     workouts: {
         data: Workout[];
     };
@@ -233,7 +233,7 @@ function getAvatarColor(id: number): string {
         <div class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 py-8 text-white">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold">Treinos de {{ props.student.name }}</h1>
+                    <h1 class="text-2xl font-bold">Treinos de {{ props.student?.name ?? 'Aluno' }}</h1>
                     <p class="text-sm text-emerald-100 mt-1">Gerencie os treinos do aluno</p>
                 </div>
 
@@ -251,6 +251,7 @@ function getAvatarColor(id: number): string {
                         </SheetHeader>
 
                         <CreateWorkoutSheet
+                            v-if="student"
                             :student="student"
                             :exercises="exercises.data"
                             :categories="categories.data"
@@ -380,7 +381,7 @@ function getAvatarColor(id: number): string {
             </DialogHeader>
 
             <EditWorkoutSheet
-                v-if="selectedWorkout"
+                v-if="selectedWorkout && student"
                 :workout="selectedWorkout"
                 :student="student"
                 :exercises="exercises.data"
