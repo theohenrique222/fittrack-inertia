@@ -19,42 +19,19 @@ use Inertia\Response;
 class ListWorkoutsController extends Controller
 {
     public function __invoke(
+        Client $student,
         ListWorkoutsAction $action,
         ListExercisesAction $exercisesAction
     ): Response {
-        $studentId = request()->query('student_id');
-
-        if (! $studentId) {
-            return Inertia::render('errors/Error', [
-                'title' => 'Erro',
-                'message' => 'Selecione um aluno para visualizar os treinos.',
-                'status' => 403,
-            ]);
-        }
-
-        $student = Client::with('user')->find($studentId);
-
-        if (! $student) {
-            return Inertia::render('errors/Error', [
-                'title' => 'Erro',
-                'message' => 'Aluno não encontrado.',
-                'status' => 404,
-            ]);
-        }
-
         $user = Auth::user();
 
         if ($user?->role !== UserRole::ADMIN && $student->user?->trainer_id !== $user?->id) {
-            return Inertia::render('errors/Error', [
-                'title' => 'Erro',
-                'message' => 'Você não tem permissão para visualizar os treinos deste aluno.',
-                'status' => 403,
-            ]);
+            abort(403, 'Você não tem permissão para visualizar os treinos deste aluno.');
         }
 
         $filters = request()->only(['search', 'is_active']);
         $filters['trainer_id'] = Auth::id();
-        $filters['client_id'] = $studentId;
+        $filters['client_id'] = $student->id;
 
         $workouts = $action->execute($filters);
         $exercises = $exercisesAction->execute();
@@ -62,8 +39,8 @@ class ListWorkoutsController extends Controller
 
         return Inertia::render('workouts/ListWorkouts', [
             'title' => 'Treinos',
-            'studentId' => (int) $studentId,
-            'student' => new StudentResource($student),
+            'studentId' => $student->id,
+            'student' => new StudentResource($student->load('user')),
             'workouts' => WorkoutResource::collection($workouts),
             'exercises' => ExerciseResource::collection($exercises),
             'categories' => CategoryResource::collection($categories),

@@ -46,7 +46,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/composables/useToast';
 import CreateStudentSheet from '@/pages/students/components/CreateStudentSheet.vue';
 import EditStudentSheet from '@/pages/students/components/EditStudentSheet.vue';
-import { destroy, resetPassword } from '@/routes/students';
+import { destroy, resetPassword, workouts as studentsWorkouts } from '@/routes/students';
 
 interface Student {
     id: number;
@@ -136,7 +136,7 @@ const handleResetPasswordClick = (id: number, event: Event) => {
 
 const handleCreateWorkoutClick = (id: number, event: Event) => {
     event.stopPropagation();
-    router.visit(`/workouts?student_id=${id}&create=true`);
+    router.visit(studentsWorkouts.url({ student: id }, { query: { create: 'true' } }));
 };
 
 const closeCreateSheet = () => {

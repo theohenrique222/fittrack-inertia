@@ -121,8 +121,8 @@ $router
     ->middleware('auth');
 
 $router
-    ->get(uri: '/workouts', action: ListWorkoutsController::class)
-    ->name('workouts')
+    ->get(uri: '/students/{student}/workouts', action: ListWorkoutsController::class)
+    ->name('students.workouts')
     ->middleware('auth');
 
 $router

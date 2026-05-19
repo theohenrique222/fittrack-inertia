@@ -37,8 +37,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { router } from '@inertiajs/vue3';
-import { destroy, resetPassword } from '@/routes/students';
-import { workouts } from '@/routes';
+import { destroy, resetPassword, workouts as studentsWorkouts } from '@/routes/students';
 
 interface Student {
     id: number;
@@ -189,9 +188,10 @@ function getAvatarColor(id: number): string {
 
                 <div class="flex items-center gap-2 lg:flex-col">
                     <Button
+                        v-if="student?.id"
                         variant="default"
                         class="bg-emerald-500 text-white hover:bg-emerald-600"
-                        @click="router.visit(workouts.url({ query: { student_id: student.id, create: 'true' } }))"
+                        @click="router.visit(studentsWorkouts.url({ student: student.id }, { query: { create: 'true' } }))"
                     >
                         <Dumbbell class="mr-2 h-4 w-4" />
                         Novo Treino
@@ -363,9 +363,10 @@ function getAvatarColor(id: number): string {
 
                 <div class="border-t border-neutral-200 bg-neutral-50 px-6 py-4 dark:border-neutral-700 dark:bg-neutral-900/50">
                     <Button
+                        v-if="student?.id"
                         variant="default"
                         class="w-full bg-emerald-500 text-white hover:bg-emerald-600"
-                        @click="router.visit(workouts.url({ query: { student_id: student.id } }))"
+                        @click="router.visit(studentsWorkouts.url({ student: student.id }))"
                     >
                         <Play class="mr-2 h-4 w-4" />
                         Ver Treino Completo
@@ -382,8 +383,9 @@ function getAvatarColor(id: number): string {
                     Este aluno ainda não possui um treino ativo
                 </p>
                 <Button
+                    v-if="student?.id"
                     class="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
-                    @click="router.visit(workouts.url({ query: { student_id: student.id, create: 'true' } }))"
+                    @click="router.visit(studentsWorkouts.url({ student: student.id }, { query: { create: 'true' } }))"
                 >
                     <Dumbbell class="mr-2 h-4 w-4" />
                     Criar Primeiro Treino
@@ -472,8 +474,9 @@ function getAvatarColor(id: number): string {
                     Crie um treino para este aluno começar
                 </p>
                 <Button
+                    v-if="student?.id"
                     class="mt-6 bg-emerald-500 px-6 text-white hover:bg-emerald-600"
-                    @click="router.visit(workouts.url({ query: { student_id: student.id, create: 'true' } }))"
+                    @click="router.visit(studentsWorkouts.url({ student: student.id }, { query: { create: 'true' } }))"
                 >
                     <Dumbbell class="mr-2 h-4 w-4" />
                     Criar Treino

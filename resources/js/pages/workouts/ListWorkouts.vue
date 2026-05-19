@@ -4,7 +4,6 @@ export default {
         breadcrumbs: [
             {
                 title: 'Treinos',
-                href: '/workouts',
             },
         ],
     },
