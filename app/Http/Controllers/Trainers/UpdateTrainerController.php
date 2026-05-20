@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Trainers;
 
-use App\Actions\Trainers\ListTrainersAction;
 use App\Actions\Trainers\UpdateTrainerAction;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TrainerResource;
 use App\Models\Trainer;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class UpdateTrainerController extends Controller
 {
@@ -17,19 +14,17 @@ class UpdateTrainerController extends Controller
         Request $request,
         Trainer $trainer,
         UpdateTrainerAction $action
-    ): Response {
+    ): RedirectResponse {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'specialty' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $updatedTrainer = $action->execute($trainer, $validated);
-        $trainers = (new ListTrainersAction)->execute();
+        $action->execute($trainer, $validated);
 
-        return Inertia::render('trainers/ListTrainers', [
-            'title' => 'Lista de Treinadores',
-            'trainers' => TrainerResource::collection($trainers),
-        ])->flash('success', 'Treinador atualizado com sucesso.');
+        return redirect()
+            ->route('trainers')
+            ->with('success', 'Treinador atualizado com sucesso.');
     }
 }

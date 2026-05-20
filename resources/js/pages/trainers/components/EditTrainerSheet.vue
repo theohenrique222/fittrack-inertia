@@ -18,7 +18,7 @@ const props = defineProps<{
     trainer: Trainer;
 }>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['close']);
 
 const { success } = useToast();
 
@@ -33,14 +33,14 @@ function handleSubmit() {
         onSuccess: () => {
             form.reset();
             success('Treinador atualizado com sucesso.');
-            emit('change');
+            emit('close');
         },
     });
 }
 
 function handleCancel() {
     form.reset();
-    emit('change');
+    emit('close');
 }
 </script>
 

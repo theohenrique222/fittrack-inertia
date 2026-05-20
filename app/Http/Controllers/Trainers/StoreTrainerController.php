@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers\Trainers;
 
-use App\Actions\Trainers\ListTrainersAction;
 use App\Actions\Trainers\StoreTrainerAction;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TrainerResource;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class StoreTrainerController extends Controller
 {
     public function __invoke(
         Request $request,
         StoreTrainerAction $action
-    ): Response {
+    ): RedirectResponse {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users'],
@@ -24,11 +21,9 @@ class StoreTrainerController extends Controller
         ]);
 
         $action->execute($validated);
-        $trainers = (new ListTrainersAction)->execute();
 
-        return Inertia::render('trainers/ListTrainers', [
-            'title' => 'Lista de Treinadores',
-            'trainers' => TrainerResource::collection($trainers),
-        ])->flash('success', 'Treinador criado com sucesso.');
+        return redirect()
+            ->route('trainers')
+            ->with('success', 'Treinador criado com sucesso.');
     }
 }
