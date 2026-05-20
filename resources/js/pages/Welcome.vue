@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
-import { login, register } from '@/routes';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { ref, onMounted, computed } from 'vue';
+import { login, register, dashboard } from '@/routes';
 
 withDefaults(
     defineProps<{
@@ -11,6 +11,9 @@ withDefaults(
         canRegister: true,
     },
 );
+
+const page = usePage();
+const isLoggedIn = computed(() => !!page.props.auth?.user);
 
 const scrolled = ref(false);
 const mobileMenuOpen = ref(false);
@@ -172,17 +175,25 @@ const pricingPlans = [
 
                     <div class="hidden items-center gap-3 md:flex">
                         <Link
+                            v-if="!isLoggedIn"
                             :href="login()"
                             class="rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                         >
                             Entrar
                         </Link>
                         <Link
-                            v-if="canRegister"
+                            v-if="canRegister && !isLoggedIn"
                             :href="register()"
                             class="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110"
                         >
                             Começar Grátis
+                        </Link>
+                        <Link
+                            v-if="isLoggedIn"
+                            :href="dashboard()"
+                            class="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110"
+                        >
+                            Painel de Controle
                         </Link>
                     </div>
 
@@ -202,8 +213,9 @@ const pricingPlans = [
                     <a href="#testimonials" class="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground hover:bg-accent hover:text-foreground">Depoimentos</a>
                     <a href="#pricing" class="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground hover:bg-accent hover:text-foreground">Planos</a>
                     <div class="flex flex-col gap-2 border-t border-border pt-4">
-                        <Link :href="login()" class="rounded-lg px-3 py-2 text-center text-base font-medium text-foreground hover:bg-accent">Entrar</Link>
-                        <Link :href="register()" class="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-3 py-2 text-center text-base font-medium text-white">Começar Grátis</Link>
+                        <Link v-if="!isLoggedIn" :href="login()" class="rounded-lg px-3 py-2 text-center text-base font-medium text-foreground hover:bg-accent">Entrar</Link>
+                        <Link v-if="canRegister && !isLoggedIn" :href="register()" class="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-3 py-2 text-center text-base font-medium text-white">Começar Grátis</Link>
+                        <Link v-if="isLoggedIn" :href="dashboard()" class="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-3 py-2 text-center text-base font-medium text-white">Painel de Controle</Link>
                     </div>
                 </div>
             </div>
@@ -237,10 +249,18 @@ const pricingPlans = [
 
                     <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link
+                            v-if="!isLoggedIn"
                             :href="register()"
                             class="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110 sm:w-auto"
                         >
                             Comece Grátis Hoje
+                        </Link>
+                        <Link
+                            v-if="isLoggedIn"
+                            :href="dashboard()"
+                            class="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110 sm:w-auto"
+                        >
+                            Ir para o Painel
                         </Link>
                         <a
                             href="#features"
@@ -456,6 +476,7 @@ const pricingPlans = [
                         </ul>
 
                         <Link
+                            v-if="!isLoggedIn"
                             :href="register()"
                             :class="[
                                 'block w-full rounded-lg px-4 py-2.5 text-center text-sm font-semibold transition-all',
@@ -465,6 +486,18 @@ const pricingPlans = [
                             ]"
                         >
                             {{ plan.cta }}
+                        </Link>
+                        <Link
+                            v-if="isLoggedIn"
+                            :href="dashboard()"
+                            :class="[
+                                'block w-full rounded-lg px-4 py-2.5 text-center text-sm font-semibold transition-all',
+                                plan.highlighted
+                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:brightness-110'
+                                    : 'border border-border bg-background text-foreground hover:bg-accent',
+                            ]"
+                        >
+                            Ir para o Painel
                         </Link>
                     </div>
                 </div>
@@ -485,10 +518,18 @@ const pricingPlans = [
                         </p>
                         <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                             <Link
+                                v-if="!isLoggedIn"
                                 :href="register()"
                                 class="rounded-xl bg-white px-8 py-4 text-base font-bold text-emerald-700 shadow-xl transition-all hover:bg-white/90 hover:shadow-2xl"
                             >
                                 Começar Grátis
+                            </Link>
+                            <Link
+                                v-if="isLoggedIn"
+                                :href="dashboard()"
+                                class="rounded-xl bg-white px-8 py-4 text-base font-bold text-emerald-700 shadow-xl transition-all hover:bg-white/90 hover:shadow-2xl"
+                            >
+                                Ir para o Painel
                             </Link>
                             <a
                                 href="#features"
