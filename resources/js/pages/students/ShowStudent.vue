@@ -476,59 +476,66 @@ function getAvatarColor(id: number): string {
 
         <!-- Tab Content: Treino Ativo -->
         <div v-if="activeTab === 'workout'" class="space-y-4">
-            <div v-if="workout" class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                <!-- Header -->
-                <div class="border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5 dark:border-neutral-700 dark:from-emerald-900/20 dark:to-teal-900/20">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4 flex-1 min-w-0">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg">
-                                <Dumbbell class="h-6 w-6 text-white" />
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-3">
-                                    <h3 class="text-lg font-bold text-neutral-900 dark:text-white">
-                                        {{ workout.name }}
-                                    </h3>
-                                    <Badge class="bg-emerald-500 text-white">
-                                        Ativo
-                                    </Badge>
+            <div v-if="workouts.length > 0" class="space-y-4">
+                <div
+                    v-for="w in workouts"
+                    :key="w.id"
+                    class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800"
+                >
+                    <!-- Header -->
+                    <div class="border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5 dark:border-neutral-700 dark:from-emerald-900/20 dark:to-teal-900/20">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 flex-1 min-w-0">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg">
+                                    <Dumbbell class="h-6 w-6 text-white" />
                                 </div>
-                                <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 truncate">
-                                    {{ workout.description }}
-                                </p>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-3">
+                                        <h3 class="text-lg font-bold text-neutral-900 dark:text-white">
+                                            {{ w.name }}
+                                        </h3>
+                                        <Badge v-if="w.is_active" class="bg-emerald-500 text-white">
+                                            Ativo
+                                        </Badge>
+                                    </div>
+                                    <p v-if="w.description" class="text-sm text-neutral-500 dark:text-neutral-400 truncate">
+                                        {{ w.description }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
+                            <Button
+                                v-if="w.is_active"
+                                variant="ghost"
+                                size="sm"
+                                class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 shrink-0"
+                                @click="handleEditWorkout(w)"
+                            >
+                                <Edit class="mr-1.5 h-3.5 w-3.5" />
+                                Editar
+                            </Button>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-3 px-6 py-4">
                         <Button
-                            variant="ghost"
-                            size="sm"
-                            class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 shrink-0"
-                            @click="handleEditWorkout(workout)"
+                            variant="default"
+                            class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/20"
+                            @click="router.visit(`/workouts/${w.id}`)"
                         >
-                            <Edit class="mr-1.5 h-3.5 w-3.5" />
-                            Editar
+                            <Play class="mr-2 h-4 w-4" />
+                            Iniciar Treino
+                        </Button>
+                        <Button
+                            variant="outline"
+                            class="border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                            @click="router.visit(`/workouts/${w.id}`)"
+                        >
+                            Ver Detalhes
+                            <ChevronRight class="ml-2 h-4 w-4" />
                         </Button>
                     </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="grid grid-cols-2 gap-3 px-6 py-4">
-                    <Button
-                        variant="default"
-                        class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/20"
-                        @click="router.visit(`/workouts/${workout.id}`)"
-                    >
-                        <Play class="mr-2 h-4 w-4" />
-                        Iniciar Treino
-                    </Button>
-                    <Button
-                        variant="outline"
-                        class="border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-800"
-                        @click="router.visit(`/workouts/${workout.id}`)"
-                    >
-                        Ver Detalhes
-                        <ChevronRight class="ml-2 h-4 w-4" />
-                    </Button>
                 </div>
             </div>
 
@@ -540,15 +547,17 @@ function getAvatarColor(id: number): string {
                 <p class="mt-2 text-neutral-500 dark:text-neutral-400">
                     Crie um treino para este aluno começar
                 </p>
-                <Button
-                    size="lg"
-                    class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 px-8 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/25"
-                    @click="isCreateOpen = true"
-                >
-                    <Plus class="mr-2 h-5 w-5" />
-                    Criar Treino
-                </Button>
             </div>
+
+            <!-- Novo Treino Button -->
+            <Button
+                size="lg"
+                class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/25"
+                @click="isCreateOpen = true"
+            >
+                <Plus class="mr-2 h-5 w-5" />
+                Criar Novo Treino
+            </Button>
         </div>
 
         <!-- Tab Content: Histórico -->
