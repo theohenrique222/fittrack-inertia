@@ -10,12 +10,13 @@ class GetTrainerDashboardStatsAction
 {
     public function execute(User $user): array
     {
-        $totalClients = Client::count();
-        $activeClients = Client::whereHas('user', fn ($q) => $q->whereNotNull('updated_at'))->count();
+        $totalClients = Client::whereHas('user', fn ($q) => $q->where('trainer_id', $user->id))->count();
+        $activeClients = Client::whereHas('user', fn ($q) => $q->where('trainer_id', $user->id))->count();
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
         $totalCategories = DB::table('categories')->where('is_active', true)->count();
 
         $recentClients = Client::with('user')
+            ->whereHas('user', fn ($q) => $q->where('trainer_id', $user->id))
             ->latest()
             ->take(5)
             ->get()
@@ -33,12 +34,12 @@ class GetTrainerDashboardStatsAction
 
         return [
             'stats' => [
-                'totalClients' => $totalClients,
-                'activeClients' => $activeClients,
+                'totalStudents' => $totalClients,
+                'activeStudents' => $activeClients,
                 'totalExercises' => $totalExercises,
                 'totalCategories' => $totalCategories,
             ],
-            'recentClients' => $recentClients,
+            'recentStudents' => $recentClients,
             'weeklyActivity' => $weeklyActivity,
             'muscleGroupDistribution' => $muscleGroupDistribution,
             'monthlyGrowth' => $monthlyGrowth,
