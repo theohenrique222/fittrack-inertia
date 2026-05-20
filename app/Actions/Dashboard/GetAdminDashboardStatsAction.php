@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dashboard;
 
+use App\Enums\UserRole;
 use App\Models\Client;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ class GetAdminDashboardStatsAction
     {
         $totalUsers = User::count();
         $totalClients = Client::count();
-        $totalTrainers = DB::table('trainers')->count();
+        $totalTrainers = User::where('role', UserRole::PERSONAL)->count();
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
         $totalCategories = DB::table('categories')->where('is_active', true)->count();
 
@@ -47,12 +48,18 @@ class GetAdminDashboardStatsAction
 
     private function getUsersByRole(): array
     {
-        return [
-            ['role' => 'Admin', 'count' => 3, 'color' => '#10b981'],
-            ['role' => 'Personal Trainer', 'count' => 12, 'color' => '#14b8a6'],
-            ['role' => 'Cliente', 'count' => 48, 'color' => '#059669'],
-            ['role' => 'Freelancer', 'count' => 5, 'color' => '#0d9488'],
+        $roles = [
+            ['role' => 'Admin', 'key' => UserRole::ADMIN, 'color' => '#10b981'],
+            ['role' => 'Personal Trainer', 'key' => UserRole::PERSONAL, 'color' => '#14b8a6'],
+            ['role' => 'Cliente', 'key' => UserRole::CLIENT, 'color' => '#059669'],
+            ['role' => 'Freelancer', 'key' => UserRole::SELF, 'color' => '#0d9488'],
         ];
+
+        return collect($roles)->map(fn ($r) => [
+            'role' => $r['role'],
+            'count' => User::where('role', $r['key'])->count(),
+            'color' => $r['color'],
+        ])->all();
     }
 
     private function generateMonthlyGrowth(): array

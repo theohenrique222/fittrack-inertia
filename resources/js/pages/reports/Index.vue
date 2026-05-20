@@ -5,40 +5,13 @@ import { BarChart3, LayoutGrid, Users, Dumbbell, ClipboardList } from 'lucide-vu
 import PeriodFilter from '@/components/reports/PeriodFilter.vue';
 import AdminReports from '@/components/reports/AdminReports.vue';
 import TrainerReports from '@/components/reports/TrainerReports.vue';
+import BarChart from '@/components/dashboard/BarChart.vue';
+import LineChart from '@/components/dashboard/LineChart.vue';
+import DonutChart from '@/components/dashboard/DonutChart.vue';
 import { reports } from '@/routes';
 
 const page = usePage();
 const userRole = computed(() => page.props.auth.user.role);
-
-const tabs = computed(() => {
-    if (userRole.value === 'admin') {
-        return [
-            { key: 'overview', label: 'Visão Geral', icon: LayoutGrid },
-            { key: 'users', label: 'Usuários', icon: Users },
-            { key: 'workouts', label: 'Treinos', icon: ClipboardList },
-            { key: 'exercises', label: 'Exercícios', icon: Dumbbell },
-        ];
-    }
-
-    return [
-        { key: 'overview', label: 'Visão Geral', icon: LayoutGrid },
-        { key: 'students', label: 'Alunos', icon: Users },
-        { key: 'workouts', label: 'Treinos', icon: ClipboardList },
-        { key: 'exercises', label: 'Exercícios', icon: Dumbbell },
-    ];
-});
-
-const activeTab = ref('overview');
-const selectedPeriod = ref(props.selectedPeriod);
-
-function handlePeriodChange(period: string) {
-    selectedPeriod.value = period;
-    router.get(reports(), { period }, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-    });
-}
 
 const props = defineProps<{
     overview?: {
@@ -86,6 +59,36 @@ const props = defineProps<{
     }[];
     selectedPeriod: string;
 }>();
+
+const tabs = computed(() => {
+    if (userRole.value === 'admin') {
+        return [
+            { key: 'overview', label: 'Visão Geral', icon: LayoutGrid },
+            { key: 'users', label: 'Usuários', icon: Users },
+            { key: 'workouts', label: 'Treinos', icon: ClipboardList },
+            { key: 'exercises', label: 'Exercícios', icon: Dumbbell },
+        ];
+    }
+
+    return [
+        { key: 'overview', label: 'Visão Geral', icon: LayoutGrid },
+        { key: 'students', label: 'Alunos', icon: Users },
+        { key: 'workouts', label: 'Treinos', icon: ClipboardList },
+        { key: 'exercises', label: 'Exercícios', icon: Dumbbell },
+    ];
+});
+
+const activeTab = ref('overview');
+const selectedPeriod = ref(props.selectedPeriod);
+
+function handlePeriodChange(period: string) {
+    selectedPeriod.value = period;
+    router.get(reports(), { period }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+}
 
 const isAdmin = computed(() => userRole.value === 'admin');
 

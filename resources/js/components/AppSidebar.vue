@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Dumbbell, BarChart3, GraduationCap } from 'lucide-vue-next';
+import { LayoutGrid, Dumbbell, BarChart3, GraduationCap, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -30,7 +30,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
 
-    ...(can.view_students
+    ...(can.view_students && !can.impersonate
         ? [
               {
                   title: 'Alunos',
@@ -45,7 +45,7 @@ const mainNavItems: NavItem[] = [
               {
                   title: 'Treinadores',
                   href: trainers(),
-                  icon: LayoutGrid,
+                  icon: Users,
               },
           ]
         : []),

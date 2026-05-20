@@ -13,7 +13,7 @@ interface Props {
     emptyMessage?: string;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     emptyMessage: 'Nenhum dado disponível',
 });
 

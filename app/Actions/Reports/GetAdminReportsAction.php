@@ -2,6 +2,7 @@
 
 namespace App\Actions\Reports;
 
+use App\Enums\UserRole;
 use App\Models\Client;
 use App\Models\User;
 use Carbon\CarbonInterface;
@@ -51,15 +52,15 @@ class GetAdminReportsAction
         $previousUsers = User::whereBetween('created_at', [$previousStart, $start])->count();
         $currentClients = Client::whereBetween('created_at', [$start, $end])->count();
         $previousClients = Client::whereBetween('created_at', [$previousStart, $start])->count();
-        $currentTrainers = DB::table('trainers')->whereBetween('created_at', [$start, $end])->count();
-        $previousTrainers = DB::table('trainers')->whereBetween('created_at', [$previousStart, $start])->count();
+        $currentTrainers = User::where('role', UserRole::PERSONAL)->whereBetween('created_at', [$start, $end])->count();
+        $previousTrainers = User::where('role', UserRole::PERSONAL)->whereBetween('created_at', [$previousStart, $start])->count();
         $currentWorkouts = DB::table('workouts')->whereBetween('created_at', [$start, $end])->count();
         $previousWorkouts = DB::table('workouts')->whereBetween('created_at', [$previousStart, $start])->count();
 
         return [
             'totalUsers' => User::count(),
             'totalClients' => Client::count(),
-            'totalTrainers' => DB::table('trainers')->count(),
+            'totalTrainers' => User::where('role', UserRole::PERSONAL)->count(),
             'totalExercises' => DB::table('exercises')->where('is_active', true)->count(),
             'totalWorkouts' => DB::table('workouts')->count(),
             'newUsers' => $currentUsers,
@@ -153,16 +154,14 @@ class GetAdminReportsAction
 
     private function getTopTrainers(CarbonInterface $start, CarbonInterface $end): array
     {
-        return DB::table('trainers')
-            ->join('users', 'trainers.user_id', '=', 'users.id')
-            ->selectRaw('users.name, trainers.specialty, (SELECT COUNT(*) FROM users u WHERE u.trainer_id = trainers.user_id) as students_count')
-            ->groupBy('trainers.user_id', 'users.name', 'trainers.specialty')
+        return User::where('role', UserRole::PERSONAL)
+            ->withCount(['students as students_count'])
             ->orderByDesc('students_count')
             ->limit(5)
             ->get()
             ->map(fn ($row) => [
                 'name' => $row->name,
-                'specialty' => $row->specialty ?? 'Não informada',
+                'specialty' => 'Não informada',
                 'studentsCount' => (int) $row->students_count,
             ])
             ->all();
