@@ -86,6 +86,10 @@ const activityChartData = computed(() => {
                         <span class="text-sm font-medium">{{ stats.totalUsers }} usuários</span>
                     </div>
                     <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                        <UserPlus class="w-4 h-4" />
+                        <span class="text-sm font-medium">{{ stats.totalStudents }} alunos</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                         <TrendingUp class="w-4 h-4" />
                         <span class="text-sm font-medium">+{{ userGrowthRate }}% este mês</span>
                     </div>
@@ -119,10 +123,10 @@ const activityChartData = computed(() => {
             <div class="group rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Clientes</p>
-                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.totalClients }}</h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">Alunos</p>
+                        <h2 class="text-3xl font-bold mt-2 text-neutral-900 dark:text-white">{{ stats.totalStudents }}</h2>
                         <div class="flex items-center gap-1 mt-2">
-                            <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ Math.round((stats.totalClients / stats.totalUsers) * 100) }}% do total</span>
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ Math.round((stats.totalStudents / stats.totalUsers) * 100) }}% do total</span>
                         </div>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">

@@ -14,6 +14,7 @@ class StudentResource extends JsonResource
             'name' => $this->user?->name ?? 'Sem nome',
             'email' => $this->user?->email ?? '',
             'nickname' => $this->nickname,
+            'trainer_name' => $this->user?->trainer?->name ?? null,
         ];
     }
 }

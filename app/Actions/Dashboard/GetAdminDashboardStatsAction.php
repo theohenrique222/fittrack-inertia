@@ -26,7 +26,7 @@ class GetAdminDashboardStatsAction
         return [
             'stats' => [
                 'totalUsers' => $totalUsers,
-                'totalClients' => $totalClients,
+                'totalStudents' => $totalClients,
                 'totalTrainers' => $totalTrainers,
                 'totalExercises' => $totalExercises,
             ],
@@ -39,8 +39,8 @@ class GetAdminDashboardStatsAction
             'quickActions' => [
                 ['label' => 'Gerenciar Usuários', 'route' => '/users', 'icon' => 'users'],
                 ['label' => 'Gerenciar Treinadores', 'route' => '/trainers', 'icon' => 'user-check'],
+                ['label' => 'Todos os Alunos', 'route' => '/admin/students', 'icon' => 'dumbbell'],
                 ['label' => 'Gerenciar Exercícios', 'route' => '/exercises', 'icon' => 'dumbbell'],
-                ['label' => 'Relatórios do Sistema', 'route' => '/admin/reports', 'icon' => 'bar-chart-3'],
             ],
         ];
     }

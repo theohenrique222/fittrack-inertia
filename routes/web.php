@@ -11,6 +11,7 @@ use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Students\DestroyStudentController;
+use App\Http\Controllers\Students\ListAllStudentsController;
 use App\Http\Controllers\Students\ListStudentsController;
 use App\Http\Controllers\Students\ResetPasswordStudentController;
 use App\Http\Controllers\Students\ShowStudentController;
@@ -50,6 +51,11 @@ $router
     ->get(uri: '/students', action: ListStudentsController::class)
     ->name('students')
     ->middleware('auth');
+
+$router
+    ->get(uri: '/admin/students', action: ListAllStudentsController::class)
+    ->name('admin.students')
+    ->middleware(['auth', 'can:isAdmin']);
 
 $router
     ->get(uri: '/students/{student}', action: ShowStudentController::class)
