@@ -41,12 +41,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import {
     Sheet,
     SheetContent,
     SheetHeader,
@@ -689,11 +683,11 @@ function getAvatarColor(id: number): string {
         </SheetContent>
     </Sheet>
 
-    <Dialog v-model:open="isEditOpen">
-        <DialogContent class="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>Editar Treino</DialogTitle>
-            </DialogHeader>
+    <Sheet v-model:open="isEditOpen">
+        <SheetContent side="right" class="w-full sm:max-w-xl p-0">
+            <SheetHeader class="sr-only">
+                <SheetTitle>Editar Treino</SheetTitle>
+            </SheetHeader>
 
             <EditWorkoutSheet
                 v-if="selectedWorkout && student"
@@ -702,8 +696,8 @@ function getAvatarColor(id: number): string {
                 :exercises="exercises"
                 @close="closeEditSheet"
             />
-        </DialogContent>
-    </Dialog>
+        </SheetContent>
+    </Sheet>
 
     <ToastContainer v-model="toasts" />
 </template>

@@ -16,14 +16,6 @@ import { ChevronRight, Dumbbell, Plus, Search } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import {
     Sheet,
     SheetContent,
     SheetHeader,
@@ -367,11 +359,11 @@ function getAvatarColor(id: number): string {
         </SheetContent>
     </Sheet>
 
-    <Dialog v-model:open="isEditOpen">
-        <DialogContent class="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>Editar Treino</DialogTitle>
-            </DialogHeader>
+    <Sheet v-model:open="isEditOpen">
+        <SheetContent side="right" class="w-full sm:max-w-xl p-0">
+            <SheetHeader class="sr-only">
+                <SheetTitle>Editar Treino</SheetTitle>
+            </SheetHeader>
 
             <EditWorkoutSheet
                 v-if="selectedWorkout && student"
@@ -380,6 +372,6 @@ function getAvatarColor(id: number): string {
                 :exercises="exercises"
                 @close="closeEditSheet"
             />
-        </DialogContent>
-    </Dialog>
+        </SheetContent>
+    </Sheet>
 </template>
