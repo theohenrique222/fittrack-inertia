@@ -22,6 +22,7 @@ class GenerateWorkoutRequest extends FormRequest
             'client_id' => ['required', 'integer', Rule::in(Client::pluck('id')->toArray())],
             'category_ids' => ['required', 'array', 'min:1'],
             'category_ids.*' => ['required', 'integer', Rule::in(Category::pluck('id')->toArray())],
+            'exercise_count' => ['nullable', 'integer', 'min:1', 'max:20'],
         ];
     }
 }

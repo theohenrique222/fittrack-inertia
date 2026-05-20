@@ -16,10 +16,11 @@ class GenerateWorkoutAction
         return DB::transaction(function () use ($data) {
             $categoryIds = $data['category_ids'];
             $studentId = $data['client_id'];
+            $exerciseCount = $data['exercise_count'] ?? 6;
             $name = $data['name'] ?? $this->generateName($categoryIds);
             $description = $data['description'] ?? null;
 
-            $exercises = $this->getExercisesForCategories($categoryIds);
+            $exercises = $this->getExercisesForCategories($categoryIds, $exerciseCount);
 
             $workout = Workout::create([
                 'name' => $name,
@@ -56,15 +57,16 @@ class GenerateWorkoutAction
         return 'Treino '.$categories->take(2)->implode('/').' - ABC';
     }
 
-    private function getExercisesForCategories(array $categoryIds): Collection
+    private function getExercisesForCategories(array $categoryIds, int $exerciseCount): Collection
     {
         $exercisesByCategory = [];
+        $exercisesPerCategory = max(1, (int) ceil($exerciseCount / count($categoryIds)));
 
         foreach ($categoryIds as $categoryId) {
             $categoryExercises = Exercise::where('category_id', $categoryId)
                 ->where('is_active', true)
                 ->inRandomOrder()
-                ->limit($this->getExercisesPerCategory(count($categoryIds)))
+                ->limit($exercisesPerCategory)
                 ->get();
 
             foreach ($categoryExercises as $exercise) {
@@ -72,17 +74,7 @@ class GenerateWorkoutAction
             }
         }
 
-        return collect($exercisesByCategory);
-    }
-
-    private function getExercisesPerCategory(int $categoryCount): int
-    {
-        return match (true) {
-            $categoryCount === 1 => 6,
-            $categoryCount === 2 => 4,
-            $categoryCount <= 4 => 3,
-            default => 2,
-        };
+        return collect($exercisesByCategory)->take($exerciseCount);
     }
 
     private function getDefaultSets(string $difficulty): int

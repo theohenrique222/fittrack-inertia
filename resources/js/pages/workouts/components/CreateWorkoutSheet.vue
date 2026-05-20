@@ -5,6 +5,7 @@ import {
     ChevronDown,
     Clock,
     Dumbbell,
+    Minus,
     Plus,
     Sparkles,
     Trash2,
@@ -74,6 +75,7 @@ const form = useForm({
     client_id: 0 as number,
     exercises: [] as WorkoutExercise[],
     category_ids: [] as number[],
+    exercise_count: 6,
     is_active: true,
 });
 
@@ -109,6 +111,7 @@ function handleSubmit() {
     const submitOptions = {
         onSuccess: () => {
             form.reset();
+            form.exercise_count = 6;
             if (mode.value === 'manual') {
                 workoutExercises.value = [];
             }
@@ -160,6 +163,7 @@ function handleSubmit() {
 
 function handleCancel() {
     form.reset();
+    form.exercise_count = 6;
     workoutExercises.value = [];
     selectedCategoryIds.value = [];
     emit('close');
@@ -336,6 +340,43 @@ function handleCancel() {
                     <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300">
                         {{ selectedCategoryIds.length }} grupo(s) selecionado(s)
                     </span>
+                </div>
+
+                <div class="mt-5">
+                    <Label class="mb-3 flex items-center gap-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        <Dumbbell class="w-4 h-4 text-emerald-500" />
+                        Quantidade de Exercícios
+                    </Label>
+                    <div class="flex items-center gap-4">
+                        <button
+                            type="button"
+                            @click="form.exercise_count = Math.max(1, form.exercise_count - 1)"
+                            :disabled="form.exercise_count <= 1"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-neutral-200 bg-white text-neutral-600 transition-all hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-neutral-600 disabled:hover:bg-white dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:border-emerald-600 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 dark:disabled:hover:border-neutral-700 dark:disabled:hover:text-neutral-400 dark:disabled:hover:bg-neutral-800"
+                        >
+                            <Minus class="w-4 h-4" />
+                        </button>
+
+                        <div class="flex-1">
+                            <div class="flex items-center justify-center rounded-xl border-2 border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900/50">
+                                <span class="text-3xl font-bold text-neutral-900 dark:text-white">{{ form.exercise_count }}</span>
+                                <span class="ml-2 text-sm text-neutral-500 dark:text-neutral-400">exercícios</span>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            @click="form.exercise_count = Math.min(20, form.exercise_count + 1)"
+                            :disabled="form.exercise_count >= 20"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-neutral-200 bg-white text-neutral-600 transition-all hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-neutral-600 disabled:hover:bg-white dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:border-emerald-600 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20 dark:disabled:hover:border-neutral-700 dark:disabled:hover:text-neutral-400 dark:disabled:hover:bg-neutral-800"
+                        >
+                            <Plus class="w-4 h-4" />
+                        </button>
+                    </div>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-2.5 flex items-center gap-1.5">
+                        <Sparkles class="w-3 h-3" />
+                        Exercícios serão escolhidos aleatoriamente dos grupos selecionados
+                    </p>
                 </div>
 
                 <span
