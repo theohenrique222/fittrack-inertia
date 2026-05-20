@@ -117,10 +117,10 @@ const props = defineProps<{
     title: string;
     student: Student;
     workout: Workout | null;
-    workouts: { data: Workout[] };
+    workouts: Workout[];
     stats: Stats;
-    exercises: { data: ExerciseOption[] };
-    categories: { data: CategoryOption[] };
+    exercises: ExerciseOption[];
+    categories: CategoryOption[];
 }>();
 
 const isCreateOpen = ref(false);
@@ -131,10 +131,10 @@ const selectedWorkout = ref<Workout | null>(null);
 const activeTab = ref<'overview' | 'workout' | 'history'>('overview');
 
 const filteredWorkouts = computed(() => {
-    if (!searchQuery.value) return props.workouts.data;
+    if (!searchQuery.value) return props.workouts;
 
     const query = searchQuery.value.toLowerCase();
-    return props.workouts.data.filter(
+    return props.workouts.filter(
         (w) =>
             w.name.toLowerCase().includes(query) ||
             w.description?.toLowerCase().includes(query),
@@ -653,8 +653,8 @@ function getAvatarColor(id: number): string {
             <CreateWorkoutSheet
                 v-if="student"
                 :student="student"
-                :exercises="exercises.data"
-                :categories="categories.data"
+                :exercises="exercises"
+                :categories="categories"
                 :redirect-on-success="`/students/${student.id}`"
                 @close="isCreateOpen = false"
             />
@@ -671,7 +671,7 @@ function getAvatarColor(id: number): string {
                 v-if="selectedWorkout && student"
                 :workout="selectedWorkout"
                 :student="student"
-                :exercises="exercises.data"
+                :exercises="exercises"
                 @close="closeEditSheet"
             />
         </DialogContent>

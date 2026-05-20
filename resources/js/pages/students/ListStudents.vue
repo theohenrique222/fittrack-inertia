@@ -57,9 +57,7 @@ interface Student {
 
 const props = defineProps<{
     title: string;
-    students: {
-        data: Student[];
-    };
+    students: Student[];
 }>();
 
 const page = usePage();
@@ -71,12 +69,12 @@ const searchQuery = ref('');
 
 const filteredStudents = computed(() => {
     if (!searchQuery.value) {
-        return props.students.data;
+        return props.students;
     }
 
     const query = searchQuery.value.toLowerCase();
 
-    return props.students.data.filter(
+    return props.students.filter(
         (s) =>
             s.name.toLowerCase().includes(query) ||
             s.email.toLowerCase().includes(query) ||
@@ -85,7 +83,7 @@ const filteredStudents = computed(() => {
 });
 
 const stats = computed(() => ({
-    total: props.students.data.length,
+    total: props.students.length,
 }));
 
 watch(

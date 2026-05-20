@@ -47,9 +47,7 @@ interface Trainer {
 
 const props = defineProps<{
     title: string;
-    trainers: {
-        data: Trainer[];
-    };
+    trainers: Trainer[];
 }>();
 
 const page = usePage();
@@ -62,12 +60,12 @@ const searchQuery = ref('');
 
 const filteredTrainers = computed(() => {
     if (!searchQuery.value) {
-        return props.trainers.data;
+        return props.trainers;
     }
 
     const query = searchQuery.value.toLowerCase();
 
-    return props.trainers.data.filter(
+    return props.trainers.filter(
         (t) =>
             t.name.toLowerCase().includes(query) ||
             t.email.toLowerCase().includes(query) ||
@@ -76,7 +74,7 @@ const filteredTrainers = computed(() => {
 });
 
 const stats = computed(() => ({
-    total: props.trainers.data.length,
+    total: props.trainers.length,
 }));
 
 watch(

@@ -71,12 +71,8 @@ interface Exercise {
 
 const props = defineProps<{
     title: string;
-    exercises?: {
-        data: Exercise[];
-    };
-    categories?: {
-        data: Category[];
-    };
+    exercises?: Exercise[];
+    categories?: Category[];
 }>();
 
 const page = usePage();
@@ -86,7 +82,7 @@ const searchQuery = ref('');
 const selectedDifficulty = ref<string>('all');
 
 const filteredExercises = computed(() => {
-    let result = props.exercises?.data || [];
+    let result = props.exercises || [];
 
     if (selectedDifficulty.value !== 'all') {
         result = result.filter(
@@ -110,7 +106,7 @@ const filteredExercises = computed(() => {
 });
 
 const stats = computed(() => {
-    const exercises = props.exercises?.data || [];
+    const exercises = props.exercises || [];
 
     return {
         total: exercises.length,
@@ -423,7 +419,7 @@ function getAvatarColor(id: number): string {
                         </DialogHeader>
 
                         <CreateExerciseSheet
-                            :categories="categories.data"
+                            :categories="categories"
                             @close="closeCreateSheet"
                         />
                     </DialogContent>
@@ -796,7 +792,7 @@ function getAvatarColor(id: number): string {
             <EditExerciseSheet
                 v-if="selectedExercise"
                 :exercise="selectedExercise"
-                :categories="categories.data"
+                :categories="categories"
                 @close="closeEditSheet"
             />
         </DialogContent>

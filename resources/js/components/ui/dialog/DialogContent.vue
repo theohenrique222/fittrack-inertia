@@ -6,6 +6,7 @@ import { X } from "lucide-vue-next"
 import {
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogPortal,
   useForwardPropsEmits,
 } from "reka-ui"
@@ -38,6 +39,10 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
           props.class,
         )"
     >
+      <DialogDescription class="sr-only">
+        Dialog content
+      </DialogDescription>
+
       <slot />
 
       <DialogClose

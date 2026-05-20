@@ -97,15 +97,9 @@ const props = defineProps<{
     title: string;
     studentId?: number;
     student?: Student;
-    workouts: {
-        data: Workout[];
-    };
-    exercises: {
-        data: Exercise[];
-    };
-    categories: {
-        data: Category[];
-    };
+    workouts: Workout[];
+    exercises: Exercise[];
+    categories: Category[];
 }>();
 
 const page = usePage();
@@ -114,7 +108,7 @@ const { toasts, success, error } = useToast();
 const searchQuery = ref('');
 
 const filteredWorkouts = computed(() => {
-    let result = props.workouts.data;
+    let result = props.workouts;
 
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
@@ -130,8 +124,8 @@ const filteredWorkouts = computed(() => {
 });
 
 const stats = computed(() => ({
-    total: props.workouts.data.length,
-    totalExercises: props.workouts.data.reduce((sum, w) => sum + (w.exercises?.length || 0), 0),
+    total: props.workouts.length,
+    totalExercises: props.workouts.reduce((sum, w) => sum + (w.exercises?.length || 0), 0),
 }));
 
 watch(
@@ -252,8 +246,8 @@ function getAvatarColor(id: number): string {
                         <CreateWorkoutSheet
                             v-if="student"
                             :student="student"
-                            :exercises="exercises.data"
-                            :categories="categories.data"
+                            :exercises="exercises"
+                            :categories="categories"
                             @close="closeCreateSheet"
                         />
                     </SheetContent>
@@ -383,7 +377,7 @@ function getAvatarColor(id: number): string {
                 v-if="selectedWorkout && student"
                 :workout="selectedWorkout"
                 :student="student"
-                :exercises="exercises.data"
+                :exercises="exercises"
                 @close="closeEditSheet"
             />
         </DialogContent>
