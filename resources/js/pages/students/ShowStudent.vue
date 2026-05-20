@@ -12,7 +12,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Calendar,
@@ -30,7 +30,7 @@ import {
     Search,
     Plus,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -52,10 +52,28 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { ToastContainer } from '@/components/ui/toast';
+import { useToast } from '@/composables/useToast';
 import { destroy as destroyStudent, resetPassword } from '@/routes/students';
 import { destroy as destroyWorkout } from '@/routes/workouts';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
+
+const page = usePage();
+const { toasts, success, error } = useToast();
+
+watch(
+    () => page.props.flash,
+    (flash: any) => {
+        if (flash?.success) {
+            success(flash.success);
+        }
+
+        if (flash?.error) {
+            error(flash.error);
+        }
+    },
+);
 
 interface Student {
     id: number;
@@ -686,4 +704,6 @@ function getAvatarColor(id: number): string {
             />
         </DialogContent>
     </Dialog>
+
+    <ToastContainer v-model="toasts" />
 </template>
