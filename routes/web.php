@@ -23,6 +23,7 @@ use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
 use App\Http\Controllers\Workouts\DestroyWorkoutController;
 use App\Http\Controllers\Workouts\GenerateWorkoutController;
+use App\Http\Controllers\Workouts\ShowWorkoutDetailController;
 use App\Http\Controllers\Workouts\StoreWorkoutController;
 use App\Http\Controllers\Workouts\UpdateWorkoutController;
 use Illuminate\Routing\Router;
@@ -136,6 +137,11 @@ $router
 $router
     ->put(uri: '/workouts/{workout}', action: UpdateWorkoutController::class)
     ->name('workouts.update');
+
+$router
+    ->get(uri: '/workouts/{workout}', action: ShowWorkoutDetailController::class)
+    ->name('workouts.show')
+    ->middleware('auth');
 
 $router
     ->delete(uri: '/workouts/{workout}', action: DestroyWorkoutController::class)

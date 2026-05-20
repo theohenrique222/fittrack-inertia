@@ -12,7 +12,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Calendar,
@@ -52,7 +52,6 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { router } from '@inertiajs/vue3';
 import { destroy, resetPassword } from '@/routes/students';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
@@ -360,25 +359,30 @@ function getAvatarColor(id: number): string {
         <div v-if="activeTab === 'overview'" class="space-y-6">
             <!-- Treino Ativo Preview -->
             <div v-if="workout" class="rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                <div class="border-b border-neutral-200 px-6 py-4 dark:border-neutral-700">
+                <div
+                    class="border-b border-neutral-200 px-6 py-4 dark:border-neutral-700 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors"
+                    @click="router.visit(`/workouts/${workout.id}`)"
+                >
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
                             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">
                                 <Dumbbell class="h-5 w-5 text-white" />
                             </div>
-                            <div>
-                                <h3 class="font-semibold text-neutral-900 dark:text-white">{{ workout.name }}</h3>
-                                <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-semibold text-neutral-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                                    {{ workout.name }}
+                                </h3>
+                                <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 truncate">
                                     {{ workout.description }}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 shrink-0 ml-3">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
-                                @click="handleEditWorkout(workout)"
+                                @click.stop="handleEditWorkout(workout)"
                             >
                                 <Edit class="mr-1.5 h-3.5 w-3.5" />
                                 Editar
@@ -395,7 +399,8 @@ function getAvatarColor(id: number): string {
                         <div
                             v-for="(exercise, index) in workout.exercises.slice(0, 3)"
                             :key="exercise.id"
-                            class="flex items-center gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50"
+                            class="flex items-center gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-600 transition-colors"
+                            @click="router.visit(`/workouts/${workout.id}`)"
                         >
                             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                                 {{ index + 1 }}
@@ -442,7 +447,7 @@ function getAvatarColor(id: number): string {
                     <Button
                         variant="default"
                         class="w-full bg-emerald-500 text-white hover:bg-emerald-600"
-                        @click="activeTab = 'workout'"
+                        @click="router.visit(`/workouts/${workout.id}`)"
                     >
                         <Play class="mr-2 h-4 w-4" />
                         Ver Treino Completo
@@ -472,25 +477,30 @@ function getAvatarColor(id: number): string {
         <!-- Tab Content: Treino Ativo -->
         <div v-if="activeTab === 'workout'" class="space-y-4">
             <div v-if="workout" class="rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                <div class="border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 dark:border-neutral-700 dark:from-emerald-900/20 dark:to-teal-900/20">
+                <div
+                    class="border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 dark:border-neutral-700 dark:from-emerald-900/20 dark:to-teal-900/20 cursor-pointer hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30 transition-colors"
+                    @click="router.visit(`/workouts/${workout.id}`)"
+                >
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
                             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg">
                                 <Dumbbell class="h-6 w-6 text-white" />
                             </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-neutral-900 dark:text-white">{{ workout.name }}</h3>
-                                <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-lg font-bold text-neutral-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                                    {{ workout.name }}
+                                </h3>
+                                <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 truncate">
                                     {{ workout.description }}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 shrink-0 ml-3">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
-                                @click="handleEditWorkout(workout)"
+                                @click.stop="handleEditWorkout(workout)"
                             >
                                 <Edit class="mr-1.5 h-3.5 w-3.5" />
                                 Editar Treino
@@ -507,7 +517,8 @@ function getAvatarColor(id: number): string {
                         <div
                             v-for="(exercise, index) in workout.exercises"
                             :key="exercise.id"
-                            class="group rounded-xl border border-neutral-200 bg-white p-5 transition-all hover:border-emerald-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
+                            class="group rounded-xl border border-neutral-200 bg-white p-5 transition-all hover:border-emerald-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600 cursor-pointer"
+                            @click="router.visit(`/workouts/${workout.id}`)"
                         >
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start gap-4">
@@ -590,7 +601,7 @@ function getAvatarColor(id: number): string {
                 >
                     <div
                         class="flex items-center gap-4 p-4 cursor-pointer"
-                        @click="activeTab = 'workout'"
+                        @click="router.visit(`/workouts/${workout.id}`)"
                     >
                         <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-bold text-sm shadow-sm">
                             {{ (workout.exercises?.length || 0).toString().padStart(2, '0') }}

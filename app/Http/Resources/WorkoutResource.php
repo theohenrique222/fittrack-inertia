@@ -28,6 +28,14 @@ class WorkoutResource extends JsonResource
             'exercises' => $this->whenLoaded('exercises', fn () => $this->exercises->map(fn ($exercise) => [
                 'id' => $exercise->id,
                 'name' => $exercise->name,
+                'slug' => $exercise->slug,
+                'description' => $exercise->description,
+                'muscle_group' => $exercise->muscle_group,
+                'equipment' => $exercise->equipment,
+                'difficulty' => $exercise->difficulty,
+                'instructions' => $exercise->instructions,
+                'image' => $exercise->image,
+                'video_url' => $exercise->video_url,
                 'category' => $exercise->category ? [
                     'id' => $exercise->category->id,
                     'name' => $exercise->category->name,
