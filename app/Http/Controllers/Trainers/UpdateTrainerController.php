@@ -30,6 +30,6 @@ class UpdateTrainerController extends Controller
         return Inertia::render('trainers/ListTrainers', [
             'title' => 'Lista de Treinadores',
             'trainers' => TrainerResource::collection($trainers),
-        ]);
+        ])->flash('success', 'Treinador atualizado com sucesso.');
     }
 }

@@ -4,6 +4,7 @@ import { Mail, User, UserPlus } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/composables/useToast';
 import { update } from '@/routes/trainers';
 
 interface Trainer {
@@ -19,6 +20,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['change']);
 
+const { success } = useToast();
+
 const form = useForm({
     name: props.trainer.name,
     email: props.trainer.email,
@@ -29,6 +32,7 @@ function handleSubmit() {
     form.put(update.url(props.trainer.id), {
         onSuccess: () => {
             form.reset();
+            success('Treinador atualizado com sucesso.');
             emit('change');
         },
     });

@@ -108,6 +108,7 @@ const handleDeleteClick = (id: number) => {
     router.delete(destroy.url({ trainer: id }), {
         onSuccess: () => {
             selectedTrainer.value = null;
+            success('Treinador removido com sucesso.');
         },
     });
 };

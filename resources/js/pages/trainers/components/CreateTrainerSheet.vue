@@ -4,9 +4,12 @@ import { Mail, Shield, User, UserPlus } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/composables/useToast';
 import { store } from '@/routes/trainers';
 
 const emit = defineEmits(['change']);
+
+const { success } = useToast();
 
 const form = useForm({
     name: '',
@@ -19,6 +22,7 @@ function handleSubmit() {
     form.post(store.url(), {
         onSuccess: () => {
             form.reset();
+            success('Treinador criado com sucesso.');
             emit('change');
         },
     });
