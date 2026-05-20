@@ -476,95 +476,64 @@ function getAvatarColor(id: number): string {
 
         <!-- Tab Content: Treino Ativo -->
         <div v-if="activeTab === 'workout'" class="space-y-4">
-            <div v-if="workout" class="rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                <div
-                    class="border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 dark:border-neutral-700 dark:from-emerald-900/20 dark:to-teal-900/20 cursor-pointer hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30 transition-colors"
-                    @click="router.visit(`/workouts/${workout.id}`)"
-                >
+            <div v-if="workout" class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                <!-- Header -->
+                <div class="border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5 dark:border-neutral-700 dark:from-emerald-900/20 dark:to-teal-900/20">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
                             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg">
                                 <Dumbbell class="h-6 w-6 text-white" />
                             </div>
                             <div class="min-w-0 flex-1">
-                                <h3 class="text-lg font-bold text-neutral-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-                                    {{ workout.name }}
-                                </h3>
+                                <div class="flex items-center gap-3">
+                                    <h3 class="text-lg font-bold text-neutral-900 dark:text-white">
+                                        {{ workout.name }}
+                                    </h3>
+                                    <Badge class="bg-emerald-500 text-white">
+                                        Ativo
+                                    </Badge>
+                                </div>
                                 <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 truncate">
                                     {{ workout.description }}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-3">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
-                                @click.stop="handleEditWorkout(workout)"
-                            >
-                                <Edit class="mr-1.5 h-3.5 w-3.5" />
-                                Editar Treino
-                            </Button>
-                            <Badge class="bg-emerald-500 text-white">
-                                Ativo
-                            </Badge>
-                        </div>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 shrink-0"
+                            @click="handleEditWorkout(workout)"
+                        >
+                            <Edit class="mr-1.5 h-3.5 w-3.5" />
+                            Editar
+                        </Button>
                     </div>
                 </div>
 
-                <div class="p-6">
-                    <div v-if="workout.exercises && workout.exercises.length > 0" class="space-y-4">
-                        <div
-                            v-for="(exercise, index) in workout.exercises"
-                            :key="exercise.id"
-                            class="group rounded-xl border border-neutral-200 bg-white p-5 transition-all hover:border-emerald-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600 cursor-pointer"
-                            @click="router.visit(`/workouts/${workout.id}`)"
-                        >
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-start gap-4">
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 text-base font-bold text-emerald-700 dark:from-emerald-900/30 dark:to-teal-900/30 dark:text-emerald-300">
-                                        {{ index + 1 }}
-                                    </div>
-                                    <div>
-                                        <h4 class="text-base font-semibold text-neutral-900 dark:text-white">{{ exercise.name }}</h4>
-                                        <p v-if="exercise.category" class="text-sm text-neutral-500 dark:text-neutral-400">
-                                            {{ exercise.category.name }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-4 grid grid-cols-3 gap-4 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900/50">
-                                <div class="text-center">
-                                    <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Séries</p>
-                                    <p class="mt-1 text-2xl font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.sets }}</p>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Repetições</p>
-                                    <p class="mt-1 text-2xl font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.reps }}</p>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Descanso</p>
-                                    <p class="mt-1 text-2xl font-bold text-neutral-900 dark:text-white">{{ formatRestSeconds(exercise.pivot.rest_seconds) }}</p>
-                                </div>
-                            </div>
-
-                            <p v-if="exercise.pivot.notes" class="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
-                                <span class="font-semibold">Observação:</span> {{ exercise.pivot.notes }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div v-else class="py-12 text-center text-neutral-500 dark:text-neutral-400">
-                        <Dumbbell class="mx-auto mb-4 h-16 w-16 text-neutral-300 dark:text-neutral-600" />
-                        <p class="text-lg font-medium">Nenhum exercício adicionado</p>
-                        <p class="mt-1 text-sm">Adicione exercícios para começar o treino</p>
-                    </div>
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 px-6 py-4">
+                    <Button
+                        variant="default"
+                        class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/20"
+                        @click="router.visit(`/workouts/${workout.id}`)"
+                    >
+                        <Play class="mr-2 h-4 w-4" />
+                        Iniciar Treino
+                    </Button>
+                    <Button
+                        variant="outline"
+                        class="border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                        @click="router.visit(`/workouts/${workout.id}`)"
+                    >
+                        Ver Detalhes
+                        <ChevronRight class="ml-2 h-4 w-4" />
+                    </Button>
                 </div>
             </div>
 
-            <div v-else class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-20 text-center dark:border-neutral-700 dark:bg-neutral-900/50">
-                <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
+            <div v-else class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-20 text-center dark:border-neutral-700 dark:bg-neutral-900/50">
+                <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-700">
                     <Dumbbell class="h-10 w-10 text-neutral-400" />
                 </div>
                 <h3 class="text-xl font-bold text-neutral-900 dark:text-white">Nenhum treino ativo</h3>
@@ -573,7 +542,7 @@ function getAvatarColor(id: number): string {
                 </p>
                 <Button
                     size="lg"
-                    class="mt-6 bg-emerald-500 px-8 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
+                    class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 px-8 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/25"
                     @click="isCreateOpen = true"
                 >
                     <Plus class="mr-2 h-5 w-5" />
