@@ -52,7 +52,8 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { destroy, resetPassword } from '@/routes/students';
+import { destroy as destroyStudent, resetPassword } from '@/routes/students';
+import { destroy as destroyWorkout } from '@/routes/workouts';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
 
@@ -172,8 +173,18 @@ function handleDelete() {
         return;
     }
 
-    router.delete(destroy.url({ student: props.student.id }), {
+    router.delete(destroyStudent.url({ student: props.student.id }), {
         onSuccess: () => router.visit('/students'),
+    });
+}
+
+function handleDeleteWorkout(workoutId: number) {
+    if (!confirm('Tem certeza que deseja deletar este treino?')) {
+        return;
+    }
+
+    router.delete(destroyWorkout.url({ workout: workoutId }), {
+        preserveScroll: true,
     });
 }
 
@@ -504,16 +515,26 @@ function getAvatarColor(id: number): string {
                                 </div>
                             </div>
 
-                            <Button
-                                v-if="w.is_active"
-                                variant="ghost"
-                                size="sm"
-                                class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 shrink-0"
-                                @click="handleEditWorkout(w)"
-                            >
-                                <Edit class="mr-1.5 h-3.5 w-3.5" />
-                                Editar
-                            </Button>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <Button
+                                    v-if="w.is_active"
+                                    variant="ghost"
+                                    size="sm"
+                                    class="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                                    @click="handleEditWorkout(w)"
+                                >
+                                    <Edit class="mr-1.5 h-3.5 w-3.5" />
+                                    Editar
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    class="h-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                                    @click="handleDeleteWorkout(w.id)"
+                                >
+                                    <Trash2 class="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
 
