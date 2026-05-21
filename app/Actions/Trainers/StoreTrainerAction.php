@@ -18,6 +18,7 @@ class StoreTrainerAction
                 'password' => $data['password'] ?? 'password',
                 'role' => UserRole::PERSONAL,
                 'email_verified_at' => now(),
+                'must_reset_password' => true,
             ]);
 
             return Trainer::create([

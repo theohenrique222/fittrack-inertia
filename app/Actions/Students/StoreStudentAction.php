@@ -18,6 +18,7 @@ class StoreStudentAction
             $user->name = $data['name'];
             $user->email = $data['email'];
             $user->password = Hash::make($data['password'] ?? 'password');
+            $user->must_reset_password = true;
             $user->role = UserRole::CLIENT->value;
             $user->trainer_id = Auth::id();
             $user->email_verified_at = now();

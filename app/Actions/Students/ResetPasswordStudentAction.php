@@ -11,6 +11,7 @@ class ResetPasswordStudentAction
     {
         $student->user()->update([
             'password' => Hash::make('password'),
+            'must_reset_password' => true,
         ]);
     }
 }

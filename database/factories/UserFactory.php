@@ -57,4 +57,11 @@ class UserFactory extends Factory
             'two_factor_confirmed_at' => now(),
         ]);
     }
+
+    public function mustResetPassword(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'must_reset_password' => true,
+        ]);
+    }
 }

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\MustResetPasswordController;
 use App\Http\Controllers\Auth\StopImpersonationController;
+use App\Http\Controllers\Auth\UpdateFirstPasswordController;
 use App\Http\Controllers\Authentication\LoginController;
 use App\Http\Controllers\Categories\ListCategoriesController;
 use App\Http\Controllers\Context\ChangeContextController;
@@ -39,9 +41,18 @@ $router
     ->name('welcome');
 
 $router
-
     ->get(uri: '/login', action: LoginController::class)
     ->name('login');
+
+$router
+    ->get(uri: '/password/must-reset', action: MustResetPasswordController::class)
+    ->name('password.must-reset')
+    ->middleware('auth');
+
+$router
+    ->post(uri: '/password/update-first', action: UpdateFirstPasswordController::class)
+    ->name('password.update-first')
+    ->middleware('auth');
 
 $router
     ->post(uri: 'change-context', action: ChangeContextController::class)
