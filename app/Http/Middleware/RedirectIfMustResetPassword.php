@@ -12,11 +12,14 @@ class RedirectIfMustResetPassword
     {
         $user = $request->user();
 
-        if ($user && $user->mustResetPassword()) {
-            $allowedRoutes = ['password.must-reset', 'logout'];
+        if ($user) {
+            $freshUser = $user->fresh();
+            if ($freshUser && $freshUser->must_reset_password === true) {
+                $allowedRoutes = ['password.must-reset', 'logout'];
 
-            if (! in_array($request->route()->getName(), $allowedRoutes)) {
-                return redirect()->route('password.must-reset');
+                if (! in_array($request->route()->getName(), $allowedRoutes)) {
+                    return redirect()->route('password.must-reset');
+                }
             }
         }
 
