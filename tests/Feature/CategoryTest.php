@@ -4,10 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Exercise;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_categories_table_exists(): void
     {
         $this->assertTrue(

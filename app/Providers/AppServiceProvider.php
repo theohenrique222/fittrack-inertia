@@ -73,10 +73,15 @@ class AppServiceProvider extends ServiceProvider
     protected function preventTestingDatabaseCollision(): void
     {
         if (app()->environment('testing')) {
-            $testingDatabase = config('database.connections.mysql.database');
-            $developmentDatabase = env('DB_DATABASE');
+            $connection = config('database.default');
 
-            if ($testingDatabase === $developmentDatabase) {
+            if ($connection === 'sqlite') {
+                return;
+            }
+
+            $testingDatabase = config("database.connections.{$connection}.database");
+
+            if ($testingDatabase === 'fittrack') {
                 abort(500, 'Testing database cannot be the same as development database.');
             }
         }

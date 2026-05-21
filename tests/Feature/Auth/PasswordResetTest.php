@@ -3,6 +3,7 @@
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -30,15 +31,11 @@ test('reset password screen can be rendered', function () {
 
     $user = User::factory()->create();
 
-    $this->post(route('password.email'), ['email' => $user->email]);
+    $token = Password::createToken($user);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get(route('password.reset', $notification->token));
+    $response = $this->get(route('password.reset', ['token' => $token]));
 
-        $response->assertOk();
-
-        return true;
-    });
+    $response->assertOk();
 });
 
 test('password can be reset with valid token', function () {

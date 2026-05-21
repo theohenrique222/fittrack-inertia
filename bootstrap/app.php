@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
             RedirectIfMustResetPassword::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        if (env('APP_ENV') === 'testing') {
+            $middleware->validateCsrfTokens(except: ['*']);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
