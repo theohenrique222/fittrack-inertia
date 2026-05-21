@@ -24,7 +24,7 @@ FitTrack é uma aplicação web moderna projetada para ajudar personal trainers 
 
 | Categoria | Tecnologia |
 |-----------|------------|
-| **Backend** | Laravel 13, PHP 8.4 |
+| **Backend** | Laravel 13, PHP 8.3 |
 | **Frontend** | Vue 3, TypeScript, Inertia.js v3 |
 | **Banco de Dados** | MySQL / PostgreSQL |
 | **UI** | Tailwind CSS v4, ShadCN Vue |
@@ -36,57 +36,116 @@ FitTrack é uma aplicação web moderna projetada para ajudar personal trainers 
 ```
 app/
 ├── Actions/              # Lógica de negócio (Store, Update, Destroy)
-── Http/Controllers/     # Controllers enxutos organizados por módulo
+├── Http/Controllers/     # Controllers enxutos organizados por módulo
 ├── Http/Resources/       # Transformação de dados via Resources
 ├── Models/               # Models Eloquent
 └── Contexts/             # Ações específicas por domínio
 
 resources/js/
-── pages/                # Páginas Inertia.js + Vue 3
+├── pages/                # Páginas Inertia.js + Vue 3
 ├── components/           # Componentes reutilizáveis (DataTable, Sheet, Buttons)
 └── layouts/              # Componentes de layout
 ```
 
 ## Instalação
 
+### Pré-requisitos
+
+- Docker + Docker Compose instalados
+
+### Passos
+
 1. Clone o repositório:
    ```bash
    git clone https://github.com/theohenrique222/fittrack-inertia.git
-   cd fittrack
+   cd fittrack-inertia
    ```
 
-2. Instale as dependências do backend:
-   ```bash
-   composer install
-   ```
-
-3. Configure o ambiente:
+2. Copie o arquivo de ambiente:
    ```bash
    cp .env.example .env
-   php artisan key:generate
    ```
 
-4. Execute as migrações:
+3. Configure o UID/GID do seu usuário (Linux):
    ```bash
-   php artisan migrate
+   echo "WWWUSER=$(id -u)" >> .env
+   echo "WWWGROUP=$(id -g)" >> .env
    ```
 
-5. Instale as dependências do frontend:
+4. Inicie os containers:
    ```bash
-   npm install
+   docker compose up -d --build
    ```
 
-6. Inicie o servidor de desenvolvimento:
+5. Instale as dependências:
    ```bash
-   composer run dev
+   docker compose exec fittrack composer install
+   docker compose exec fittrack npm install
    ```
 
-7. Crie uma conta de super admin:
+6. Gere a chave da aplicação:
    ```bash
-   php artisan app:create-super-admin
+   docker compose exec fittrack php artisan key:generate
    ```
 
-8. Acesse a aplicação em `http://localhost:8000`
+7. Execute as migrações:
+   ```bash
+   docker compose exec fittrack php artisan migrate
+   ```
+
+8. Inicie o servidor de desenvolvimento:
+   ```bash
+   docker compose exec fittrack composer run dev:docker
+   ```
+
+9. Acesse a aplicação em `http://localhost:8088`
+
+### Serviços
+
+| Serviço | Container | Porta | Descrição |
+|---------|-----------|-------|-----------|
+| `fittrack` | fittrack-app | 9000, 5173 | PHP 8.3-FPM + Node 22 + Composer |
+| `nginx` | fittrack-nginx | 8088 | Proxy reverso |
+| `mysql` | fittrack-mysql | 3307 | Banco de dados |
+
+### Estrutura Docker
+
+```
+docker/
+├── php/
+│   ├── Dockerfile          # Imagem PHP 8.3 + Node 22
+│   └── www.conf            # Configuração do PHP-FPM
+├── nginx/
+│   └── default.conf        # Configuração do Nginx
+docker-compose.yml          # Orquestração dos serviços
+.dockerignore               # Arquivos ignorados no build
+```
+
+### Comandos Úteis
+
+| Comando | Descrição |
+|---------|-----------|
+| `docker compose exec fittrack bash` | Acessa o terminal do container |
+| `docker compose exec fittrack composer install` | Instala dependências PHP |
+| `docker compose exec fittrack npm install` | Instala dependências Node |
+| `docker compose exec fittrack composer run dev:docker` | Inicia Vite + queue worker |
+| `docker compose exec fittrack npm run dev` | Inicia apenas o Vite |
+| `docker compose exec fittrack php artisan migrate` | Executa migrações |
+| `docker compose exec fittrack php artisan test` | Executa os testes |
+| `docker compose exec fittrack php artisan db:seed` | Executa seeders |
+| `docker compose logs -f fittrack` | Visualiza logs da aplicação |
+| `docker compose logs -f nginx` | Visualiza logs do Nginx |
+| `docker compose logs -f mysql` | Visualiza logs do MySQL |
+| `docker compose down -v` | Para containers e remove volumes |
+| `docker compose build --no-cache` | Rebuild sem cache |
+
+### Troubleshooting
+
+**Erro de permissão:** execute `docker compose down && docker compose up -d --build` para reconstruir com as permissões corretas.
+
+**Porta 3307 em uso:** altere `FORWARD_DB_PORT` no `.env` para outra porta disponível.
+
+**Vite não conecta:** verifique se a porta `5173` está acessível e se o `npm run dev` está rodando no container.
 
 ## Padrões de Desenvolvimento
 
