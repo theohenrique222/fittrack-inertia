@@ -26,7 +26,14 @@ import {
     KeyRound,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
     Sheet,
@@ -36,13 +43,6 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { ToastContainer } from '@/components/ui/toast';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/composables/useToast';
 import CreateStudentSheet from '@/pages/students/components/CreateStudentSheet.vue';
 import EditStudentSheet from '@/pages/students/components/EditStudentSheet.vue';
@@ -112,6 +112,7 @@ const handleEditClick = (student: Student, event: Event) => {
 
 const handleDeleteClick = (id: number, event: Event) => {
     event.stopPropagation();
+
     if (!confirm('Tem certeza que deseja deletar este aluno?')) {
         return;
     }
@@ -125,6 +126,7 @@ const handleDeleteClick = (id: number, event: Event) => {
 
 const handleResetPasswordClick = (id: number, event: Event) => {
     event.stopPropagation();
+
     if (!confirm('Tem certeza que deseja redefinir a senha para "password"?')) {
         return;
     }

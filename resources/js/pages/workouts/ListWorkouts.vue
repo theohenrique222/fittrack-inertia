@@ -171,11 +171,6 @@ const closeEditSheet = () => {
     isEditOpen.value = false;
 };
 
-const closeViewSheet = () => {
-    isViewOpen.value = false;
-    selectedWorkout.value = null;
-};
-
 onMounted(() => {
     const url = new URL(window.location.href);
     const shouldCreate = url.searchParams.get('create');

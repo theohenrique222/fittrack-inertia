@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
-import { Users, UserCheck, Dumbbell, FolderOpen, TrendingUp, ArrowUpRight, ArrowDownRight, UserPlus, Activity, Server, Database, BarChart3, Star, Shield, Zap } from 'lucide-vue-next';
+import { Users, UserCheck, Dumbbell, TrendingUp, ArrowUpRight, ArrowDownRight, UserPlus, Activity, Server, Database, BarChart3, Star, Shield, Zap } from 'lucide-vue-next';
 import { computed } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
 import DonutChart from '@/components/dashboard/DonutChart.vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
-import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 
 interface Props {
     stats: {

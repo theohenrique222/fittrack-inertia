@@ -10,7 +10,7 @@ const page = usePage();
 
 const user = computed(() => page.props.auth.user);
 
-const props = defineProps<{
+defineProps<{
     stats?: {
         totalUsers?: number;
         totalStudents?: number;

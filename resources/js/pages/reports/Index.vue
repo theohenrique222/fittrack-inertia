@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { BarChart3, LayoutGrid, Users, Dumbbell, ClipboardList } from 'lucide-vue-next';
-import PeriodFilter from '@/components/reports/PeriodFilter.vue';
-import AdminReports from '@/components/reports/AdminReports.vue';
-import TrainerReports from '@/components/reports/TrainerReports.vue';
+import { computed, ref } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
-import LineChart from '@/components/dashboard/LineChart.vue';
 import DonutChart from '@/components/dashboard/DonutChart.vue';
+import LineChart from '@/components/dashboard/LineChart.vue';
+import AdminReports from '@/components/reports/AdminReports.vue';
+import PeriodFilter from '@/components/reports/PeriodFilter.vue';
+import TrainerReports from '@/components/reports/TrainerReports.vue';
 import { reports } from '@/routes';
 
 const page = usePage();

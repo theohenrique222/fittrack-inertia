@@ -11,14 +11,7 @@ import {
     Image as ImageIcon,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     Sheet,
     SheetContent,
@@ -67,7 +60,7 @@ interface Workout {
     };
 }
 
-const props = defineProps<{
+defineProps<{
     workout: Workout;
     exercises: Exercise[];
 }>();
@@ -84,8 +77,10 @@ function formatRestSeconds(seconds: number): string {
     if (seconds < 60) {
         return `${seconds}s`;
     }
+
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
+
     return remainingSeconds > 0 ? `${minutes}m${remainingSeconds}s` : `${minutes}m`;
 }
 

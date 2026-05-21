@@ -5,7 +5,6 @@ import { computed } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
 import DonutChart from '@/components/dashboard/DonutChart.vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
-import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 
 interface Props {
     stats: {

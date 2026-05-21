@@ -11,7 +11,7 @@ import {
     Trash2,
     User,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -112,9 +112,11 @@ function handleSubmit() {
         onSuccess: () => {
             form.reset();
             form.exercise_count = 6;
+
             if (mode.value === 'manual') {
                 workoutExercises.value = [];
             }
+
             selectedCategoryIds.value = [];
             emit('close');
         },
@@ -133,12 +135,14 @@ function handleSubmit() {
         form.client_id = props.student.id;
     } else {
         console.error('Student ID is missing!');
+
         return;
     }
 
     if (mode.value === 'auto') {
         if (selectedCategoryIds.value.length === 0) {
             console.warn('No categories selected');
+
             return;
         }
 
@@ -153,6 +157,7 @@ function handleSubmit() {
 
         if (form.exercises.length === 0) {
             console.warn('No valid exercises');
+
             return;
         }
 

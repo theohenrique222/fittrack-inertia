@@ -31,15 +31,15 @@ import {
     Plus,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
@@ -48,10 +48,10 @@ import {
 } from '@/components/ui/sheet';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
-import { destroy as destroyStudent, resetPassword } from '@/routes/students';
-import { destroy as destroyWorkout } from '@/routes/workouts';
 import CreateWorkoutSheet from '@/pages/workouts/components/CreateWorkoutSheet.vue';
 import EditWorkoutSheet from '@/pages/workouts/components/EditWorkoutSheet.vue';
+import { destroy as destroyStudent, resetPassword } from '@/routes/students';
+import { destroy as destroyWorkout } from '@/routes/workouts';
 
 const page = usePage();
 const { toasts, success, error } = useToast();
@@ -143,9 +143,12 @@ const selectedWorkout = ref<Workout | null>(null);
 const activeTab = ref<'overview' | 'workout' | 'history'>('overview');
 
 const filteredWorkouts = computed(() => {
-    if (!searchQuery.value) return props.workouts;
+    if (!searchQuery.value) {
+return props.workouts;
+}
 
     const query = searchQuery.value.toLowerCase();
+
     return props.workouts.filter(
         (w) =>
             w.name.toLowerCase().includes(query) ||
@@ -160,7 +163,10 @@ const tabs = computed(() => [
 ]);
 
 function getInitials(name: string | undefined | null): string {
-    if (!name) return '';
+    if (!name) {
+return '';
+}
+
     return name
         .split(' ')
         .map((n) => n[0])

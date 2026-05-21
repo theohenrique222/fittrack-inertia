@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Users, UserPlus, UserCheck, Dumbbell, ClipboardList, TrendingUp, TrendingDown, Star, Award } from 'lucide-vue-next';
+import { computed } from 'vue';
 import BarChart from '@/components/dashboard/BarChart.vue';
 import DonutChart from '@/components/dashboard/DonutChart.vue';
 import LineChart from '@/components/dashboard/LineChart.vue';

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Dumbbell, Flame, Trophy, Target, CheckCircle, User, Calendar, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
+import { Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
 import { computed } from 'vue';
-import BarChart from '@/components/dashboard/BarChart.vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 

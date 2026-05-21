@@ -43,6 +43,7 @@ const sortedRows = computed(() => {
         }
 
         const comparison = String(aVal).localeCompare(String(bVal));
+
         return sortDirection.value === 'asc' ? comparison : -comparison;
     });
 });
