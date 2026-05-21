@@ -25,9 +25,6 @@
                 background-color: oklch(1 0 0);
             }
 
-            html.dark {
-                background-color: oklch(0.145 0 0);
-            }
         </style>
 
         <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
@@ -37,8 +34,9 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>{{ config('app.name') }}</title>
         </x-inertia::head>
+        <title></title>
     </head>
     <body class="font-sans antialiased">
         <x-inertia::app />
