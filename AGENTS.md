@@ -150,6 +150,54 @@ When generating code:
 
 ---
 
+## 🌿 Git Workflow
+
+### Branch Naming
+
+Use:
+
+- feature/{name}
+- fix/{name}
+- refactor/{name}
+- chore/{name}
+
+Examples:
+
+- feature/trainer-management
+- fix/login-validation
+- refactor/client-creation-action
+
+### Commit Convention
+
+All commit messages MUST be written in English.
+
+Use Conventional Commits.
+
+Format:
+
+<type>: <description>
+
+Allowed types:
+
+- feat
+- fix
+- refactor
+- docs
+- test
+- chore
+- style
+
+Examples:
+
+- feat: add Docker environment setup
+- fix: resolve trainer validation issue
+- refactor: simplify client creation action
+- test: add trainer action tests
+
+Never generate commit messages in Portuguese.
+
+When asked to create a commit, always generate a Conventional Commit message in English.
+
 ## 🧠 FitTrack Patterns
 
 ### Example Flow
