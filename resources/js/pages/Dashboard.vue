@@ -39,7 +39,25 @@ defineProps<{
     muscleGroupDistribution?: { name: string; value: number; color: string }[];
     upcomingWorkouts?: any[];
     quickActions?: { label: string; route: string; icon: string }[];
-    activeWorkout?: { id: number; name: string; exercises_count: number; is_active: boolean } | null;
+    activeWorkout?: {
+        id: number;
+        name: string;
+        description?: string;
+        exercises_count: number;
+        total_reps: number;
+        estimated_time_minutes: number;
+        is_active: boolean;
+        exercises?: {
+            id: number;
+            name: string;
+            category?: string | null;
+            pivot: {
+                sets: number;
+                reps: number;
+                rest_seconds: number;
+            };
+        }[];
+    } | null;
     weeklyWorkouts?: { day: string; completed: boolean; type: string }[];
     progressData?: { week: string; weight: number; bodyFat: number }[];
     nutritionData?: {

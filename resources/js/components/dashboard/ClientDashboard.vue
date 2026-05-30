@@ -1,9 +1,60 @@
 <script setup lang="ts">
-import { Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-vue-next';
-import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+
+interface ExercisePivot {
+    sets: number;
+    reps: number;
+    rest_seconds: number;
+}
+
+interface DialogExercise {
+    id: number;
+    name: string;
+    category?: string | null;
+    pivot: ExercisePivot;
+}
+
+interface ActiveWorkout {
+    id: number;
+    name: string;
+    description?: string;
+    exercises_count: number;
+    total_reps: number;
+    estimated_time_minutes: number;
+    is_active: boolean;
+    exercises?: DialogExercise[];
+}
+
+interface UpcomingWorkout {
+    id?: number;
+    name: string;
+    date: string;
+    time: string;
+    exercises: number;
+    status: string;
+}
+
+interface DialogWorkoutData {
+    id: number;
+    name: string;
+    description?: string;
+    exercises_count: number;
+    total_reps?: number;
+    estimated_time_minutes?: number;
+    exercises?: DialogExercise[];
+}
 
 interface Props {
     stats: {
@@ -21,8 +72,8 @@ interface Props {
         fat: { consumed: number; target: number; percentage: number; unit: string };
     };
     bodyMetrics: { label: string; value: string; change: string; trend: string }[];
-    activeWorkout: { id: number; name: string; exercises_count: number; is_active: boolean } | null;
-    upcomingWorkouts: { id?: number; name: string; date: string; time: string; exercises: number; status: string }[];
+    activeWorkout: ActiveWorkout | null;
+    upcomingWorkouts: UpcomingWorkout[];
     recentAchievements: { title: string; description: string; icon: string; date: string }[];
     trainer: { name: string; specialty: string; email: string };
 }
@@ -36,10 +87,53 @@ const iconMap: Record<string, any> = {
     'check-circle': CheckCircle,
 };
 
+const isDialogOpen = ref(false);
+const dialogWorkout = ref<DialogWorkoutData | null>(null);
+
+function openWorkoutDialog(workout: ActiveWorkout | UpcomingWorkout) {
+    if (!workout.id) return;
+
+    if ('exercises' in workout && workout.exercises) {
+        dialogWorkout.value = {
+            id: workout.id,
+            name: workout.name,
+            description: workout.description,
+            exercises_count: workout.exercises_count,
+            total_reps: workout.total_reps,
+            estimated_time_minutes: workout.estimated_time_minutes,
+            exercises: workout.exercises,
+        };
+    } else {
+        dialogWorkout.value = {
+            id: workout.id,
+            name: workout.name,
+            exercises_count: workout.exercises,
+        };
+    }
+
+    isDialogOpen.value = true;
+}
+
+function formatRest(seconds: number): string {
+    if (seconds >= 60) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return secs > 0 ? `${mins}m${secs}s` : `${mins}min`;
+    }
+    return `${seconds}s`;
+}
+
+function startWorkout() {
+    if (dialogWorkout.value) {
+        isDialogOpen.value = false;
+        router.visit(`/workouts/${dialogWorkout.value.id}`);
+    }
+}
+
 const completionRate = computed(() => {
     if (props.stats.totalWorkouts === 0) {
 return 0;
-}
+    }
 
     return Math.round((props.stats.completedWorkouts / props.stats.totalWorkouts) * 100);
 });
@@ -151,17 +245,17 @@ const completedThisWeek = computed(() => {
         </div>
 
         <!-- Active Workout -->
-        <Link
+        <div
             v-if="activeWorkout"
-            :href="`/workouts/${activeWorkout.id}`"
-            class="group rounded-xl border-2 border-emerald-400 dark:border-emerald-600 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-5 shadow-sm hover:shadow-lg transition-all block"
+            class="group rounded-xl border-2 border-emerald-400 dark:border-emerald-600 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-5 shadow-sm hover:shadow-lg transition-all cursor-pointer"
+            @click="openWorkoutDialog(activeWorkout)"
         >
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform pointer-events-none">
                         <Dumbbell class="w-7 h-7" />
                     </div>
-                    <div>
+                    <div class="pointer-events-none">
                         <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium uppercase tracking-wide">Treino Ativo</p>
                         <h3 class="text-lg font-bold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                             {{ activeWorkout.name }}
@@ -171,12 +265,12 @@ const completedThisWeek = computed(() => {
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 pointer-events-none">
                     <span class="text-sm font-medium">Ver treino</span>
                     <ChevronRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </div>
             </div>
-        </Link>
+        </div>
 
         <!-- Body Metrics -->
         <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
@@ -337,13 +431,13 @@ const completedThisWeek = computed(() => {
                     </Link>
                 </div>
                 <div class="space-y-1">
-                    <Link
+                    <div
                         v-for="(workout, index) in upcomingWorkouts"
                         :key="index"
-                        :href="workout.id ? `/workouts/${workout.id}` : '#'"
-                        class="flex items-center justify-between py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors group"
+                        class="flex items-center justify-between py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors group cursor-pointer"
+                        @click="openWorkoutDialog(workout)"
                     >
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                                 <Dumbbell class="w-5 h-5" />
                             </div>
@@ -366,8 +460,8 @@ const completedThisWeek = computed(() => {
                                 </div>
                             </div>
                         </div>
-                        <ChevronRight v-if="workout.id" class="w-5 h-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors" />
-                    </Link>
+                        <ChevronRight v-if="workout.id" class="w-5 h-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors pointer-events-none" />
+                    </div>
                 </div>
             </div>
 
@@ -407,4 +501,122 @@ const completedThisWeek = computed(() => {
             </div>
         </div>
     </div>
+
+    <Dialog v-model:open="isDialogOpen">
+        <DialogContent class="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0 gap-0">
+            <!-- Hero Header -->
+            <div v-if="dialogWorkout" class="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 pt-8 pb-6 text-white">
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/20"></div>
+                    <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/10"></div>
+                </div>
+
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-1">
+                        <Dumbbell class="h-4 w-4 text-emerald-200" />
+                        <span class="text-xs font-medium uppercase tracking-wider text-emerald-200">Resumo do Treino</span>
+                    </div>
+
+                    <DialogTitle class="text-xl font-bold mt-1">
+                        {{ dialogWorkout.name }}
+                    </DialogTitle>
+
+                    <DialogDescription v-if="dialogWorkout.description" class="text-sm text-emerald-100 mt-2">
+                        {{ dialogWorkout.description }}
+                    </DialogDescription>
+
+                    <!-- Stats Row -->
+                    <div class="mt-4 flex flex-wrap items-center gap-2">
+                        <div class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs backdrop-blur-sm">
+                            <Dumbbell class="h-3.5 w-3.5" />
+                            <span>{{ dialogWorkout.exercises_count }} exercícios</span>
+                        </div>
+                        <div v-if="dialogWorkout.total_reps" class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs backdrop-blur-sm">
+                            <Repeat class="h-3.5 w-3.5" />
+                            <span>{{ dialogWorkout.total_reps }} reps</span>
+                        </div>
+                        <div v-if="dialogWorkout.estimated_time_minutes" class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs backdrop-blur-sm">
+                            <Clock class="h-3.5 w-3.5" />
+                            <span>~{{ dialogWorkout.estimated_time_minutes }}min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4">
+                <!-- Muscle Groups -->
+                <div v-if="dialogWorkout?.exercises?.length" class="mb-4">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2">Grupos Musculares</h4>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span
+                            v-for="group in [...new Set(dialogWorkout.exercises.map(e => e.category).filter(Boolean))]"
+                            :key="group"
+                            class="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300"
+                        >
+                            {{ group }}
+                        </span>
+                        <span
+                            v-if="![...new Set(dialogWorkout.exercises.map(e => e.category).filter(Boolean))].length"
+                            class="text-xs text-neutral-400 dark:text-neutral-500"
+                        >
+                            Diversos grupos
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Exercise List -->
+                <div v-if="dialogWorkout?.exercises?.length" class="space-y-1.5">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2">
+                        Exercícios
+                        <span class="font-normal text-neutral-400 dark:text-neutral-500">· {{ dialogWorkout.exercises.length }}</span>
+                    </h4>
+                    <div
+                        v-for="(exercise, index) in dialogWorkout.exercises"
+                        :key="exercise.id"
+                        class="flex items-center gap-3 rounded-lg border border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5"
+                    >
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                            {{ index + 1 }}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">{{ exercise.name }}</p>
+                            <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                                <span>{{ exercise.pivot.sets }} × {{ exercise.pivot.reps }}</span>
+                                <span class="text-neutral-300 dark:text-neutral-600">·</span>
+                                <span>{{ formatRest(exercise.pivot.rest_seconds) }} descanso</span>
+                            </div>
+                        </div>
+                        <span
+                            v-if="exercise.category"
+                            class="shrink-0 rounded-md bg-neutral-100 dark:bg-neutral-700 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500 dark:text-neutral-400"
+                        >
+                            {{ exercise.category }}
+                        </span>
+                    </div>
+                </div>
+
+                <div v-else-if="dialogWorkout" class="flex flex-col items-center justify-center py-6 text-center">
+                    <Dumbbell class="h-8 w-8 text-neutral-300 dark:text-neutral-600 mb-2" />
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Nenhum exercício neste treino</p>
+                </div>
+            </div>
+
+            <DialogFooter class="px-6 pb-6 pt-2 gap-2">
+                <button
+                    class="flex-1 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+                    @click="isDialogOpen = false"
+                >
+                    Fechar
+                </button>
+                <button
+                    class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition-colors shadow-sm"
+                    @click="startWorkout"
+                >
+                    <Play class="h-4 w-4" />
+                    Iniciar Treino
+                </button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>

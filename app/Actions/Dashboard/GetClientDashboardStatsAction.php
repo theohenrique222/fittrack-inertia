@@ -145,7 +145,7 @@ class GetClientDashboardStatsAction
         }
 
         $workout = $client->workouts()
-            ->withCount('exercises')
+            ->with('exercises.category')
             ->where('is_active', true)
             ->latest()
             ->first();
@@ -154,11 +154,28 @@ class GetClientDashboardStatsAction
             return null;
         }
 
+        $exercises = $workout->exercises->map(fn ($exercise) => [
+            'id' => $exercise->id,
+            'name' => $exercise->name,
+            'category' => $exercise->category?->name,
+            'pivot' => [
+                'sets' => $exercise->pivot->sets,
+                'reps' => $exercise->pivot->reps,
+                'rest_seconds' => $exercise->pivot->rest_seconds,
+            ],
+        ]);
+
+        $totalSeconds = $exercises->sum(fn ($ex) => $ex['pivot']['sets'] * ($ex['pivot']['reps'] * 3 + $ex['pivot']['rest_seconds']));
+
         return [
             'id' => $workout->id,
             'name' => $workout->name,
-            'exercises_count' => $workout->exercises_count,
+            'description' => $workout->description,
+            'exercises_count' => $exercises->count(),
+            'total_reps' => $exercises->sum(fn ($ex) => $ex['pivot']['sets'] * $ex['pivot']['reps']),
+            'estimated_time_minutes' => max(1, round($totalSeconds / 60)),
             'is_active' => true,
+            'exercises' => $exercises->values()->toArray(),
         ];
     }
 
