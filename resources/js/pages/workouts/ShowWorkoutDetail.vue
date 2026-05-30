@@ -72,6 +72,70 @@ const isStudent = computed(() => (page.props.auth.user as any)?.role === 'client
 const selectedExercise = ref<Exercise | null>(null);
 const isExerciseDetailOpen = ref(false);
 
+const muscleGroupColors: Record<string, { bg: string; text: string; dot: string; border: string; gradient: string }> = {
+    Peito: { bg: 'bg-rose-50 dark:bg-rose-900/20', text: 'text-rose-700 dark:text-rose-300', dot: 'bg-rose-500', border: 'border-rose-200 dark:border-rose-800', gradient: 'from-rose-500 to-rose-600' },
+    Costas: { bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-300', dot: 'bg-blue-500', border: 'border-blue-200 dark:border-blue-800', gradient: 'from-blue-500 to-blue-600' },
+    Pernas: { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-700 dark:text-violet-300', dot: 'bg-violet-500', border: 'border-violet-200 dark:border-violet-800', gradient: 'from-violet-500 to-violet-600' },
+    Ombros: { bg: 'bg-orange-50 dark:bg-orange-900/20', text: 'text-orange-700 dark:text-orange-300', dot: 'bg-orange-500', border: 'border-orange-200 dark:border-orange-800', gradient: 'from-orange-500 to-orange-600' },
+    Bíceps: { bg: 'bg-pink-50 dark:bg-pink-900/20', text: 'text-pink-700 dark:text-pink-300', dot: 'bg-pink-500', border: 'border-pink-200 dark:border-pink-800', gradient: 'from-pink-500 to-pink-600' },
+    Tríceps: { bg: 'bg-indigo-50 dark:bg-indigo-900/20', text: 'text-indigo-700 dark:text-indigo-300', dot: 'bg-indigo-500', border: 'border-indigo-200 dark:border-indigo-800', gradient: 'from-indigo-500 to-indigo-600' },
+    Abdômen: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-300', dot: 'bg-emerald-500', border: 'border-emerald-200 dark:border-emerald-800', gradient: 'from-emerald-500 to-emerald-600' },
+    Glúteos: { bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-300', dot: 'bg-amber-500', border: 'border-amber-200 dark:border-amber-800', gradient: 'from-amber-500 to-amber-600' },
+    Antebraço: { bg: 'bg-teal-50 dark:bg-teal-900/20', text: 'text-teal-700 dark:text-teal-300', dot: 'bg-teal-500', border: 'border-teal-200 dark:border-teal-800', gradient: 'from-teal-500 to-teal-600' },
+    Trapézio: { bg: 'bg-cyan-50 dark:bg-cyan-900/20', text: 'text-cyan-700 dark:text-cyan-300', dot: 'bg-cyan-500', border: 'border-cyan-200 dark:border-cyan-800', gradient: 'from-cyan-500 to-cyan-600' },
+    Lombar: { bg: 'bg-lime-50 dark:bg-lime-900/20', text: 'text-lime-700 dark:text-lime-300', dot: 'bg-lime-500', border: 'border-lime-200 dark:border-lime-800', gradient: 'from-lime-500 to-lime-600' },
+    Panturrilha: { bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20', text: 'text-fuchsia-700 dark:text-fuchsia-300', dot: 'bg-fuchsia-500', border: 'border-fuchsia-200 dark:border-fuchsia-800', gradient: 'from-fuchsia-500 to-fuchsia-600' },
+};
+
+function getMuscleGroupStyle(group?: string) {
+    if (!group) return { bg: 'bg-neutral-50 dark:bg-neutral-800/50', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', border: 'border-neutral-200 dark:border-neutral-700', gradient: 'from-neutral-400 to-neutral-500' };
+    return muscleGroupColors[group] || { bg: 'bg-neutral-50 dark:bg-neutral-800/50', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', border: 'border-neutral-200 dark:border-neutral-700', gradient: 'from-neutral-400 to-neutral-500' };
+}
+
+function getGroupedExercises(workout: Workout): { group: string; exercises: Exercise[]; style: ReturnType<typeof getMuscleGroupStyle> }[] {
+    if (!workout.exercises?.length) return [];
+    const groups = new Map<string, Exercise[]>();
+    workout.exercises.forEach((ex) => {
+        const key = ex.muscle_group || 'Outros';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key)!.push(ex);
+    });
+    const order = Object.keys(muscleGroupColors);
+    return Array.from(groups.entries())
+        .sort((a, b) => {
+            const ia = order.indexOf(a[0]);
+            const ib = order.indexOf(b[0]);
+            if (ia === -1 && ib === -1) return a[0].localeCompare(b[0]);
+            if (ia === -1) return 1;
+            if (ib === -1) return -1;
+            return ia - ib;
+        })
+        .map(([group, exercises]) => ({
+            group,
+            exercises,
+            style: getMuscleGroupStyle(group),
+        }));
+}
+
+function workoutTotalSets(workout: Workout): number {
+    if (!workout.exercises?.length) return 0;
+    return workout.exercises.reduce((sum, ex) => sum + ex.pivot.sets, 0);
+}
+
+function workoutTotalReps(workout: Workout): number {
+    if (!workout.exercises?.length) return 0;
+    return workout.exercises.reduce((sum, ex) => sum + ex.pivot.sets * ex.pivot.reps, 0);
+}
+
+function workoutEstimatedTime(workout: Workout): string {
+    if (!workout.exercises?.length) return '—';
+    const totalSeconds = workout.exercises.reduce((sum, ex) => {
+        return sum + ex.pivot.sets * (ex.pivot.reps * 3 + ex.pivot.rest_seconds);
+    }, 0);
+    const mins = Math.round(totalSeconds / 60);
+    return `~${mins}min`;
+}
+
 function openExerciseDetail(exercise: Exercise) {
     selectedExercise.value = exercise;
     isExerciseDetailOpen.value = true;
@@ -146,8 +210,8 @@ function getDifficultyLabel(difficulty?: string): string {
             </div>
         </div>
 
-        <!-- Workout Info -->
         <div class="max-w-3xl mx-auto px-4 py-6">
+            <!-- Description -->
             <div v-if="workout.description" class="mb-6 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
                 <p class="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
                     {{ workout.description }}
@@ -155,7 +219,7 @@ function getDifficultyLabel(difficulty?: string): string {
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="grid grid-cols-4 gap-3 mb-6">
                 <div class="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 text-center">
                     <Dumbbell class="h-5 w-5 mx-auto mb-2 text-emerald-500" />
                     <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ workout.exercises?.length || 0 }}</p>
@@ -163,93 +227,136 @@ function getDifficultyLabel(difficulty?: string): string {
                 </div>
 
                 <div class="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 text-center">
-                    <Clock class="h-5 w-5 mx-auto mb-2 text-blue-500" />
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-                        {{ workout.exercises?.reduce((sum, ex) => sum + ex.pivot.sets * ex.pivot.reps, 0) || 0 }}
-                    </p>
+                    <Play class="h-5 w-5 mx-auto mb-2 text-blue-500" />
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ workoutTotalSets(workout) }}</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Séries</p>
+                </div>
+
+                <div class="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 text-center">
+                    <Clock class="h-5 w-5 mx-auto mb-2 text-violet-500" />
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ workoutTotalReps(workout) }}</p>
                     <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Reps</p>
                 </div>
 
                 <div class="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 text-center">
-                    <Play class="h-5 w-5 mx-auto mb-2 text-violet-500" />
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-                        ~{{ Math.round((workout.exercises?.reduce((sum, ex) => sum + (ex.pivot.sets * (ex.pivot.reps * 3 + ex.pivot.rest_seconds)), 0) || 0) / 60) }}min
-                    </p>
+                    <Clock class="h-5 w-5 mx-auto mb-2 text-amber-500" />
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ workoutEstimatedTime(workout) }}</p>
                     <p class="text-xs text-neutral-500 dark:text-neutral-400">Tempo Est.</p>
                 </div>
             </div>
 
-            <!-- Exercises List -->
-            <div class="space-y-3">
-                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
+            <!-- Muscle Groups Summary -->
+            <div v-if="getGroupedExercises(workout).length > 1" class="mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <span
+                        v-for="({ group, exercises, style }) in getGroupedExercises(workout)"
+                        :key="group"
+                        :class="['inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium border', style.bg, style.text, style.border]"
+                    >
+                        <span :class="['h-2 w-2 rounded-full', style.dot]"></span>
+                        {{ group }}
+                        <span class="opacity-60">({{ exercises.length }})</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Exercises Grouped by Muscle Group -->
+            <div class="space-y-6">
+                <div class="flex items-center gap-2">
                     <Dumbbell class="h-5 w-5 text-emerald-500" />
-                    Exercícios
-                </h2>
+                    <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">Exercícios</h2>
+                </div>
 
-                <div
-                    v-for="(exercise, index) in workout.exercises"
-                    :key="exercise.id"
-                    class="group bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer"
-                    @click="openExerciseDetail(exercise)"
-                >
-                    <div class="p-4">
-                        <div class="flex items-start gap-4">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-base font-bold text-emerald-700 dark:text-emerald-300">
-                                {{ index + 1 }}
-                            </div>
-
+                <template v-if="getGroupedExercises(workout).length">
+                    <div
+                        v-for="({ group, exercises, style }) in getGroupedExercises(workout)"
+                        :key="group"
+                        class="space-y-2"
+                    >
+                        <!-- Muscle Group Section Header -->
+                        <div :class="['flex items-center gap-3 px-4 py-2.5 rounded-xl border', style.bg, style.border]">
+                            <span :class="['flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br text-white text-sm font-bold shadow-sm', style.gradient]">
+                                {{ exercises.length }}
+                            </span>
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="min-w-0 flex-1">
-                                        <h3 class="font-semibold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                            {{ exercise.name }}
-                                        </h3>
-
-                                        <div class="flex flex-wrap items-center gap-2 mt-1">
-                                            <span v-if="exercise.category" class="text-xs text-neutral-500 dark:text-neutral-400">
-                                                {{ exercise.category.name }}
-                                            </span>
-
-                                            <Badge v-if="exercise.difficulty" :class="getDifficultyColor(exercise.difficulty)" class="text-xs px-2 py-0">
-                                                {{ getDifficultyLabel(exercise.difficulty) }}
-                                            </Badge>
-
-                                            <span v-if="exercise.muscle_group" class="text-xs text-neutral-400 dark:text-neutral-500">
-                                                {{ exercise.muscle_group }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <ChevronRight class="h-5 w-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors shrink-0 mt-1" />
-                                </div>
-
-                                <div class="mt-3 grid grid-cols-3 gap-3">
-                                    <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
-                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Séries</p>
-                                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.sets }}</p>
-                                    </div>
-
-                                    <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
-                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Reps</p>
-                                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.reps }}</p>
-                                    </div>
-
-                                    <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
-                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Descanso</p>
-                                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ formatRestSeconds(exercise.pivot.rest_seconds) }}</p>
-                                    </div>
-                                </div>
-
-                                <p v-if="exercise.pivot.notes" class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                                    <Info class="h-3 w-3" />
-                                    {{ exercise.pivot.notes }}
+                                <h3 :class="['font-semibold text-sm', style.text]">{{ group }}</h3>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                    {{ exercises.length }} {{ exercises.length === 1 ? 'exercício' : 'exercícios' }}
+                                    · {{ exercises.reduce((s, e) => s + e.pivot.sets, 0) }} séries
+                                    · {{ exercises.reduce((s, e) => s + e.pivot.sets * e.pivot.reps, 0) }} reps
                                 </p>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div v-if="!workout.exercises || workout.exercises.length === 0" class="flex flex-col items-center justify-center py-16 text-center">
+                        <!-- Exercises in this group -->
+                        <div class="space-y-2 ml-2">
+                            <div
+                                v-for="(exercise, index) in exercises"
+                                :key="exercise.id"
+                                class="group bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer"
+                                @click="openExerciseDetail(exercise)"
+                            >
+                                <div class="p-4">
+                                    <div class="flex items-start gap-4">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-base font-bold text-emerald-700 dark:text-emerald-300">
+                                            {{ index + 1 }}
+                                        </div>
+
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-start justify-between gap-2">
+                                                <div class="min-w-0 flex-1">
+                                                    <h3 class="font-semibold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                                        {{ exercise.name }}
+                                                    </h3>
+
+                                                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                                                        <span v-if="exercise.category" class="text-xs text-neutral-500 dark:text-neutral-400">
+                                                            {{ exercise.category.name }}
+                                                        </span>
+
+                                                        <Badge v-if="exercise.difficulty" :class="getDifficultyColor(exercise.difficulty)" class="text-xs px-2 py-0">
+                                                            {{ getDifficultyLabel(exercise.difficulty) }}
+                                                        </Badge>
+
+                                                        <span v-if="exercise.muscle_group" class="text-xs text-neutral-400 dark:text-neutral-500">
+                                                            {{ exercise.muscle_group }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <ChevronRight class="h-5 w-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors shrink-0 mt-1" />
+                                            </div>
+
+                                            <div class="mt-3 grid grid-cols-3 gap-3">
+                                                <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
+                                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Séries</p>
+                                                    <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.sets }}</p>
+                                                </div>
+
+                                                <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
+                                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Reps</p>
+                                                    <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.reps }}</p>
+                                                </div>
+
+                                                <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
+                                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Descanso</p>
+                                                    <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ formatRestSeconds(exercise.pivot.rest_seconds) }}</p>
+                                                </div>
+                                            </div>
+
+                                            <p v-if="exercise.pivot.notes" class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                                <Info class="h-3 w-3" />
+                                                {{ exercise.pivot.notes }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div v-else class="flex flex-col items-center justify-center py-16 text-center">
                     <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4">
                         <Dumbbell class="h-8 w-8 text-neutral-400" />
                     </div>

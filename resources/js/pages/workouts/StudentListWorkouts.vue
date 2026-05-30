@@ -12,7 +12,7 @@ export default {
 
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { ChevronRight, Clock, Dumbbell, Play, Repeat, Search } from 'lucide-vue-next';
+import { ChevronRight, Clock, Dumbbell, Play, Repeat, Search, Target } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import {
     Dialog,
@@ -34,6 +34,7 @@ interface ExercisePivot {
 interface WorkoutExercise {
     id: number;
     name: string;
+    muscle_group?: string;
     category?: {
         id: number;
         name: string;
@@ -75,6 +76,54 @@ const filteredWorkouts = computed(() => {
 
     return result;
 });
+
+const muscleGroupColors: Record<string, { bg: string; text: string; dot: string; section: string }> = {
+    Peito: { bg: 'bg-rose-100 dark:bg-rose-900/30', text: 'text-rose-700 dark:text-rose-300', dot: 'bg-rose-500', section: 'border-l-rose-400' },
+    Costas: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', dot: 'bg-blue-500', section: 'border-l-blue-400' },
+    Pernas: { bg: 'bg-violet-100 dark:bg-violet-900/30', text: 'text-violet-700 dark:text-violet-300', dot: 'bg-violet-500', section: 'border-l-violet-400' },
+    Ombros: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', dot: 'bg-orange-500', section: 'border-l-orange-400' },
+    Bíceps: { bg: 'bg-pink-100 dark:bg-pink-900/30', text: 'text-pink-700 dark:text-pink-300', dot: 'bg-pink-500', section: 'border-l-pink-400' },
+    Tríceps: { bg: 'bg-indigo-100 dark:bg-indigo-900/30', text: 'text-indigo-700 dark:text-indigo-300', dot: 'bg-indigo-500', section: 'border-l-indigo-400' },
+    Abdômen: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-300', dot: 'bg-emerald-500', section: 'border-l-emerald-400' },
+    Glúteos: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', dot: 'bg-amber-500', section: 'border-l-amber-400' },
+    Antebraço: { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-700 dark:text-teal-300', dot: 'bg-teal-500', section: 'border-l-teal-400' },
+    Trapézio: { bg: 'bg-cyan-100 dark:bg-cyan-900/30', text: 'text-cyan-700 dark:text-cyan-300', dot: 'bg-cyan-500', section: 'border-l-cyan-400' },
+    Lombar: { bg: 'bg-lime-100 dark:bg-lime-900/30', text: 'text-lime-700 dark:text-lime-300', dot: 'bg-lime-500', section: 'border-l-lime-400' },
+    Panturrilha: { bg: 'bg-fuchsia-100 dark:bg-fuchsia-900/30', text: 'text-fuchsia-700 dark:text-fuchsia-300', dot: 'bg-fuchsia-500', section: 'border-l-fuchsia-400' },
+};
+
+function getMuscleGroupStyle(group?: string) {
+    if (!group) return { bg: 'bg-neutral-100 dark:bg-neutral-800', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', section: 'border-l-neutral-300 dark:border-l-neutral-600' };
+    return muscleGroupColors[group] || { bg: 'bg-neutral-100 dark:bg-neutral-800', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', section: 'border-l-neutral-300 dark:border-l-neutral-600' };
+}
+
+function workoutMuscleGroups(workout: Workout): string[] {
+    if (!workout.exercises?.length) return [];
+    const groups = new Set<string>();
+    workout.exercises.forEach((ex) => {
+        if (ex.muscle_group) groups.add(ex.muscle_group);
+    });
+    return Array.from(groups);
+}
+
+function groupedExercises(workout: Workout): { group: string; exercises: WorkoutExercise[] }[] {
+    if (!workout.exercises?.length) return [];
+    const groups = new Map<string, WorkoutExercise[]>();
+    workout.exercises.forEach((ex) => {
+        const key = ex.muscle_group || 'Outros';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key)!.push(ex);
+    });
+    const order = Object.keys(muscleGroupColors);
+    return Array.from(groups.entries()).sort((a, b) => {
+        const ia = order.indexOf(a[0]);
+        const ib = order.indexOf(b[0]);
+        if (ia === -1 && ib === -1) return a[0].localeCompare(b[0]);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+    }).map(([group, exercises]) => ({ group, exercises }));
+}
 
 function getInitials(name: string): string {
     return name
@@ -137,25 +186,28 @@ function totalReps(workout: Workout): number {
     <Head title="Meus Treinos" />
 
     <div class="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
-        <div class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 py-8 text-white">
-            <div class="mb-6">
+        <div class="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 px-6 py-8 text-white">
+            <div class="absolute -top-6 -right-6 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl"></div>
+            <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-emerald-400/10 blur-2xl"></div>
+
+            <div class="relative mb-6">
                 <h1 class="text-2xl font-bold">Meus Treinos</h1>
                 <p class="text-sm text-emerald-100 mt-1">Visualize todos os seus treinos</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3">
+            <div class="relative grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3 transition hover:bg-white/20">
                     <div class="flex items-center gap-2 mb-1">
                         <Dumbbell class="h-4 w-4 text-emerald-100" />
-                        <span class="text-xs text-emerald-100">Total</span>
+                        <span class="text-xs text-emerald-100">Total de Treinos</span>
                     </div>
                     <p class="text-2xl font-bold">{{ stats.total }}</p>
                 </div>
 
-                <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3">
+                <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3 transition hover:bg-white/20">
                     <div class="flex items-center gap-2 mb-1">
-                        <ChevronRight class="h-4 w-4 text-emerald-100" />
-                        <span class="text-xs text-emerald-100">Exercícios</span>
+                        <Target class="h-4 w-4 text-emerald-100" />
+                        <span class="text-xs text-emerald-100">Total de Exercícios</span>
                     </div>
                     <p class="text-2xl font-bold">{{ stats.totalExercises }}</p>
                 </div>
@@ -168,7 +220,7 @@ function totalReps(workout: Workout): number {
                 <input
                     v-model="searchQuery"
                     placeholder="Buscar treino..."
-                    class="w-full rounded-lg border border-neutral-200 bg-white pl-9 pr-4 py-2 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+                    class="w-full rounded-lg border border-neutral-200 bg-white pl-9 pr-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
                 />
             </div>
 
@@ -193,7 +245,7 @@ function totalReps(workout: Workout): number {
                                     v-if="workout.exercises?.length"
                                     class="shrink-0 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
                                 >
-                                    {{ workout.exercises.length }}
+                                    {{ workout.exercises.length }} ex
                                 </span>
                                 <span
                                     v-if="workout.is_active"
@@ -205,6 +257,16 @@ function totalReps(workout: Workout): number {
                             <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 mt-1 truncate">
                                 {{ workout.description }}
                             </p>
+                            <div v-if="workoutMuscleGroups(workout).length" class="flex flex-wrap gap-1 mt-2">
+                                <span
+                                    v-for="group in workoutMuscleGroups(workout)"
+                                    :key="group"
+                                    :class="['inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', getMuscleGroupStyle(group).bg, getMuscleGroupStyle(group).text]"
+                                >
+                                    <span :class="['h-1.5 w-1.5 rounded-full', getMuscleGroupStyle(group).dot]"></span>
+                                    {{ group }}
+                                </span>
+                            </div>
                         </div>
 
                         <ChevronRight class="h-5 w-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors shrink-0" />
@@ -248,7 +310,6 @@ function totalReps(workout: Workout): number {
                 </DialogDescription>
             </DialogHeader>
 
-            <!-- Stats Cards -->
             <div v-if="selectedWorkout" class="grid grid-cols-3 gap-3 py-2">
                 <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3 text-center">
                     <Dumbbell class="h-5 w-5 mx-auto mb-1.5 text-emerald-500" />
@@ -269,25 +330,35 @@ function totalReps(workout: Workout): number {
                 </div>
             </div>
 
-            <!-- Exercise List -->
-            <div v-if="selectedWorkout?.exercises?.length" class="space-y-1.5">
-                <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Exercícios</h4>
-                <div
-                    v-for="(exercise, index) in selectedWorkout.exercises"
-                    :key="exercise.id"
-                    class="flex items-center gap-3 rounded-lg border border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5"
-                >
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                        {{ index + 1 }}
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">{{ exercise.name }}</p>
-                        <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                            <span>{{ exercise.pivot.sets }} séries</span>
-                            <span class="text-neutral-300 dark:text-neutral-600">·</span>
-                            <span>{{ exercise.pivot.reps }} reps</span>
-                            <span v-if="exercise.pivot.rest_seconds" class="text-neutral-300 dark:text-neutral-600">·</span>
-                            <span v-if="exercise.pivot.rest_seconds">descanso {{ formatRest(exercise.pivot.rest_seconds) }}</span>
+            <div v-if="selectedWorkout?.exercises?.length" class="space-y-4">
+                <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Exercícios</h4>
+
+                <div v-for="({ group, exercises }, gi) in groupedExercises(selectedWorkout)" :key="gi" class="space-y-1.5">
+                    <div class="flex items-center gap-2 px-1">
+                        <span :class="['h-2 w-2 rounded-full', getMuscleGroupStyle(group).dot]"></span>
+                        <span :class="['text-xs font-semibold uppercase tracking-wider', getMuscleGroupStyle(group).text]">
+                            {{ group }}
+                        </span>
+                        <span class="text-xs text-neutral-400 dark:text-neutral-500">({{ exercises.length }})</span>
+                    </div>
+
+                    <div
+                        v-for="(exercise, index) in exercises"
+                        :key="exercise.id"
+                        class="flex items-center gap-3 rounded-lg border border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5 ml-3"
+                    >
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                            {{ index + 1 }}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">{{ exercise.name }}</p>
+                            <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                                <span>{{ exercise.pivot.sets }} séries</span>
+                                <span class="text-neutral-300 dark:text-neutral-600">·</span>
+                                <span>{{ exercise.pivot.reps }} reps</span>
+                                <span v-if="exercise.pivot.rest_seconds" class="text-neutral-300 dark:text-neutral-600">·</span>
+                                <span v-if="exercise.pivot.rest_seconds">descanso {{ formatRest(exercise.pivot.rest_seconds) }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
