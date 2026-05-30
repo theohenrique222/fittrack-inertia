@@ -26,6 +26,7 @@ use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
 use App\Http\Controllers\Workouts\DestroyWorkoutController;
 use App\Http\Controllers\Workouts\GenerateWorkoutController;
+use App\Http\Controllers\Workouts\ListStudentWorkoutsController;
 use App\Http\Controllers\Workouts\ShowWorkoutDetailController;
 use App\Http\Controllers\Workouts\StoreWorkoutController;
 use App\Http\Controllers\Workouts\UpdateWorkoutController;
@@ -167,6 +168,7 @@ $router
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('reports', ReportsController::class)->name('reports');
+    Route::get('me/workouts', ListStudentWorkoutsController::class)->name('me.workouts');
 });
 
 require __DIR__.'/settings.php';

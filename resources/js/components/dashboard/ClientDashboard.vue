@@ -327,7 +327,15 @@ const completedThisWeek = computed(() => {
         <div class="grid gap-4 lg:grid-cols-2">
             <!-- Upcoming Workouts -->
             <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
-                <h3 class="font-semibold mb-4 text-neutral-900 dark:text-white">Próximos Treinos</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-neutral-900 dark:text-white">Próximos Treinos</h3>
+                    <Link
+                        href="/me/workouts"
+                        class="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                    >
+                        Ver todos
+                    </Link>
+                </div>
                 <div class="space-y-1">
                     <Link
                         v-for="(workout, index) in upcomingWorkouts"
