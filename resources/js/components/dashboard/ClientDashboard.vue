@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-vue-next';
+import { Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 
@@ -20,7 +21,8 @@ interface Props {
         fat: { consumed: number; target: number; percentage: number; unit: string };
     };
     bodyMetrics: { label: string; value: string; change: string; trend: string }[];
-    upcomingWorkouts: { name: string; date: string; time: string; exercises: number; status: string }[];
+    activeWorkout: { id: number; name: string; exercises_count: number; is_active: boolean } | null;
+    upcomingWorkouts: { id?: number; name: string; date: string; time: string; exercises: number; status: string }[];
     recentAchievements: { title: string; description: string; icon: string; date: string }[];
     trainer: { name: string; specialty: string; email: string };
 }
@@ -147,6 +149,34 @@ const completedThisWeek = computed(() => {
                 </div>
             </div>
         </div>
+
+        <!-- Active Workout -->
+        <Link
+            v-if="activeWorkout"
+            :href="`/workouts/${activeWorkout.id}`"
+            class="group rounded-xl border-2 border-emerald-400 dark:border-emerald-600 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-5 shadow-sm hover:shadow-lg transition-all block"
+        >
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                        <Dumbbell class="w-7 h-7" />
+                    </div>
+                    <div>
+                        <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium uppercase tracking-wide">Treino Ativo</p>
+                        <h3 class="text-lg font-bold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            {{ activeWorkout.name }}
+                        </h3>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                            {{ activeWorkout.exercises_count }} exercícios
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                    <span class="text-sm font-medium">Ver treino</span>
+                    <ChevronRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+            </div>
+        </Link>
 
         <!-- Body Metrics -->
         <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
@@ -299,17 +329,20 @@ const completedThisWeek = computed(() => {
             <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
                 <h3 class="font-semibold mb-4 text-neutral-900 dark:text-white">Próximos Treinos</h3>
                 <div class="space-y-1">
-                    <div
+                    <Link
                         v-for="(workout, index) in upcomingWorkouts"
                         :key="index"
-                        class="flex items-center justify-between py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                        :href="workout.id ? `/workouts/${workout.id}` : '#'"
+                        class="flex items-center justify-between py-3 px-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors group"
                     >
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                                 <Dumbbell class="w-5 h-5" />
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ workout.name }}</p>
+                                <p class="text-sm font-medium text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                    {{ workout.name }}
+                                </p>
                                 <div class="flex items-center gap-3 mt-1">
                                     <span class="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
                                         <Calendar class="w-3 h-3" />
@@ -325,7 +358,8 @@ const completedThisWeek = computed(() => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <ChevronRight v-if="workout.id" class="w-5 h-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors" />
+                    </Link>
                 </div>
             </div>
 

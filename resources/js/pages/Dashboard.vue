@@ -39,6 +39,7 @@ defineProps<{
     muscleGroupDistribution?: { name: string; value: number; color: string }[];
     upcomingWorkouts?: any[];
     quickActions?: { label: string; route: string; icon: string }[];
+    activeWorkout?: { id: number; name: string; exercises_count: number; is_active: boolean } | null;
     weeklyWorkouts?: { day: string; completed: boolean; type: string }[];
     progressData?: { week: string; weight: number; bodyFat: number }[];
     nutritionData?: {
@@ -111,6 +112,7 @@ defineOptions({
                 currentStreak: stats?.currentStreak ?? 0,
                 totalExercises: stats?.totalExercises ?? 0,
             }"
+            :active-workout="activeWorkout ?? null"
             :weekly-workouts="weeklyWorkouts ?? []"
             :progress-data="progressData ?? []"
             :nutrition-data="nutritionData ?? {

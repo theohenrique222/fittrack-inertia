@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Clock,
@@ -10,7 +10,7 @@ import {
     Film,
     Image as ImageIcon,
 } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import {
     Sheet,
@@ -64,6 +64,10 @@ defineProps<{
     workout: Workout;
     exercises: Exercise[];
 }>();
+
+const page = usePage();
+
+const isStudent = computed(() => (page.props.auth.user as any)?.role === 'client');
 
 const selectedExercise = ref<Exercise | null>(null);
 const isExerciseDetailOpen = ref(false);
@@ -120,7 +124,7 @@ function getDifficultyLabel(difficulty?: string): string {
             <div class="max-w-3xl mx-auto px-4 py-4">
                 <div class="flex items-center gap-3">
                     <Link
-                        :href="`/students/${workout.client?.id}`"
+                        :href="isStudent ? '/dashboard' : `/students/${workout.client?.id}`"
                         class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
                     >
                         <ArrowLeft class="h-5 w-5 text-neutral-600 dark:text-neutral-300" />

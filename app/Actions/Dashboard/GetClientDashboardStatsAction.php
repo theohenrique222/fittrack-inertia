@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dashboard;
 
+use App\Models\Client;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -9,8 +10,10 @@ class GetClientDashboardStatsAction
 {
     public function execute(User $user): array
     {
-        $totalWorkouts = 24;
-        $completedWorkouts = 18;
+        $client = Client::where('user_id', $user->id)->first();
+
+        $totalWorkouts = $client ? $client->workouts()->count() : 0;
+        $completedWorkouts = $client ? $client->workouts()->where('is_active', false)->count() : 0;
         $currentStreak = 7;
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
 
@@ -26,11 +29,12 @@ class GetClientDashboardStatsAction
                 'currentStreak' => $currentStreak,
                 'totalExercises' => $totalExercises,
             ],
+            'activeWorkout' => $this->getActiveWorkout($user),
             'weeklyWorkouts' => $weeklyWorkouts,
             'progressData' => $progressData,
             'nutritionData' => $nutritionData,
             'bodyMetrics' => $bodyMetrics,
-            'upcomingWorkouts' => $this->generateUpcomingWorkouts(),
+            'upcomingWorkouts' => $this->getUpcomingWorkouts($user),
             'recentAchievements' => $this->generateRecentAchievements(),
             'trainer' => [
                 'name' => 'Carlos Personal',
@@ -130,6 +134,57 @@ class GetClientDashboardStatsAction
                 'status' => 'scheduled',
             ],
         ];
+    }
+
+    public function getActiveWorkout(User $user): ?array
+    {
+        $client = Client::where('user_id', $user->id)->first();
+
+        if (! $client) {
+            return null;
+        }
+
+        $workout = $client->workouts()
+            ->withCount('exercises')
+            ->where('is_active', true)
+            ->latest()
+            ->first();
+
+        if (! $workout) {
+            return null;
+        }
+
+        return [
+            'id' => $workout->id,
+            'name' => $workout->name,
+            'exercises_count' => $workout->exercises_count,
+            'is_active' => true,
+        ];
+    }
+
+    public function getUpcomingWorkouts(User $user): array
+    {
+        $client = Client::where('user_id', $user->id)->first();
+
+        if (! $client) {
+            return [];
+        }
+
+        return $client->workouts()
+            ->withCount('exercises')
+            ->where('is_active', true)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($workout) => [
+                'id' => $workout->id,
+                'name' => $workout->name,
+                'date' => $workout->created_at->diffForHumans(),
+                'time' => $workout->created_at->format('H:i'),
+                'exercises' => $workout->exercises_count,
+                'status' => $workout->is_active ? 'scheduled' : 'completed',
+            ])
+            ->toArray();
     }
 
     private function generateRecentAchievements(): array
