@@ -3,11 +3,17 @@
 namespace App\Providers;
 
 use App\Enums\UserRole;
+use App\Models\Workout;
+use App\Policies\WorkoutPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        Workout::class => WorkoutPolicy::class,
+    ];
+
     public function boot(): void
     {
         Gate::define('isAdmin', function ($user) {

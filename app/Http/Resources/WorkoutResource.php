@@ -48,7 +48,7 @@ class WorkoutResource extends JsonResource
                     'notes' => $exercise->pivot->notes,
                 ],
                 'completed' => $this->relationLoaded('completions')
-                    ? $this->completions->contains('exercise_id', $exercise->id)
+                    ? $this->completions->where('user_id', auth()->id())->contains('exercise_id', $exercise->id)
                     : false,
             ])),
             'is_active' => $this->is_active,

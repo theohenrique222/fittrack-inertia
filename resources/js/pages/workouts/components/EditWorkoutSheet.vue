@@ -43,8 +43,7 @@ interface Workout {
     id: number;
     name: string;
     description?: string;
-    student_id?: number;
-    client_id?: number;
+    client_id: number;
     is_active: boolean;
     exercises?: {
         id: number;
@@ -89,7 +88,7 @@ watch(
 const form = useForm({
     name: props.workout.name,
     description: props.workout.description || '',
-    client_id: props.workout.client_id || props.workout.student_id || 0,
+    client_id: props.workout.client_id || 0,
     exercises: [] as WorkoutExercise[],
     is_active: props.workout.is_active,
 });

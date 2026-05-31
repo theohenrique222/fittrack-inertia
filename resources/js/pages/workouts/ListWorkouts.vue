@@ -70,12 +70,12 @@ interface Workout {
     id: number;
     name: string;
     description?: string;
-    student?: {
+    client?: {
         id: number;
         name: string;
         nickname?: string;
     };
-    student_id: number;
+    client_id: number;
     trainer?: {
         id: number;
         name: string;
@@ -107,7 +107,7 @@ const filteredWorkouts = computed(() => {
         result = result.filter(
             (w) =>
                 w.name.toLowerCase().includes(query) ||
-                w.student?.name.toLowerCase().includes(query) ||
+                w.client?.name.toLowerCase().includes(query) ||
                 w.description?.toLowerCase().includes(query),
         );
     }
@@ -281,9 +281,9 @@ function getAvatarColor(id: number): string {
                 >
                     <div class="flex items-center gap-4 p-4">
                         <div
-                            :class="['flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white font-bold text-sm shadow-sm', getAvatarColor(workout.student_id || workout.id)]"
+                            :class="['flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white font-bold text-sm shadow-sm', getAvatarColor(workout.client_id || workout.id)]"
                         >
-                            {{ getInitials(workout.student?.name || workout.name) }}
+                            {{ getInitials(workout.client?.name || workout.name) }}
                         </div>
 
                         <div class="min-w-0 flex-1">
@@ -294,7 +294,7 @@ function getAvatarColor(id: number): string {
                                 </span>
                             </div>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ workout.student?.name || 'Sem aluno' }}</span>
+                                <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ workout.client?.name || 'Sem aluno' }}</span>
                                 <span v-if="workout.description" class="text-xs text-neutral-400 dark:text-neutral-500 truncate">
                                     • {{ workout.description }}
                                 </span>
