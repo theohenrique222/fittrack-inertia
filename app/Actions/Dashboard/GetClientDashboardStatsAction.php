@@ -145,7 +145,7 @@ class GetClientDashboardStatsAction
         }
 
         $workout = $client->workouts()
-            ->with('exercises.category')
+            ->with(['exercises.category', 'completions'])
             ->where('is_active', true)
             ->latest()
             ->first();
@@ -163,6 +163,9 @@ class GetClientDashboardStatsAction
                 'reps' => $exercise->pivot->reps,
                 'rest_seconds' => $exercise->pivot->rest_seconds,
             ],
+            'completed' => $workout->completions
+                ->where('user_id', $user->id)
+                ->contains('exercise_id', $exercise->id),
         ]);
 
         $totalSeconds = $exercises->sum(fn ($ex) => $ex['pivot']['sets'] * ($ex['pivot']['reps'] * 3 + $ex['pivot']['rest_seconds']));

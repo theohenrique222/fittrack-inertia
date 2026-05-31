@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat } from 'lucide-vue-next';
+import { Check, Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
+import { Checkbox } from '@/components/ui/checkbox';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 import {
@@ -24,6 +25,7 @@ interface DialogExercise {
     name: string;
     category?: string | null;
     pivot: ExercisePivot;
+    completed?: boolean;
 }
 
 interface ActiveWorkout {
@@ -129,6 +131,19 @@ function startWorkout() {
         router.visit(`/workouts/${dialogWorkout.value.id}`);
     }
 }
+
+function toggleCompletion(exercise: DialogExercise, workoutId: number) {
+    router.post(
+        `/workouts/${workoutId}/exercises/${exercise.id}/toggle-completion`,
+        {},
+        { preserveState: true, preserveScroll: true },
+    );
+}
+
+const completedExercises = computed(() => {
+    if (!dialogWorkout.value?.exercises) return [];
+    return dialogWorkout.value.exercises.filter((e) => e.completed);
+});
 
 const completionRate = computed(() => {
     if (props.stats.totalWorkouts === 0) {
@@ -574,11 +589,25 @@ const completedThisWeek = computed(() => {
                     <div
                         v-for="(exercise, index) in dialogWorkout.exercises"
                         :key="exercise.id"
-                        class="flex items-center gap-3 rounded-lg border border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5"
+                        :class="[
+                            'flex items-center gap-3 rounded-lg border px-3 py-2.5',
+                            exercise.completed
+                                ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20'
+                                : 'border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50',
+                        ]"
                     >
-                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                            {{ index + 1 }}
-                        </span>
+                        <div @click.stop="toggleCompletion(exercise, dialogWorkout!.id)" class="shrink-0">
+                            <Checkbox :checked="exercise.completed" />
+                        </div>
+                        <div :class="[
+                            'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                            exercise.completed
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+                        ]">
+                            <Check v-if="exercise.completed" class="h-4 w-4" />
+                            <span v-else>{{ index + 1 }}</span>
+                        </div>
                         <div class="min-w-0 flex-1">
                             <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">{{ exercise.name }}</p>
                             <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -599,6 +628,28 @@ const completedThisWeek = computed(() => {
                 <div v-else-if="dialogWorkout" class="flex flex-col items-center justify-center py-6 text-center">
                     <Dumbbell class="h-8 w-8 text-neutral-300 dark:text-neutral-600 mb-2" />
                     <p class="text-sm text-neutral-500 dark:text-neutral-400">Nenhum exercício neste treino</p>
+                </div>
+            </div>
+
+            <!-- Completed Exercises -->
+            <div v-if="completedExercises.length" class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700">
+                <div class="flex items-center gap-2 mb-3">
+                    <Check class="h-4 w-4 text-emerald-500" />
+                    <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                        Concluídos ({{ completedExercises.length }})
+                    </span>
+                </div>
+                <div class="space-y-1.5">
+                    <div
+                        v-for="exercise in completedExercises"
+                        :key="exercise.id"
+                        class="flex items-center gap-2 px-1 py-1"
+                    >
+                        <Check class="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        <span class="text-sm text-neutral-600 dark:text-neutral-400 truncate">
+                            {{ exercise.name }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
