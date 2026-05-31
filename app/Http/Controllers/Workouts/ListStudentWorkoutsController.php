@@ -22,6 +22,7 @@ class ListStudentWorkoutsController extends Controller
         $filters['client_id'] = $client->id;
 
         $workouts = $action->execute($filters);
+        $workouts->load('completions');
 
         return Inertia::render('workouts/StudentListWorkouts', [
             'workouts' => WorkoutResource::collection($workouts),

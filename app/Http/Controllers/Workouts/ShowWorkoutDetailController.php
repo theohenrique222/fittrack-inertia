@@ -15,7 +15,7 @@ class ShowWorkoutDetailController extends Controller
         Workout $workout,
         ListExercisesAction $exercisesAction,
     ): Response {
-        $workout->loadMissing(['exercises.category', 'client.user']);
+        $workout->loadMissing(['exercises.category', 'client.user', 'completions']);
 
         $exercises = $exercisesAction->execute();
 

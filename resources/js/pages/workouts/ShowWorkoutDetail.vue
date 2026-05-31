@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
+    Check,
     Clock,
     Dumbbell,
     Play,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Sheet,
     SheetContent,
@@ -45,6 +47,7 @@ interface Exercise {
     video_url?: string;
     category?: ExerciseCategory | null;
     pivot: ExercisePivot;
+    completed?: boolean;
 }
 
 interface Workout {
@@ -177,6 +180,21 @@ function getDifficultyLabel(difficulty?: string): string {
             return difficulty || '-';
     }
 }
+
+function toggleCompletion(exercise: Exercise) {
+    router.post(
+        `/workouts/${(page.props as any).workout.id}/exercises/${exercise.id}/toggle-completion`,
+        {},
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
+}
+
+const completedExercises = computed(() => {
+    return ((page.props as any).workout as Workout)?.exercises?.filter((e) => e.completed) ?? [];
+});
 </script>
 
 <template>
@@ -293,13 +311,30 @@ function getDifficultyLabel(difficulty?: string): string {
                             <div
                                 v-for="(exercise, index) in exercises"
                                 :key="exercise.id"
-                                class="group bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer"
+                                :class="[
+                                    'group bg-white dark:bg-neutral-800 rounded-xl border overflow-hidden hover:shadow-lg transition-all cursor-pointer',
+                                    exercise.completed
+                                        ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-900/10'
+                                        : 'border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-600',
+                                ]"
                                 @click="openExerciseDetail(exercise)"
                             >
                                 <div class="p-4">
                                     <div class="flex items-start gap-4">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-base font-bold text-emerald-700 dark:text-emerald-300">
-                                            {{ index + 1 }}
+                                        <div
+                                            class="mt-1 shrink-0"
+                                            @click.stop="toggleCompletion(exercise)"
+                                        >
+                                            <Checkbox :checked="exercise.completed" />
+                                        </div>
+                                        <div :class="[
+                                            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-base font-bold',
+                                            exercise.completed
+                                                ? 'bg-emerald-500 text-white'
+                                                : 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-emerald-700 dark:text-emerald-300',
+                                        ]">
+                                            <Check v-if="exercise.completed" class="h-5 w-5" />
+                                            <span v-else>{{ index + 1 }}</span>
                                         </div>
 
                                         <div class="flex-1 min-w-0">
@@ -364,6 +399,42 @@ function getDifficultyLabel(difficulty?: string): string {
                     <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
                         Este treino ainda não possui exercícios
                     </p>
+                </div>
+            </div>
+
+            <!-- Completed Exercises -->
+            <div v-if="completedExercises.length" class="mt-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <Check class="h-5 w-5 text-emerald-500" />
+                    <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                        Exercícios Concluídos
+                    </h2>
+                    <span class="text-sm text-neutral-500 dark:text-neutral-400">
+                        ({{ completedExercises.length }} de {{ workout.exercises?.length || 0 }})
+                    </span>
+                </div>
+
+                <div class="bg-white dark:bg-neutral-800 rounded-xl border border-emerald-200 dark:border-emerald-800 overflow-hidden">
+                    <div
+                        v-for="(exercise, index) in completedExercises"
+                        :key="exercise.id"
+                        class="flex items-center gap-3 px-4 py-3 border-b border-emerald-100 dark:border-emerald-900/30 last:border-b-0"
+                    >
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                            <Check class="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">
+                                {{ exercise.name }}
+                            </p>
+                            <p v-if="exercise.muscle_group" class="text-xs text-neutral-500 dark:text-neutral-400">
+                                {{ exercise.muscle_group }}
+                            </p>
+                        </div>
+                        <span class="text-xs text-neutral-400 dark:text-neutral-500">
+                            {{ exercise.pivot.sets }}×{{ exercise.pivot.reps }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
