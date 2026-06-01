@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'specialty'])]
+#[Fillable(['user_id', 'specialty', 'password'])]
 class Trainer extends Model
 {
     use HasFactory;

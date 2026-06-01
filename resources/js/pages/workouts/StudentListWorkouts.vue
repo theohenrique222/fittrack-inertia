@@ -94,34 +94,61 @@ const muscleGroupColors: Record<string, { bg: string; text: string; dot: string;
 };
 
 function getMuscleGroupStyle(group?: string) {
-    if (!group) return { bg: 'bg-neutral-100 dark:bg-neutral-800', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', section: 'border-l-neutral-300 dark:border-l-neutral-600' };
+    if (!group) {
+return { bg: 'bg-neutral-100 dark:bg-neutral-800', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', section: 'border-l-neutral-300 dark:border-l-neutral-600' };
+}
+
     return muscleGroupColors[group] || { bg: 'bg-neutral-100 dark:bg-neutral-800', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', section: 'border-l-neutral-300 dark:border-l-neutral-600' };
 }
 
 function workoutMuscleGroups(workout: Workout): string[] {
-    if (!workout.exercises?.length) return [];
+    if (!workout.exercises?.length) {
+return [];
+}
+
     const groups = new Set<string>();
     workout.exercises.forEach((ex) => {
-        if (ex.muscle_group) groups.add(ex.muscle_group);
+        if (ex.muscle_group) {
+groups.add(ex.muscle_group);
+}
     });
+
     return Array.from(groups);
 }
 
 function groupedExercises(workout: Workout): { group: string; exercises: WorkoutExercise[] }[] {
-    if (!workout.exercises?.length) return [];
+    if (!workout.exercises?.length) {
+return [];
+}
+
     const groups = new Map<string, WorkoutExercise[]>();
     workout.exercises.forEach((ex) => {
         const key = ex.muscle_group || 'Outros';
-        if (!groups.has(key)) groups.set(key, []);
+
+        if (!groups.has(key)) {
+groups.set(key, []);
+}
+
         groups.get(key)!.push(ex);
     });
     const order = Object.keys(muscleGroupColors);
+
     return Array.from(groups.entries()).sort((a, b) => {
         const ia = order.indexOf(a[0]);
         const ib = order.indexOf(b[0]);
-        if (ia === -1 && ib === -1) return a[0].localeCompare(b[0]);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
+
+        if (ia === -1 && ib === -1) {
+return a[0].localeCompare(b[0]);
+}
+
+        if (ia === -1) {
+return 1;
+}
+
+        if (ib === -1) {
+return -1;
+}
+
         return ia - ib;
     }).map(([group, exercises]) => ({ group, exercises }));
 }
@@ -163,22 +190,31 @@ function formatRest(seconds: number): string {
     if (seconds >= 60) {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
+
         return secs > 0 ? `${mins}m${secs}s` : `${mins}min`;
     }
+
     return `${seconds}s`;
 }
 
 function estimatedTime(workout: Workout): string {
-    if (!workout.exercises?.length) return '—';
+    if (!workout.exercises?.length) {
+return '—';
+}
+
     const totalSeconds = workout.exercises.reduce((sum, ex) => {
         return sum + ex.pivot.sets * (ex.pivot.reps * 3 + ex.pivot.rest_seconds);
     }, 0);
     const mins = Math.round(totalSeconds / 60);
+
     return `~${mins}min`;
 }
 
 function totalReps(workout: Workout): number {
-    if (!workout.exercises?.length) return 0;
+    if (!workout.exercises?.length) {
+return 0;
+}
+
     return workout.exercises.reduce((sum, ex) => sum + ex.pivot.sets * ex.pivot.reps, 0);
 }
 

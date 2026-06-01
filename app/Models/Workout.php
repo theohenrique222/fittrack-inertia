@@ -19,12 +19,14 @@ class Workout extends Model
         'client_id',
         'trainer_id',
         'is_active',
+        'completed_at',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'completed_at' => 'datetime',
         ];
     }
 

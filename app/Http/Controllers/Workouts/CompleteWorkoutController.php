@@ -22,7 +22,7 @@ class CompleteWorkoutController extends Controller
         $result = $action->execute($workout, $user);
 
         if ($result['success']) {
-            return redirect()->back()->with('success', $result['message']);
+            return redirect()->route('dashboard')->with('success', $result['message']);
         }
 
         return redirect()->back()->with('error', $result['message']);
