@@ -103,6 +103,7 @@ class WorkoutTest extends TestCase
             'client_id',
             'trainer_id',
             'is_active',
+            'completed_at',
         ];
 
         $this->assertEquals($expectedFillable, $workout->getFillable());

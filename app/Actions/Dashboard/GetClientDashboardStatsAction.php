@@ -3,7 +3,10 @@
 namespace App\Actions\Dashboard;
 
 use App\Models\Client;
+use App\Models\ExerciseCompletion;
+use App\Models\Trainer;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class GetClientDashboardStatsAction
@@ -14,13 +17,8 @@ class GetClientDashboardStatsAction
 
         $totalWorkouts = $client ? $client->workouts()->count() : 0;
         $completedWorkouts = $client ? $client->workouts()->whereNotNull('completed_at')->count() : 0;
-        $currentStreak = 7;
+        $currentStreak = $this->calculateStreak($user);
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
-
-        $weeklyWorkouts = $this->generateWeeklyWorkouts();
-        $progressData = $this->generateProgressData();
-        $nutritionData = $this->generateNutritionData();
-        $bodyMetrics = $this->generateBodyMetrics();
 
         return [
             'stats' => [
@@ -31,31 +29,163 @@ class GetClientDashboardStatsAction
             ],
             'activeWorkout' => $this->getActiveWorkout($user),
             'completedWorkouts' => $this->getCompletedWorkouts($user),
-            'weeklyWorkouts' => $weeklyWorkouts,
-            'progressData' => $progressData,
-            'nutritionData' => $nutritionData,
-            'bodyMetrics' => $bodyMetrics,
+            'weeklyWorkouts' => $this->getWeeklyWorkouts($user),
+            'progressData' => $this->generateProgressData(),
+            'nutritionData' => $this->generateNutritionData(),
+            'bodyMetrics' => $this->generateBodyMetrics(),
             'upcomingWorkouts' => $this->getUpcomingWorkouts($user),
-            'recentAchievements' => $this->generateRecentAchievements(),
-            'trainer' => [
-                'name' => 'Carlos Personal',
-                'specialty' => 'Musculação & Funcional',
-                'email' => 'carlos@fittrack.com',
-            ],
+            'recentAchievements' => $this->getRecentAchievements($user),
+            'trainer' => $this->getTrainerInfo($user),
         ];
     }
 
-    private function generateWeeklyWorkouts(): array
+    private function getTrainerInfo(User $user): array
+    {
+        $trainerUser = $user->trainer;
+
+        if (! $trainerUser) {
+            return [
+                'name' => 'Não atribuído',
+                'specialty' => '—',
+                'email' => '—',
+            ];
+        }
+
+        $trainerProfile = Trainer::where('user_id', $trainerUser->id)->first();
+
+        return [
+            'name' => $trainerUser->name,
+            'specialty' => $trainerProfile?->specialty ?? 'Personal Trainer',
+            'email' => $trainerUser->email,
+        ];
+    }
+
+    private function calculateStreak(User $user): int
+    {
+        try {
+            $dates = ExerciseCompletion::where('user_id', $user->id)
+                ->select(DB::raw('DATE(completed_at) as date'))
+                ->groupBy(DB::raw('DATE(completed_at)'))
+                ->orderByDesc('date')
+                ->pluck('date')
+                ->map(fn ($date) => Carbon::parse($date));
+        } catch (\Throwable) {
+            return 0;
+        }
+
+        if ($dates->isEmpty()) {
+            return 0;
+        }
+
+        $streak = 0;
+        $today = now()->startOfDay();
+
+        foreach ($dates as $date) {
+            $expected = $today->copy()->subDays($streak);
+            if ($date->startOfDay()->eq($expected)) {
+                $streak++;
+            } else {
+                break;
+            }
+        }
+
+        return $streak;
+    }
+
+    private function getWeeklyWorkouts(User $user): array
     {
         $days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        $completed = [true, true, false, true, true, false, false];
-        $types = ['Peito', 'Costas', 'Descanso', 'Pernas', 'Ombros', 'Descanso', 'Descanso'];
 
-        return collect($days)->map(fn ($day, $i) => [
-            'day' => $day,
-            'completed' => $completed[$i],
-            'type' => $types[$i],
-        ])->all();
+        try {
+            $startOfWeek = now()->startOfWeek(Carbon::MONDAY);
+            $endOfWeek = now()->endOfWeek(Carbon::SUNDAY);
+
+            $completionDates = ExerciseCompletion::where('user_id', $user->id)
+                ->whereBetween('completed_at', [$startOfWeek, $endOfWeek])
+                ->select(DB::raw('DATE(completed_at) as date'))
+                ->groupBy(DB::raw('DATE(completed_at)'))
+                ->pluck('date')
+                ->map(fn ($date) => Carbon::parse($date)->startOfDay());
+        } catch (\Throwable) {
+            return collect($days)->map(fn ($day) => [
+                'day' => $day,
+                'completed' => false,
+                'type' => 'Descanso',
+            ])->all();
+        }
+
+        $weeklyWorkouts = [];
+
+        foreach ($days as $i => $dayName) {
+            $currentDay = $startOfWeek->copy()->addDays($i);
+            $completed = $completionDates->contains(fn ($date) => $date->eq($currentDay));
+
+            $weeklyWorkouts[] = [
+                'day' => $dayName,
+                'completed' => $completed,
+                'type' => $completed ? 'Treino' : 'Descanso',
+            ];
+        }
+
+        return $weeklyWorkouts;
+    }
+
+    private function getRecentAchievements(User $user): array
+    {
+        $client = Client::where('user_id', $user->id)->first();
+        $totalCompleted = $client ? $client->workouts()->whereNotNull('completed_at')->count() : 0;
+        $streak = $this->calculateStreak($user);
+
+        $achievements = [];
+
+        if ($totalCompleted >= 1) {
+            $achievements[] = [
+                'title' => "{$totalCompleted} treinos concluídos!",
+                'description' => self::completionMessage($totalCompleted),
+                'icon' => 'check-circle',
+                'date' => 'Até agora',
+            ];
+        }
+
+        if ($streak >= 3) {
+            $achievements[] = [
+                'title' => "{$streak} dias de sequência!",
+                'description' => 'Continue assim!',
+                'icon' => 'flame',
+                'date' => 'Sequência atual',
+            ];
+        }
+
+        if ($totalCompleted >= 5) {
+            $achievements[] = [
+                'title' => 'Dedicação!',
+                'description' => '5+ treinos finalizados',
+                'icon' => 'trophy',
+                'date' => 'Meta alcançada',
+            ];
+        }
+
+        if (empty($achievements)) {
+            $achievements[] = [
+                'title' => 'Primeiro treino!',
+                'description' => 'Finalize seu primeiro treino',
+                'icon' => 'target',
+                'date' => 'Próximo passo',
+            ];
+        }
+
+        return $achievements;
+    }
+
+    private static function completionMessage(int $count): string
+    {
+        return match (true) {
+            $count >= 50 => 'Incrível!',
+            $count >= 30 => 'Excelente progresso!',
+            $count >= 20 => 'Continue firme!',
+            $count >= 10 => 'Bom ritmo!',
+            default => 'Ótimo começo!',
+        };
     }
 
     private function generateProgressData(): array
@@ -107,33 +237,6 @@ class GetClientDashboardStatsAction
             ['label' => 'Gordura Corporal', 'value' => '15%', 'change' => '-3%', 'trend' => 'down'],
             ['label' => 'Massa Magra', 'value' => '62 kg', 'change' => '+2 kg', 'trend' => 'up'],
             ['label' => 'IMC', 'value' => '24.2', 'change' => '+0.5', 'trend' => 'up'],
-        ];
-    }
-
-    private function generateUpcomingWorkouts(): array
-    {
-        return [
-            [
-                'name' => 'Treino A - Peito & Tríceps',
-                'date' => 'Hoje',
-                'time' => '18:00',
-                'exercises' => 6,
-                'status' => 'scheduled',
-            ],
-            [
-                'name' => 'Treino B - Costas & Bíceps',
-                'date' => 'Amanhã',
-                'time' => '18:00',
-                'exercises' => 5,
-                'status' => 'scheduled',
-            ],
-            [
-                'name' => 'Treino C - Pernas',
-                'date' => 'Quarta',
-                'time' => '18:00',
-                'exercises' => 7,
-                'status' => 'scheduled',
-            ],
         ];
     }
 
@@ -231,15 +334,5 @@ class GetClientDashboardStatsAction
                 'completed_at' => $workout->completed_at->diffForHumans(),
             ])
             ->toArray();
-    }
-
-    private function generateRecentAchievements(): array
-    {
-        return [
-            ['title' => '7 dias de sequência!', 'description' => 'Continue assim!', 'icon' => 'flame', 'date' => 'Hoje'],
-            ['title' => 'Superação no supino', 'description' => 'Novo recorde: 80kg', 'icon' => 'trophy', 'date' => 'Ontem'],
-            ['title' => '18 treinos completados', 'description' => '75% de conclusão', 'icon' => 'check-circle', 'date' => 'Esta semana'],
-            ['title' => 'Meta de proteína batida', 'description' => '145g consumidos', 'icon' => 'target', 'date' => 'Esta semana'],
-        ];
     }
 }
