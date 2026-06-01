@@ -13,7 +13,6 @@ import {
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Sheet,
     SheetContent,
@@ -353,19 +352,26 @@ const completedExercises = computed(() => {
                                 <div class="p-4">
                                     <div class="flex items-start gap-4">
                                         <div
-                                            class="mt-1 shrink-0"
+                                            class="relative mt-1 shrink-0"
                                             @click.stop="toggleCompletion(exercise)"
                                         >
-                                            <Checkbox :checked="exercise.completed" />
-                                        </div>
-                                        <div :class="[
-                                            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-base font-bold',
-                                            exercise.completed
-                                                ? 'bg-emerald-500 text-white'
-                                                : 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-emerald-700 dark:text-emerald-300',
-                                        ]">
-                                            <Check v-if="exercise.completed" class="h-5 w-5" />
-                                            <span v-else>{{ index + 1 }}</span>
+                                            <div :class="[
+                                                'flex h-10 w-10 items-center justify-center rounded-full text-base font-bold transition-all duration-200 cursor-pointer',
+                                                exercise.completed
+                                                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200 dark:shadow-emerald-900/40'
+                                                    : 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-emerald-700 dark:text-emerald-300 hover:shadow-md hover:shadow-emerald-100 dark:hover:shadow-emerald-900/20',
+                                            ]">
+                                                <Check v-if="exercise.completed" class="h-5 w-5" />
+                                                <span v-else>{{ index + 1 }}</span>
+                                            </div>
+                                            <div :class="[
+                                                'absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-200',
+                                                exercise.completed
+                                                    ? 'bg-emerald-500 border-white text-white scale-100'
+                                                    : 'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600 scale-0',
+                                            ]">
+                                                <Check class="h-3 w-3" />
+                                            </div>
                                         </div>
 
                                         <div class="flex-1 min-w-0">
