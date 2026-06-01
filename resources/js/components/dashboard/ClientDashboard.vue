@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { Link, router } from '@inertiajs/vue3';
 import { Check, Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 import {
@@ -9,7 +9,6 @@ import {
     DialogContent,
     DialogDescription,
     DialogFooter,
-    DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
 
@@ -92,7 +91,9 @@ const isDialogOpen = ref(false);
 const dialogWorkout = ref<DialogWorkoutData | null>(null);
 
 function openWorkoutDialog(workout: ActiveWorkout | UpcomingWorkout) {
-    if (!workout.id) return;
+    if (!workout.id) {
+return;
+}
 
     if ('exercises' in workout && workout.exercises) {
         dialogWorkout.value = {
@@ -119,8 +120,10 @@ function formatRest(seconds: number): string {
     if (seconds >= 60) {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
+
         return secs > 0 ? `${mins}m${secs}s` : `${mins}min`;
     }
+
     return `${seconds}s`;
 }
 

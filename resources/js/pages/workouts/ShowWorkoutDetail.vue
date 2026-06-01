@@ -91,26 +91,47 @@ const muscleGroupColors: Record<string, { bg: string; text: string; dot: string;
 };
 
 function getMuscleGroupStyle(group?: string) {
-    if (!group) return { bg: 'bg-neutral-50 dark:bg-neutral-800/50', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', border: 'border-neutral-200 dark:border-neutral-700', gradient: 'from-neutral-400 to-neutral-500' };
+    if (!group) {
+return { bg: 'bg-neutral-50 dark:bg-neutral-800/50', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', border: 'border-neutral-200 dark:border-neutral-700', gradient: 'from-neutral-400 to-neutral-500' };
+}
+
     return muscleGroupColors[group] || { bg: 'bg-neutral-50 dark:bg-neutral-800/50', text: 'text-neutral-600 dark:text-neutral-400', dot: 'bg-neutral-400', border: 'border-neutral-200 dark:border-neutral-700', gradient: 'from-neutral-400 to-neutral-500' };
 }
 
 function getGroupedExercises(workout: Workout): { group: string; exercises: Exercise[]; style: ReturnType<typeof getMuscleGroupStyle> }[] {
-    if (!workout.exercises?.length) return [];
+    if (!workout.exercises?.length) {
+return [];
+}
+
     const groups = new Map<string, Exercise[]>();
     workout.exercises.forEach((ex) => {
         const key = ex.muscle_group || 'Outros';
-        if (!groups.has(key)) groups.set(key, []);
+
+        if (!groups.has(key)) {
+groups.set(key, []);
+}
+
         groups.get(key)!.push(ex);
     });
     const order = Object.keys(muscleGroupColors);
+
     return Array.from(groups.entries())
         .sort((a, b) => {
             const ia = order.indexOf(a[0]);
             const ib = order.indexOf(b[0]);
-            if (ia === -1 && ib === -1) return a[0].localeCompare(b[0]);
-            if (ia === -1) return 1;
-            if (ib === -1) return -1;
+
+            if (ia === -1 && ib === -1) {
+return a[0].localeCompare(b[0]);
+}
+
+            if (ia === -1) {
+return 1;
+}
+
+            if (ib === -1) {
+return -1;
+}
+
             return ia - ib;
         })
         .map(([group, exercises]) => ({
@@ -121,21 +142,31 @@ function getGroupedExercises(workout: Workout): { group: string; exercises: Exer
 }
 
 function workoutTotalSets(workout: Workout): number {
-    if (!workout.exercises?.length) return 0;
+    if (!workout.exercises?.length) {
+return 0;
+}
+
     return workout.exercises.reduce((sum, ex) => sum + ex.pivot.sets, 0);
 }
 
 function workoutTotalReps(workout: Workout): number {
-    if (!workout.exercises?.length) return 0;
+    if (!workout.exercises?.length) {
+return 0;
+}
+
     return workout.exercises.reduce((sum, ex) => sum + ex.pivot.sets * ex.pivot.reps, 0);
 }
 
 function workoutEstimatedTime(workout: Workout): string {
-    if (!workout.exercises?.length) return '—';
+    if (!workout.exercises?.length) {
+return '—';
+}
+
     const totalSeconds = workout.exercises.reduce((sum, ex) => {
         return sum + ex.pivot.sets * (ex.pivot.reps * 3 + ex.pivot.rest_seconds);
     }, 0);
     const mins = Math.round(totalSeconds / 60);
+
     return `~${mins}min`;
 }
 
@@ -416,7 +447,7 @@ const completedExercises = computed(() => {
 
                 <div class="bg-white dark:bg-neutral-800 rounded-xl border border-emerald-200 dark:border-emerald-800 overflow-hidden">
                     <div
-                        v-for="(exercise, index) in completedExercises"
+                        v-for="exercise in completedExercises"
                         :key="exercise.id"
                         class="flex items-center gap-3 px-4 py-3 border-b border-emerald-100 dark:border-emerald-900/30 last:border-b-0"
                     >
