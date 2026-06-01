@@ -2,9 +2,11 @@
 
 use App\Actions\Students\ResetPasswordStudentAction;
 use App\Actions\Students\StoreStudentAction;
+use App\Actions\Trainers\ResetPasswordTrainerAction;
 use App\Actions\Trainers\StoreTrainerAction;
 use App\Enums\UserRole;
 use App\Models\Client;
+use App\Models\Trainer;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -200,3 +202,20 @@ test('password update requires minimum 8 characters', function () {
 
     $response->assertSessionHasErrors('new_password');
 })->skip('CSRF middleware prevents validation in tests');
+
+test('resetting trainer password sets must_reset_password to true', function () {
+    $user = User::factory()->create([
+        'role' => UserRole::PERSONAL,
+        'must_reset_password' => false,
+    ]);
+
+    $trainer = Trainer::factory()->create(['user_id' => $user->id]);
+
+    $action = app(ResetPasswordTrainerAction::class);
+    $action->execute($trainer);
+
+    $trainer->refresh();
+
+    expect($trainer->user->must_reset_password)->toBeTrue()
+        ->and(Hash::check('password', $trainer->user->password))->toBeTrue();
+});

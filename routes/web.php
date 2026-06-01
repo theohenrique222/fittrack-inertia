@@ -22,6 +22,7 @@ use App\Http\Controllers\Students\UpdateStudentController;
 use App\Http\Controllers\Trainers\DestroyTrainerController;
 use App\Http\Controllers\Trainers\ImpersonateTrainerController;
 use App\Http\Controllers\Trainers\ListTrainersController;
+use App\Http\Controllers\Trainers\ResetPasswordTrainerController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
 use App\Http\Controllers\Workouts\DestroyWorkoutController;
@@ -111,6 +112,11 @@ $router
 $router
     ->post(uri: '/trainers/{trainer}/impersonate', action: ImpersonateTrainerController::class)
     ->name('trainers.impersonate')
+    ->middleware(['auth', 'can:isAdmin']);
+
+$router
+    ->post(uri: '/trainers/{trainer}/reset-password', action: ResetPasswordTrainerController::class)
+    ->name('trainers.reset-password')
     ->middleware(['auth', 'can:isAdmin']);
 
 $router

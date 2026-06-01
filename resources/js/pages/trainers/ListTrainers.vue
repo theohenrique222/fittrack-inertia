@@ -17,6 +17,7 @@ import {
     ChevronRight,
     Dumbbell,
     Eye,
+    KeyRound,
     Plus,
     Search,
     UserPlus,
@@ -36,7 +37,7 @@ import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CreateTrainerSheet from '@/pages/trainers/components/CreateTrainerSheet.vue';
 import EditTrainerSheet from '@/pages/trainers/components/EditTrainerSheet.vue';
-import { destroy, impersonate } from '@/routes/trainers';
+import { destroy, impersonate, resetPassword } from '@/routes/trainers';
 
 interface Trainer {
     id: number;
@@ -119,6 +120,14 @@ const handleImpersonateClick = (trainer: Trainer) => {
     }
 
     router.post(impersonate.url({ trainer: trainer.id }));
+};
+
+const handleResetPasswordClick = (id: number) => {
+    if (!confirm('Tem certeza que deseja redefinir a senha para "password"?')) {
+        return;
+    }
+
+    router.post(resetPassword.url({ trainer: id }));
 };
 
 const closeCreateSheet = () => {
@@ -285,6 +294,15 @@ function getAvatarColor(id: number): string {
                         >
                             <Eye class="mr-1 h-3.5 w-3.5 text-amber-500" />
                             Personificar
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            class="h-8 px-3 text-xs"
+                            @click.stop="handleResetPasswordClick(trainer.id)"
+                        >
+                            <KeyRound class="mr-1 h-3.5 w-3.5 text-blue-500" />
+                            Redefinir Senha
                         </Button>
                         <Button
                             size="sm"
