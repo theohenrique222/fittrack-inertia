@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Check,
+    CheckCircle2,
     Clock,
     Dumbbell,
     Play,
@@ -11,7 +12,7 @@ import {
     Film,
     Image as ImageIcon,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import {
     Sheet,
@@ -19,6 +20,8 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { ToastContainer } from '@/components/ui/toast';
+import { useToast } from '@/composables/useToast';
 
 interface ExerciseCategory {
     id: number;
@@ -225,6 +228,45 @@ function toggleCompletion(exercise: Exercise) {
 const completedExercises = computed(() => {
     return ((page.props as any).workout as Workout)?.exercises?.filter((e) => e.completed) ?? [];
 });
+
+const allExercisesCompleted = computed(() => {
+    const exercises = ((page.props as any).workout as Workout)?.exercises;
+    if (!exercises?.length) {
+return false;
+}
+    return exercises.every((e) => e.completed);
+});
+
+const isCompleting = ref(false);
+
+const { toasts, success, error } = useToast();
+
+watch(
+    () => (page.props as any).flash,
+    (flash: any) => {
+        if (flash?.success) {
+            success(flash.success);
+        }
+        if (flash?.error) {
+            error(flash.error);
+        }
+    },
+);
+
+function completeWorkout() {
+    isCompleting.value = true;
+    router.post(
+        `/workouts/${(page.props as any).workout.id}/complete`,
+        {},
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onFinish: () => {
+                isCompleting.value = false;
+            },
+        },
+    );
+}
 </script>
 
 <template>
@@ -474,8 +516,33 @@ const completedExercises = computed(() => {
                     </div>
                 </div>
             </div>
+
+            <!-- Finish Workout Button -->
+            <div v-if="isStudent && workout.exercises?.length" class="mt-8">
+                <button
+                    :disabled="isCompleting"
+                    class="w-full inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-4 text-white font-semibold shadow-lg shadow-emerald-200 dark:shadow-emerald-900/40 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+                    @click="completeWorkout"
+                >
+                    <CheckCircle2 v-if="allExercisesCompleted && !isCompleting" class="h-6 w-6" />
+                    <Play v-else-if="isCompleting" class="h-6 w-6 animate-spin" />
+                    <Play v-else class="h-6 w-6" />
+                    <span class="text-lg">
+                        {{ isCompleting ? 'Finalizando...' : allExercisesCompleted ? 'Finalizar Treino' : 'Finalizar Treino' }}
+                    </span>
+                </button>
+                <p v-if="!allExercisesCompleted" class="text-center text-sm text-neutral-500 dark:text-neutral-400 mt-3">
+                    Complete todos os {{ workout.exercises.length }} exercícios para finalizar
+                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">({{ completedExercises.length }}/{{ workout.exercises.length }})</span>
+                </p>
+                <p v-else class="text-center text-sm text-emerald-600 dark:text-emerald-400 mt-3 font-medium">
+                    Todos os exercícios concluídos! Pronto para finalizar.
+                </p>
+            </div>
         </div>
     </div>
+
+    <ToastContainer v-model="toasts" />
 
     <!-- Exercise Detail Sheet -->
     <Sheet v-model:open="isExerciseDetailOpen">

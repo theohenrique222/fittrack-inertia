@@ -13,7 +13,7 @@ class GetClientDashboardStatsAction
         $client = Client::where('user_id', $user->id)->first();
 
         $totalWorkouts = $client ? $client->workouts()->count() : 0;
-        $completedWorkouts = $client ? $client->workouts()->where('is_active', false)->count() : 0;
+        $completedWorkouts = $client ? $client->workouts()->whereNotNull('completed_at')->count() : 0;
         $currentStreak = 7;
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
 
@@ -30,6 +30,7 @@ class GetClientDashboardStatsAction
                 'totalExercises' => $totalExercises,
             ],
             'activeWorkout' => $this->getActiveWorkout($user),
+            'completedWorkouts' => $this->getCompletedWorkouts($user),
             'weeklyWorkouts' => $weeklyWorkouts,
             'progressData' => $progressData,
             'nutritionData' => $nutritionData,
@@ -147,6 +148,7 @@ class GetClientDashboardStatsAction
         $workout = $client->workouts()
             ->with(['exercises.category', 'completions'])
             ->where('is_active', true)
+            ->whereNull('completed_at')
             ->latest()
             ->first();
 
@@ -193,6 +195,7 @@ class GetClientDashboardStatsAction
         return $client->workouts()
             ->withCount('exercises')
             ->where('is_active', true)
+            ->whereNull('completed_at')
             ->latest()
             ->take(5)
             ->get()
@@ -202,7 +205,30 @@ class GetClientDashboardStatsAction
                 'date' => $workout->created_at->diffForHumans(),
                 'time' => $workout->created_at->format('H:i'),
                 'exercises' => $workout->exercises_count,
-                'status' => $workout->is_active ? 'scheduled' : 'completed',
+                'status' => 'scheduled',
+            ])
+            ->toArray();
+    }
+
+    public function getCompletedWorkouts(User $user): array
+    {
+        $client = Client::where('user_id', $user->id)->first();
+
+        if (! $client) {
+            return [];
+        }
+
+        return $client->workouts()
+            ->withCount('exercises')
+            ->whereNotNull('completed_at')
+            ->latest('completed_at')
+            ->take(10)
+            ->get()
+            ->map(fn ($workout) => [
+                'id' => $workout->id,
+                'name' => $workout->name,
+                'exercises' => $workout->exercises_count,
+                'completed_at' => $workout->completed_at->diffForHumans(),
             ])
             ->toArray();
     }

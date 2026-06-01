@@ -37,6 +37,13 @@ interface ActiveWorkout {
     exercises?: DialogExercise[];
 }
 
+interface CompletedWorkout {
+    id: number;
+    name: string;
+    exercises: number;
+    completed_at: string;
+}
+
 interface UpcomingWorkout {
     id?: number;
     name: string;
@@ -73,6 +80,7 @@ interface Props {
     };
     bodyMetrics: { label: string; value: string; change: string; trend: string }[];
     activeWorkout: ActiveWorkout | null;
+    completedWorkouts: CompletedWorkout[];
     upcomingWorkouts: UpcomingWorkout[];
     recentAchievements: { title: string; description: string; icon: string; date: string }[];
     trainer: { name: string; specialty: string; email: string };
@@ -272,6 +280,44 @@ const completedThisWeek = computed(() => {
                 <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 pointer-events-none">
                     <span class="text-sm font-medium">Ver treino</span>
                     <ChevronRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Workouts -->
+        <div v-if="completedWorkouts.length" class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <CheckCircle class="h-5 w-5 text-emerald-500" />
+                    <h3 class="font-semibold text-neutral-900 dark:text-white">Treinos Concluídos</h3>
+                </div>
+                <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium">
+                    {{ completedWorkouts.length }} total
+                </span>
+            </div>
+            <div class="space-y-1">
+                <div
+                    v-for="workout in completedWorkouts"
+                    :key="workout.id"
+                    class="flex items-center gap-3 rounded-lg border border-emerald-100 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-3"
+                >
+                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                        <Check class="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">
+                            {{ workout.name }}
+                        </p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                            {{ workout.exercises }} exercícios · {{ workout.completed_at }}
+                        </p>
+                    </div>
+                    <Link
+                        :href="`/workouts/${workout.id}`"
+                        class="shrink-0 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                    >
+                        Ver
+                    </Link>
                 </div>
             </div>
         </div>

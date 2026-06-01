@@ -25,6 +25,7 @@ use App\Http\Controllers\Trainers\ListTrainersController;
 use App\Http\Controllers\Trainers\ResetPasswordTrainerController;
 use App\Http\Controllers\Trainers\StoreTrainerController;
 use App\Http\Controllers\Trainers\UpdateTrainerController;
+use App\Http\Controllers\Workouts\CompleteWorkoutController;
 use App\Http\Controllers\Workouts\DestroyWorkoutController;
 use App\Http\Controllers\Workouts\GenerateWorkoutController;
 use App\Http\Controllers\Workouts\ListStudentWorkoutsController;
@@ -171,6 +172,11 @@ $router
 $router
     ->post(uri: '/workouts/{workout}/exercises/{exercise}/toggle-completion', action: ToggleExerciseCompletionController::class)
     ->name('workouts.exercises.toggle-completion')
+    ->middleware('auth');
+
+$router
+    ->post(uri: '/workouts/{workout}/complete', action: CompleteWorkoutController::class)
+    ->name('workouts.complete')
     ->middleware('auth');
 
 $router
