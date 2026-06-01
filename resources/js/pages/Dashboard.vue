@@ -69,6 +69,7 @@ defineProps<{
     bodyMetrics?: { label: string; value: string; change: string; trend: string }[];
     recentAchievements?: { title: string; description: string; icon: string; date: string }[];
     trainer?: { name: string; specialty: string; email: string };
+    completedWorkouts?: { id: number; name: string; exercises: number; completed_at: string }[];
 }>();
 
 const userRole = computed(() => user.value?.role);
@@ -140,6 +141,7 @@ defineOptions({
                 fat: { consumed: 0, target: 0, percentage: 0, unit: 'g' },
             }"
             :body-metrics="bodyMetrics ?? []"
+            :completed-workouts="completedWorkouts ?? []"
             :upcoming-workouts="upcomingWorkouts ?? []"
             :recent-achievements="recentAchievements ?? []"
             :trainer="trainer ?? { name: 'Sem treinador', specialty: '', email: '' }"
