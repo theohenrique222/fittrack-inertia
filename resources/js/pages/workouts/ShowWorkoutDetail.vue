@@ -231,9 +231,11 @@ const completedExercises = computed(() => {
 
 const allExercisesCompleted = computed(() => {
     const exercises = ((page.props as any).workout as Workout)?.exercises;
+
     if (!exercises?.length) {
 return false;
 }
+
     return exercises.every((e) => e.completed);
 });
 
@@ -247,6 +249,7 @@ watch(
         if (flash?.success) {
             success(flash.success);
         }
+
         if (flash?.error) {
             error(flash.error);
         }

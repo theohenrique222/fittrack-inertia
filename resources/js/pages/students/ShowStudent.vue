@@ -31,7 +31,6 @@ import {
     Plus,
     Ruler,
     Scale,
-    Weight,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';

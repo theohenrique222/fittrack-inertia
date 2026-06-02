@@ -10,7 +10,6 @@ import {
     Ruler,
     Scale,
     TrendingUp,
-    Weight,
     Zap,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
@@ -32,8 +31,13 @@ const { toasts, success, error } = useToast();
 watch(
     () => page.props.flash,
     (flash: any) => {
-        if (flash?.success) success(flash.success);
-        if (flash?.error) error(flash.error);
+        if (flash?.success) {
+success(flash.success);
+}
+
+        if (flash?.error) {
+error(flash.error);
+}
     },
 );
 
@@ -103,7 +107,9 @@ function handleProfileSaved() {
 }
 
 const metricCards = computed(() => {
-    if (!props.latest) return [];
+    if (!props.latest) {
+return [];
+}
 
     const m = props.latest.metrics;
 

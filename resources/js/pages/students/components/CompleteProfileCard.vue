@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { Calendar, User, VenusAndMars, ArrowRight } from 'lucide-vue-next';
+import { Calendar, User, UserRound, ArrowRight } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,7 +47,7 @@ function handleSubmit() {
                 <form @submit.prevent="handleSubmit" class="mt-8 space-y-5 text-left">
                     <div class="space-y-2">
                         <Label class="flex items-center gap-1.5 text-sm font-medium text-neutral-200">
-                            <VenusAndMars class="h-4 w-4 text-emerald-400" />
+                            <UserRound class="h-4 w-4 text-emerald-400" />
                             Gênero
                         </Label>
                         <Select v-model="form.gender">

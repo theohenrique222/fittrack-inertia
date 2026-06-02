@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import { Calendar, VenusAndMars } from 'lucide-vue-next';
+import { Calendar, UserRound } from 'lucide-vue-next';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -86,7 +86,7 @@ defineOptions({
                 <Label for="gender" class="text-sm font-medium">Gênero</Label>
                 <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3">
-                        <VenusAndMars class="h-4 w-4 text-muted-foreground" />
+                        <UserRound class="h-4 w-4 text-muted-foreground" />
                     </div>
                     <Select name="gender" required>
                         <SelectTrigger class="w-full pl-10">

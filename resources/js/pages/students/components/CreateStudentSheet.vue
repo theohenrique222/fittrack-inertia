@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { Calendar, Mail, Shield, User, UserPlus, VenusAndMars } from 'lucide-vue-next';
+import { Calendar, Mail, Shield, User, UserPlus, UserRound } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -118,7 +118,7 @@ function handleCancel() {
 
                 <div>
                     <Label class="mb-2 flex items-center gap-1.5">
-                        <VenusAndMars class="w-3.5 h-3.5 text-neutral-400" />
+                        <UserRound class="w-3.5 h-3.5 text-neutral-400" />
                         Gênero *
                     </Label>
                     <Select v-model="form.gender">
