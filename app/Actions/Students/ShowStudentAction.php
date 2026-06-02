@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ShowStudentAction
 {
-    public function __construct(
-        private BodyMetricsCalculator $calculator,
-    ) {}
-
     public function execute(Client $student): array
     {
         $student->loadMissing(['user', 'workouts.exercises.category']);
@@ -32,7 +28,8 @@ class ShowStudentAction
         $latestMeasurementData = null;
         if ($latestMeasurement && $student->user->gender && $student->user->birthdate) {
             try {
-                $metrics = $this->calculator->calculate($latestMeasurement, $student->user);
+                $calculator = new BodyMetricsCalculator($latestMeasurement, $student->user);
+                $metrics = $calculator->calculate();
                 $latestMeasurementData = [
                     'id' => $latestMeasurement->id,
                     'recorded_at' => $latestMeasurement->recorded_at->format('d/m/Y'),

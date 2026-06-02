@@ -144,8 +144,8 @@ class GetClientDashboardStatsAction
 
             if ($m->neck && $m->waist) {
                 try {
-                    $calculator = app(BodyMetricsCalculator::class);
-                    $fullMetrics = $calculator->calculate($m, $client->user);
+                    $calculator = new BodyMetricsCalculator($m, $client->user);
+                    $fullMetrics = $calculator->calculate();
                     $bodyFat = $fullMetrics['body_fat']['value'];
                 } catch (\Throwable) {
                 }
