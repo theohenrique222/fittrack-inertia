@@ -60,11 +60,15 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    {
-        title: 'Exercícios',
-        href: exercises(),
-        icon: Dumbbell,
-    },
+    ...(can.view_students || can.view_trainers
+        ? [
+              {
+                  title: 'Exercícios',
+                  href: exercises(),
+                  icon: Dumbbell,
+              },
+          ]
+        : []),
 
     ...(can.view_students
         ? [
