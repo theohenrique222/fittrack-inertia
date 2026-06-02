@@ -11,7 +11,7 @@ import {
     Timer,
     Weight,
 } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,6 +56,9 @@ function handleSubmit() {
             form.reset();
             emit('saved');
         },
+        onError: () => {
+            console.error('Form errors:', form.errors);
+        },
     });
 }
 
@@ -72,6 +75,10 @@ const activityLevels = [
     { value: 'very_active', label: 'Extremamente ativo', desc: 'Atleta / trabalho físico' },
 ];
 
+const selectedActivityLabel = computed(
+    () => activityLevels.find((l) => l.value === form.activity_level)?.label ?? '',
+);
+
 const goals = [
     { value: 'maintain', label: 'Manter peso', icon: '⚖️' },
     { value: 'lose', label: 'Perder gordura', icon: '🔥' },
@@ -79,9 +86,27 @@ const goals = [
 ];
 </script>
 
+<style>
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+</style>
+
 <template>
     <form @submit.prevent="handleSubmit" class="flex h-full flex-col">
         <div class="flex-1 space-y-6 overflow-y-auto px-6 py-6">
+            <div v-if="form.hasErrors" class="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-900/10">
+                <p class="text-sm font-medium text-red-700 dark:text-red-400">Erro ao salvar:</p>
+                <ul class="mt-1 list-inside list-disc text-xs text-red-600 dark:text-red-400">
+                    <li v-for="(error, key) in form.errors" :key="key">{{ error }}</li>
+                </ul>
+            </div>
+
             <div>
                 <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
                     Nova Medição Corporal
@@ -203,13 +228,14 @@ const goals = [
                         </Label>
                         <Select v-model="form.activity_level">
                             <SelectTrigger class="w-full dark:bg-neutral-800">
-                                <SelectValue placeholder="Selecione..." />
+                                <SelectValue placeholder="Selecione..." :textContent="selectedActivityLabel" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem
                                     v-for="level in activityLevels"
                                     :key="level.value"
                                     :value="level.value"
+                                    :textValue="level.label"
                                 >
                                     <div class="flex flex-col">
                                         <span>{{ level.label }}</span>
