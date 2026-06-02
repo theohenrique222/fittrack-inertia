@@ -22,6 +22,7 @@ import type { NavItem } from '@/types';
 const page = usePage();
 
 const can = page.props.auth.can;
+const user = page.props.auth.user;
 
 const mainNavItems: NavItem[] = [
     {
@@ -80,7 +81,7 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(can.view_students
+    ...(can.view_students || user?.role === 'client'
         ? [
               {
                   title: 'Medidas',

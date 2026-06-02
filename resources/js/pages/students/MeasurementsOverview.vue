@@ -30,6 +30,14 @@ import { useToast } from '@/composables/useToast';
 const page = usePage();
 const { toasts, success, error } = useToast();
 
+function handleAddMeasurements() {
+    if (page.props.auth.user?.role === 'client') {
+        router.visit(`/students/${page.props.auth.user.id}/measurements`);
+    } else {
+        router.visit('/students');
+    }
+}
+
 watch(
     () => page.props.flash,
     (flash: any) => {
@@ -397,9 +405,9 @@ const statsSummary = computed(() => {
             <Button
                 v-if="!searchQuery"
                 class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 hover:brightness-110"
-                @click="router.visit('/students')"
+                @click="handleAddMeasurements"
             >
-                Ir para Alunos
+                Adicionar Medidas
             </Button>
         </div>
     </div>
