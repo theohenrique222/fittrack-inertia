@@ -31,8 +31,8 @@ const page = usePage();
 const { toasts, success, error } = useToast();
 
 function handleAddMeasurements() {
-    if (page.props.auth.user?.role === 'client') {
-        router.visit(`/students/${page.props.auth.user.id}/measurements`);
+    if (page.props.auth.user?.role === 'client' && page.props.auth.client_id) {
+        router.visit(`/students/${page.props.auth.client_id}/measurements`);
     } else {
         router.visit('/students');
     }

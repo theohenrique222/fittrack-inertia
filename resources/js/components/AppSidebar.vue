@@ -23,6 +23,7 @@ const page = usePage();
 
 const can = page.props.auth.can;
 const user = page.props.auth.user;
+const clientId = page.props.auth.client_id;
 
 const mainNavItems: NavItem[] = [
     {
@@ -85,7 +86,9 @@ const mainNavItems: NavItem[] = [
         ? [
               {
                   title: 'Medidas',
-                  href: measurements(),
+                  href: user?.role === 'client' && clientId
+                      ? `/students/${clientId}/measurements`
+                      : measurements(),
                   icon: Ruler,
               },
           ]

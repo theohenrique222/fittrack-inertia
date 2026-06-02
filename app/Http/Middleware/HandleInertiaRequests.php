@@ -34,6 +34,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'client_id' => $request->user()?->client?->id,
                 'can' => [
                     'create_student' => $request->user()?->can('create-student'),
                     'view_students' => $request->user()?->role !== UserRole::CLIENT,

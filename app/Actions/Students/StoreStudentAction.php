@@ -17,13 +17,11 @@ class StoreStudentAction
             $user = new User;
             $user->name = $data['name'];
             $user->email = $data['email'];
-            $user->password = Hash::make($data['password'] ?? 'password');
+            $user->password = Hash::make('password');
             $user->must_reset_password = true;
             $user->role = UserRole::CLIENT->value;
             $user->trainer_id = Auth::id();
             $user->email_verified_at = now();
-            $user->gender = ! empty($data['gender']) ? $data['gender'] : null;
-            $user->birthdate = ! empty($data['birthdate']) ? $data['birthdate'] : null;
             $user->save();
 
             return Client::create([
