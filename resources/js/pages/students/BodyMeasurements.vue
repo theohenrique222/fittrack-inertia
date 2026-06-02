@@ -1,15 +1,5 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { defineOptions } from 'vue';
-
-defineOptions({
-    layout: (pageProps: any) => ({
-        breadcrumbs: [
-            { title: 'Alunos', href: '/students' },
-            { title: pageProps?.student?.name ?? 'Medidas', href: `/students/${pageProps?.student?.id}/measurements` },
-        ],
-    }),
-});
 import {
     Activity,
     ArrowLeft,
@@ -22,7 +12,16 @@ import {
     TrendingUp,
     Zap,
 } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, defineOptions, ref, watch } from 'vue';
+
+defineOptions({
+    layout: (pageProps: any) => ({
+        breadcrumbs: [
+            { title: 'Alunos', href: '/students' },
+            { title: pageProps?.student?.name ?? 'Medidas', href: `/students/${pageProps?.student?.id}/measurements` },
+        ],
+    }),
+});
 import { Button } from '@/components/ui/button';
 import {
     Sheet,

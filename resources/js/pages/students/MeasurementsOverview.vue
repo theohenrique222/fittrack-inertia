@@ -9,7 +9,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import {
     Activity,
     ChevronRight,
@@ -41,8 +41,13 @@ function handleAddMeasurements() {
 watch(
     () => page.props.flash,
     (flash: any) => {
-        if (flash?.success) success(flash.success);
-        if (flash?.error) error(flash.error);
+        if (flash?.success) {
+success(flash.success);
+}
+
+        if (flash?.error) {
+error(flash.error);
+}
     },
 );
 
@@ -75,9 +80,12 @@ const props = defineProps<{
 const searchQuery = ref('');
 
 const filteredStudents = computed(() => {
-    if (!searchQuery.value) return props.students;
+    if (!searchQuery.value) {
+return props.students;
+}
 
     const q = searchQuery.value.toLowerCase();
+
     return props.students.filter(
         (s) =>
             s.name.toLowerCase().includes(q) ||
@@ -113,6 +121,7 @@ const statsSummary = computed(() => {
     const total = props.students.length;
     const withData = props.students.filter((s) => s.latest_measurement).length;
     const withoutData = total - withData;
+
     return { total, withData, withoutData };
 });
 </script>
