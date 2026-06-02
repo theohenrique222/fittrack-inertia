@@ -18,6 +18,7 @@ use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Settings\CompleteProfileController;
 use App\Http\Controllers\Students\DestroyStudentController;
 use App\Http\Controllers\Students\ListAllStudentsController;
+use App\Http\Controllers\Students\ListMeasurementsOverviewController;
 use App\Http\Controllers\Students\ListStudentsController;
 use App\Http\Controllers\Students\ResetPasswordStudentController;
 use App\Http\Controllers\Students\ShowStudentController;
@@ -208,6 +209,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('measurements', ListMeasurementsOverviewController::class)->name('measurements');
     Route::get('reports', ReportsController::class)->name('reports');
     Route::get('me/workouts', ListStudentWorkoutsController::class)->name('me.workouts');
 });

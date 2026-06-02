@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Dumbbell, BarChart3, GraduationCap, Users } from 'lucide-vue-next';
+import { LayoutGrid, Dumbbell, BarChart3, GraduationCap, Ruler, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,7 +15,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { students, dashboard, exercises, trainers, reports } from '@/routes';
+import { students, dashboard, exercises, trainers, reports, measurements } from '@/routes';
 import { students as adminStudents } from '@/routes/admin';
 import type { NavItem } from '@/types';
 
@@ -76,6 +76,16 @@ const mainNavItems: NavItem[] = [
                   title: 'Relatórios',
                   href: reports(),
                   icon: BarChart3,
+              },
+          ]
+        : []),
+
+    ...(can.view_students
+        ? [
+              {
+                  title: 'Medidas',
+                  href: measurements(),
+                  icon: Ruler,
               },
           ]
         : []),

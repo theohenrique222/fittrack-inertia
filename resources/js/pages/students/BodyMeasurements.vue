@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { defineOptions } from 'vue';
+
+defineOptions({
+    layout: (pageProps: any) => ({
+        breadcrumbs: [
+            { title: 'Alunos', href: '/students' },
+            { title: pageProps?.student?.name ?? 'Medidas', href: `/students/${pageProps?.student?.id}/measurements` },
+        ],
+    }),
+});
 import {
     Activity,
     ArrowLeft,
@@ -172,17 +182,6 @@ return [];
 });
 
 const measurementsData = computed(() => props.measurements?.data ?? []);
-
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Alunos',
-                href: '/students',
-            },
-        ],
-    },
-});
 </script>
 
 <template>
