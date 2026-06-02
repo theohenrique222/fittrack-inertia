@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { Mail, Shield, User, UserPlus } from 'lucide-vue-next';
+import { Calendar, Mail, Shield, User, UserPlus, VenusAndMars } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { store } from '@/routes/students';
 
 const emit = defineEmits(['change']);
@@ -13,6 +20,8 @@ const form = useForm({
     email: '',
     password: '',
     nickname: '',
+    gender: '',
+    birthdate: '',
 });
 
 function handleSubmit() {
@@ -105,6 +114,41 @@ function handleCancel() {
                         v-if="form.errors.nickname"
                         class="text-xs text-red-500 mt-1"
                     >{{ form.errors.nickname }}</span>
+                </div>
+
+                <div>
+                    <Label class="mb-2 flex items-center gap-1.5">
+                        <VenusAndMars class="w-3.5 h-3.5 text-neutral-400" />
+                        Gênero *
+                    </Label>
+                    <Select v-model="form.gender">
+                        <SelectTrigger class="w-full">
+                            <SelectValue placeholder="Selecione o gênero" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="male">Masculino</SelectItem>
+                            <SelectItem value="female">Feminino</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <span
+                        v-if="form.errors.gender"
+                        class="text-xs text-red-500 mt-1"
+                    >{{ form.errors.gender }}</span>
+                </div>
+
+                <div>
+                    <Label class="mb-2 flex items-center gap-1.5">
+                        <Calendar class="w-3.5 h-3.5 text-neutral-400" />
+                        Data de Nascimento *
+                    </Label>
+                    <Input
+                        v-model="form.birthdate"
+                        type="date"
+                    />
+                    <span
+                        v-if="form.errors.birthdate"
+                        class="text-xs text-red-500 mt-1"
+                    >{{ form.errors.birthdate }}</span>
                 </div>
             </div>
         </div>

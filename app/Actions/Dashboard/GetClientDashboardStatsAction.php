@@ -2,6 +2,8 @@
 
 namespace App\Actions\Dashboard;
 
+use App\Actions\BodyMeasurements\BodyMetricsCalculator;
+use App\Actions\BodyMeasurements\LatestBodyMeasurementAction;
 use App\Models\Client;
 use App\Models\ExerciseCompletion;
 use App\Models\Trainer;
@@ -11,6 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 class GetClientDashboardStatsAction
 {
+    public function __construct(
+        private LatestBodyMeasurementAction $latestMeasurementAction,
+    ) {}
+
     public function execute(User $user): array
     {
         $client = Client::where('user_id', $user->id)->first();
@@ -19,6 +25,8 @@ class GetClientDashboardStatsAction
         $completedWorkouts = $client ? $client->workouts()->whereNotNull('completed_at')->count() : 0;
         $currentStreak = $this->calculateStreak($user);
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
+
+        $latestMeasurement = $client ? $this->latestMeasurementAction->execute($client) : null;
 
         return [
             'stats' => [
@@ -30,13 +38,125 @@ class GetClientDashboardStatsAction
             'activeWorkout' => $this->getActiveWorkout($user),
             'completedWorkouts' => $this->getCompletedWorkouts($user),
             'weeklyWorkouts' => $this->getWeeklyWorkouts($user),
-            'progressData' => $this->generateProgressData(),
-            'nutritionData' => $this->generateNutritionData(),
-            'bodyMetrics' => $this->generateBodyMetrics(),
+            'progressData' => $this->getProgressData($client, $user),
+            'nutritionData' => $latestMeasurement ? $this->getNutritionData($latestMeasurement) : $this->emptyNutritionData(),
+            'bodyMetrics' => $latestMeasurement ? $this->getBodyMetrics($latestMeasurement) : [],
             'upcomingWorkouts' => $this->getUpcomingWorkouts($user),
             'recentAchievements' => $this->getRecentAchievements($user),
             'trainer' => $this->getTrainerInfo($user),
         ];
+    }
+
+    private function getBodyMetrics(array $latest): array
+    {
+        $metrics = $latest['metrics'];
+
+        $items = [
+            [
+                'label' => 'Peso',
+                'value' => $latest['weight'].' kg',
+                'change' => '-',
+                'trend' => 'up',
+            ],
+            [
+                'label' => 'IMC',
+                'value' => (string) $metrics['bmi']['value'],
+                'change' => $metrics['bmi']['classification'],
+                'trend' => 'up',
+            ],
+            [
+                'label' => 'Gordura Corporal',
+                'value' => $metrics['body_fat']['value'].'%',
+                'change' => $metrics['body_fat']['classification'],
+                'trend' => 'down',
+            ],
+            [
+                'label' => 'Massa Magra',
+                'value' => $metrics['lean_mass'].' kg',
+                'change' => '-',
+                'trend' => 'up',
+            ],
+        ];
+
+        return $items;
+    }
+
+    private function getNutritionData(array $latest): array
+    {
+        $macros = $latest['metrics']['macros'];
+
+        $tdee = $macros['calories'];
+
+        return [
+            'calories' => [
+                'consumed' => 0,
+                'target' => $tdee,
+                'percentage' => 0,
+            ],
+            'protein' => [
+                'consumed' => 0,
+                'target' => $macros['protein']['grams'],
+                'percentage' => 0,
+                'unit' => 'g',
+            ],
+            'carbs' => [
+                'consumed' => 0,
+                'target' => $macros['carbs']['grams'],
+                'percentage' => 0,
+                'unit' => 'g',
+            ],
+            'fat' => [
+                'consumed' => 0,
+                'target' => $macros['fat']['grams'],
+                'percentage' => 0,
+                'unit' => 'g',
+            ],
+        ];
+    }
+
+    private function emptyNutritionData(): array
+    {
+        return [
+            'calories' => ['consumed' => 0, 'target' => 2400, 'percentage' => 0],
+            'protein' => ['consumed' => 0, 'target' => 150, 'percentage' => 0, 'unit' => 'g'],
+            'carbs' => ['consumed' => 0, 'target' => 300, 'percentage' => 0, 'unit' => 'g'],
+            'fat' => ['consumed' => 0, 'target' => 80, 'percentage' => 0, 'unit' => 'g'],
+        ];
+    }
+
+    private function getProgressData(?Client $client, User $user): array
+    {
+        if (! $client) {
+            return [];
+        }
+
+        $measurements = $client->bodyMeasurements()
+            ->orderBy('recorded_at', 'asc')
+            ->take(8)
+            ->get(['weight', 'neck', 'waist', 'hip', 'recorded_at']);
+
+        if ($measurements->isEmpty()) {
+            return [];
+        }
+
+        return $measurements->map(function ($m) use ($client) {
+            $bodyFat = 0;
+
+            if ($m->neck && $m->waist) {
+                try {
+                    $calculator = app(BodyMetricsCalculator::class);
+                    $fullMetrics = $calculator->calculate($m, $client->user);
+                    $bodyFat = $fullMetrics['body_fat']['value'];
+                } catch (\Throwable) {
+                }
+            }
+
+            return [
+                'week' => $m->recorded_at->format('d/m'),
+                'weight' => (float) $m->weight,
+                'bodyFat' => $bodyFat,
+            ];
+        })->toArray();
     }
 
     private function getTrainerInfo(User $user): array
@@ -186,58 +306,6 @@ class GetClientDashboardStatsAction
             $count >= 10 => 'Bom ritmo!',
             default => 'Ótimo começo!',
         };
-    }
-
-    private function generateProgressData(): array
-    {
-        $weeks = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'];
-        $weight = [70, 70.5, 71, 71.2, 71.8, 72, 72.5, 73];
-        $bodyFat = [18, 17.5, 17, 16.8, 16.2, 15.8, 15.5, 15];
-
-        return collect($weeks)->map(fn ($week, $i) => [
-            'week' => $week,
-            'weight' => $weight[$i],
-            'bodyFat' => $bodyFat[$i],
-        ])->all();
-    }
-
-    private function generateNutritionData(): array
-    {
-        return [
-            'calories' => [
-                'consumed' => 2150,
-                'target' => 2400,
-                'percentage' => 90,
-            ],
-            'protein' => [
-                'consumed' => 145,
-                'target' => 160,
-                'percentage' => 91,
-                'unit' => 'g',
-            ],
-            'carbs' => [
-                'consumed' => 220,
-                'target' => 280,
-                'percentage' => 79,
-                'unit' => 'g',
-            ],
-            'fat' => [
-                'consumed' => 65,
-                'target' => 75,
-                'percentage' => 87,
-                'unit' => 'g',
-            ],
-        ];
-    }
-
-    private function generateBodyMetrics(): array
-    {
-        return [
-            ['label' => 'Peso', 'value' => '73 kg', 'change' => '+3 kg', 'trend' => 'up'],
-            ['label' => 'Gordura Corporal', 'value' => '15%', 'change' => '-3%', 'trend' => 'down'],
-            ['label' => 'Massa Magra', 'value' => '62 kg', 'change' => '+2 kg', 'trend' => 'up'],
-            ['label' => 'IMC', 'value' => '24.2', 'change' => '+0.5', 'trend' => 'up'],
-        ];
     }
 
     public function getActiveWorkout(User $user): ?array

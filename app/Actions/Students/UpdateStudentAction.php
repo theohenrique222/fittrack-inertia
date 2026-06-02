@@ -17,6 +17,8 @@ class UpdateStudentAction
             $student->user()->update([
                 'name' => $data['name'] ?? $student->user->name,
                 'email' => $data['email'] ?? $student->user->email,
+                'gender' => $data['gender'] ?? $student->user->gender,
+                'birthdate' => $data['birthdate'] ?? $student->user->birthdate,
             ]);
 
             return $student->fresh(['user']);

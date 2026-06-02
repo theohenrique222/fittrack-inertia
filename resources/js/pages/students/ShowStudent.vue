@@ -29,6 +29,9 @@ import {
     ChevronRight,
     Search,
     Plus,
+    Ruler,
+    Scale,
+    Weight,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -118,11 +121,26 @@ interface Workout {
     created_at?: string;
 }
 
+interface LatestMeasurement {
+    id: number;
+    recorded_at: string;
+    weight: number;
+    height: number;
+    metrics: {
+        bmi: { value: number; classification: string; color: string };
+        body_fat: { value: number; classification: string; color: string };
+        lean_mass: number;
+        bmr: number;
+        daily_water: number;
+    };
+}
+
 interface Stats {
     total_workouts: number;
     active_workouts: number;
     created_at: string;
     trainer_name: string;
+    latest_measurement?: LatestMeasurement | null;
 }
 
 const props = defineProps<{
@@ -140,7 +158,7 @@ const isEditOpen = ref(false);
 const searchQuery = ref('');
 const selectedWorkout = ref<Workout | null>(null);
 
-const activeTab = ref<'overview' | 'workout' | 'history'>('overview');
+const activeTab = ref<'overview' | 'workout' | 'history' | 'measurements'>('overview');
 
 const filteredWorkouts = computed(() => {
     if (!searchQuery.value) {
@@ -160,6 +178,7 @@ const tabs = computed(() => [
     { id: 'overview' as const, label: 'Visão Geral' },
     { id: 'workout' as const, label: 'Treino Ativo' },
     { id: 'history' as const, label: 'Histórico' },
+    { id: 'measurements' as const, label: 'Medidas' },
 ]);
 
 function getInitials(name: string | undefined | null): string {
@@ -597,6 +616,73 @@ function getAvatarColor(id: number): string {
                 <Plus class="mr-2 h-5 w-5" />
                 Criar Novo Treino
             </Button>
+        </div>
+
+        <!-- Tab Content: Medidas Corporais -->
+        <div v-if="activeTab === 'measurements'" class="space-y-4">
+            <div
+                class="cursor-pointer rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
+                @click="router.visit(`/students/${student.id}/measurements`)"
+            >
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg">
+                            <Ruler class="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                                Medidas Corporais
+                            </h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                                {{ stats.latest_measurement
+                                    ? 'Última medição: ' + stats.latest_measurement.recorded_at
+                                    : 'Nenhuma medição registrada' }}
+                            </p>
+                        </div>
+                    </div>
+                    <ChevronRight class="h-5 w-5 text-neutral-300 dark:text-neutral-600" />
+                </div>
+
+                <div v-if="stats.latest_measurement" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Peso</p>
+                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ stats.latest_measurement.weight }} kg</p>
+                    </div>
+                    <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">IMC</p>
+                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ stats.latest_measurement.metrics.bmi.value }}</p>
+                    </div>
+                    <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">% Gordura</p>
+                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ stats.latest_measurement.metrics.body_fat.value }}%</p>
+                    </div>
+                    <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">TMB</p>
+                        <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ stats.latest_measurement.metrics.bmr }} kcal</p>
+                    </div>
+                </div>
+
+                <div v-else class="mt-4">
+                    <div
+                        class="flex items-center justify-center rounded-lg border-2 border-dashed border-neutral-200 py-6 text-center dark:border-neutral-600"
+                    >
+                        <div class="flex items-center gap-2 text-sm text-neutral-400">
+                            <Scale class="h-4 w-4" />
+                            <span>Registre a primeira medição para acompanhar a evolução</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button
+                        class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-emerald-500/25 transition-all hover:brightness-110"
+                        @click.stop="router.visit(`/students/${student.id}/measurements`)"
+                    >
+                        <Plus class="h-4 w-4" />
+                        {{ stats.latest_measurement ? 'Ver Medições' : 'Nova Medição' }}
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Tab Content: Histórico -->

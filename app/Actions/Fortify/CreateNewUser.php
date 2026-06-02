@@ -28,6 +28,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
+            'gender' => ! empty($input['gender']) ? $input['gender'] : null,
+            'birthdate' => ! empty($input['birthdate']) ? $input['birthdate'] : null,
         ]);
     }
 }

@@ -22,6 +22,8 @@ class UpdateStudentController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'nickname' => ['nullable', 'string', 'max:255'],
+            'gender' => ['required', 'string', 'in:male,female'],
+            'birthdate' => ['required', 'date', 'before:today'],
         ]);
 
         $updatedStudent = $action->execute($student, $validated);

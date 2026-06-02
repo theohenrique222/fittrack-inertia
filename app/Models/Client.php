@@ -30,4 +30,9 @@ class Client extends Model
     {
         return $this->hasMany(Workout::class);
     }
+
+    public function bodyMeasurements(): HasMany
+    {
+        return $this->hasMany(BodyMeasurement::class);
+    }
 }

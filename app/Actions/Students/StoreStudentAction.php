@@ -22,6 +22,8 @@ class StoreStudentAction
             $user->role = UserRole::CLIENT->value;
             $user->trainer_id = Auth::id();
             $user->email_verified_at = now();
+            $user->gender = ! empty($data['gender']) ? $data['gender'] : null;
+            $user->birthdate = ! empty($data['birthdate']) ? $data['birthdate'] : null;
             $user->save();
 
             return Client::create([

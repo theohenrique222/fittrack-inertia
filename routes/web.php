@@ -4,6 +4,9 @@ use App\Http\Controllers\Auth\MustResetPasswordController;
 use App\Http\Controllers\Auth\StopImpersonationController;
 use App\Http\Controllers\Auth\UpdateFirstPasswordController;
 use App\Http\Controllers\Authentication\LoginController;
+use App\Http\Controllers\BodyMeasurements\LatestBodyMeasurementController;
+use App\Http\Controllers\BodyMeasurements\ListBodyMeasurementsController;
+use App\Http\Controllers\BodyMeasurements\StoreBodyMeasurementController;
 use App\Http\Controllers\Categories\ListCategoriesController;
 use App\Http\Controllers\Context\ChangeContextController;
 use App\Http\Controllers\Dashboard\DashboardController;
@@ -12,6 +15,7 @@ use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
 use App\Http\Controllers\Reports\ReportsController;
+use App\Http\Controllers\Settings\CompleteProfileController;
 use App\Http\Controllers\Students\DestroyStudentController;
 use App\Http\Controllers\Students\ListAllStudentsController;
 use App\Http\Controllers\Students\ListStudentsController;
@@ -92,6 +96,21 @@ $router
 $router
     ->post(uri: '/students/{student}/reset-password', action: ResetPasswordStudentController::class)
     ->name('students.reset-password');
+
+$router
+    ->get(uri: '/students/{student}/measurements', action: ListBodyMeasurementsController::class)
+    ->name('students.measurements')
+    ->middleware('auth');
+
+$router
+    ->post(uri: '/students/{student}/measurements', action: StoreBodyMeasurementController::class)
+    ->name('students.measurements.store')
+    ->middleware('auth');
+
+$router
+    ->get(uri: '/students/{student}/measurements/latest', action: LatestBodyMeasurementController::class)
+    ->name('students.measurements.latest')
+    ->middleware('auth');
 
 $router
     ->get(uri: '/trainers', action: ListTrainersController::class)
@@ -182,6 +201,10 @@ $router
 $router
     ->delete(uri: '/workouts/{workout}', action: DestroyWorkoutController::class)
     ->name('workouts.destroy');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('profile/complete', CompleteProfileController::class)->name('profile.complete');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

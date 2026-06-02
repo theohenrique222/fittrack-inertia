@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { Calendar, VenusAndMars } from 'lucide-vue-next';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -75,6 +83,43 @@ defineOptions({
             </div>
 
             <div class="grid gap-2.5">
+                <Label for="gender" class="text-sm font-medium">Gênero</Label>
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3">
+                        <VenusAndMars class="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <Select name="gender" required>
+                        <SelectTrigger class="w-full pl-10">
+                            <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="male">Masculino</SelectItem>
+                            <SelectItem value="female">Feminino</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <InputError :message="errors.gender" />
+            </div>
+
+            <div class="grid gap-2.5">
+                <Label for="birthdate" class="text-sm font-medium">Data de Nascimento</Label>
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <Calendar class="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <Input
+                        id="birthdate"
+                        type="date"
+                        required
+                        :tabindex="3"
+                        name="birthdate"
+                        class="pl-10"
+                    />
+                </div>
+                <InputError :message="errors.birthdate" />
+            </div>
+
+            <div class="grid gap-2.5">
                 <Label for="password" class="text-sm font-medium">Senha</Label>
                 <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -85,7 +130,7 @@ defineOptions({
                     <PasswordInput
                         id="password"
                         required
-                        :tabindex="3"
+                        :tabindex="5"
                         autocomplete="new-password"
                         name="password"
                         placeholder="Mínimo 8 caracteres"
@@ -106,7 +151,7 @@ defineOptions({
                     <PasswordInput
                         id="password_confirmation"
                         required
-                        :tabindex="4"
+                        :tabindex="6"
                         autocomplete="new-password"
                         name="password_confirmation"
                         placeholder="Repita sua senha"
@@ -119,7 +164,7 @@ defineOptions({
             <Button
                 type="submit"
                 class="mt-2 w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110"
-                tabindex="5"
+                tabindex="7"
                 :disabled="processing"
                 data-test="register-user-button"
             >
@@ -138,7 +183,7 @@ defineOptions({
             <TextLink
                 :href="login()"
                 class="font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
-                :tabindex="6"
+                :tabindex="8"
             >Faça login</TextLink>
         </div>
     </Form>

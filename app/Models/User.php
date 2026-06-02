@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Casts\NullableGender;
 use App\Enums\UserRole;
+use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -13,12 +15,24 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'email_verified_at', 'trainer_id', 'must_reset_password'])]
+#[Fillable(['name', 'email', 'password', 'role', 'email_verified_at', 'trainer_id', 'must_reset_password', 'gender', 'birthdate'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $user) {
+            if ($user->gender === '') {
+                $user->gender = null;
+            }
+            if ($user->birthdate === '') {
+                $user->birthdate = null;
+            }
+        });
+    }
 
     /**
      * @return array<string, string>
@@ -31,7 +45,18 @@ class User extends Authenticatable
             'must_reset_password' => 'boolean',
             'two_factor_confirmed_at' => 'datetime',
             'role' => UserRole::class,
+            'gender' => NullableGender::class,
+            'birthdate' => 'date',
         ];
+    }
+
+    public function age(): ?int
+    {
+        if (! $this->birthdate) {
+            return null;
+        }
+
+        return $this->birthdate->diffInYears(Carbon::today());
     }
 
     public function mustResetPassword(): bool
