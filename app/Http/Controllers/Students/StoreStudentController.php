@@ -23,7 +23,7 @@ class StoreStudentController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
+//            'password' => ['required', 'string', 'min:8'],
         ]);
 
         $action->execute($validated);

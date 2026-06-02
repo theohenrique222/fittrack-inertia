@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\Trainer;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class StoreTrainerAction
 {
@@ -15,7 +16,7 @@ class StoreTrainerAction
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'] ?? 'password',
+                'password' => Hash::make('password'),
                 'role' => UserRole::PERSONAL,
                 'email_verified_at' => now(),
                 'must_reset_password' => true,

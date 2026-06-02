@@ -12,6 +12,8 @@ export type User = {
 export type Auth = {
     user: User;
     can: {
+        impersonate: boolean;
+        create_trainer: boolean;
         view_trainers: any;
         view_students: any;
         create_student: boolean;

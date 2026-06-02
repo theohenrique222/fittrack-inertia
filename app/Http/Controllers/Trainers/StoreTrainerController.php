@@ -16,7 +16,6 @@ class StoreTrainerController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
             'specialty' => ['nullable', 'string', 'max:255'],
         ]);
 

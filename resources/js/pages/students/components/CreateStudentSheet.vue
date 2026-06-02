@@ -11,7 +11,7 @@ const emit = defineEmits(['change']);
 const form = useForm({
     name: '',
     email: '',
-    password: '',
+    // password: '',
     nickname: '',
 });
 
@@ -75,21 +75,21 @@ function handleCancel() {
                     >{{ form.errors.email }}</span>
                 </div>
 
-                <div>
-                    <Label class="mb-2 flex items-center gap-1.5">
-                        <Shield class="w-3.5 h-3.5 text-neutral-400" />
-                        Senha *
-                    </Label>
-                    <Input
-                        v-model="form.password"
-                        type="password"
-                        placeholder="Mínimo 8 caracteres"
-                    />
-                    <span
-                        v-if="form.errors.password"
-                        class="text-xs text-red-500 mt-1"
-                    >{{ form.errors.password }}</span>
-                </div>
+<!--                <div>-->
+<!--                    <Label class="mb-2 flex items-center gap-1.5">-->
+<!--                        <Shield class="w-3.5 h-3.5 text-neutral-400" />-->
+<!--                        Senha *-->
+<!--                    </Label>-->
+<!--                    <Input-->
+<!--                        v-model="form.password"-->
+<!--                        type="password"-->
+<!--                        placeholder="Mínimo 8 caracteres"-->
+<!--                    />-->
+<!--                    <span-->
+<!--                        v-if="form.errors.password"-->
+<!--                        class="text-xs text-red-500 mt-1"-->
+<!--                    >{{ form.errors.password }}</span>-->
+<!--                </div>-->
 
                 <div>
                     <Label class="mb-2 flex items-center gap-1.5">
