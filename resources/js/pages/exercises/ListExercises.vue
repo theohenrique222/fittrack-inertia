@@ -281,7 +281,7 @@ const toggleGroup = (key: string) => {
     }
 };
 
-const isGroupCollapsed = (key: string) => collapsedGroups.value.has(key);
+const isGroupCollapsed = (key: string) => !collapsedGroups.value.has(key);
 
 const exerciseImageUrl = computed(() => {
     if (!selectedExercise.value?.image) {
