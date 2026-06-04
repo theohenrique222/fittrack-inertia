@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\WorkoutResource;
 use App\Models\Client;
 use App\Models\Workout;
+use App\Models\WorkoutSession;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,7 +29,16 @@ class ShowWorkoutDetailController extends Controller
 
         $session = null;
         if ($client) {
-            $session = $startSession->execute($workout, $client);
+            $session = WorkoutSession::where([
+                'workout_id' => $workout->id,
+                'client_id' => $client->id,
+                'status' => 'in_progress',
+            ])->first();
+
+            if (! $session) {
+                $session = $startSession->execute($workout, $client);
+            }
+
             $workout->load('completions');
         }
 
