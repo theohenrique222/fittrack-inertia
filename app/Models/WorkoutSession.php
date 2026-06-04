@@ -5,20 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ExerciseCompletion extends Model
+class WorkoutSession extends Model
 {
     protected $fillable = [
         'workout_id',
-        'exercise_id',
-        'user_id',
-        'workout_session_id',
+        'client_id',
+        'started_at',
         'completed_at',
+        'duration_minutes',
+        'status',
     ];
 
     protected function casts(): array
     {
         return [
+            'started_at' => 'datetime',
             'completed_at' => 'datetime',
+            'duration_minutes' => 'integer',
         ];
     }
 
@@ -27,18 +30,8 @@ class ExerciseCompletion extends Model
         return $this->belongsTo(Workout::class);
     }
 
-    public function exercise(): BelongsTo
+    public function client(): BelongsTo
     {
-        return $this->belongsTo(Exercise::class);
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function session(): BelongsTo
-    {
-        return $this->belongsTo(WorkoutSession::class, 'workout_session_id');
+        return $this->belongsTo(Client::class);
     }
 }

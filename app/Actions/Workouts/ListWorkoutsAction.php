@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ListWorkoutsAction
 {
-    public function execute(array $filters = []): Collection
+    public function execute(array $filters = [], bool $withMetrics = false): Collection
     {
         $query = Workout::with(['client.user', 'trainer', 'exercises.category']);
 
@@ -27,6 +27,12 @@ class ListWorkoutsAction
 
         if (isset($filters['is_active'])) {
             $query->where('is_active', $filters['is_active']);
+        }
+
+        if ($withMetrics) {
+            $query->withCount(['sessions as total_sessions' => fn ($q) => $q->where('status', 'completed')])
+                ->withMax('sessions as last_completed_at', 'completed_at')
+                ->withAvg('sessions as avg_duration_minutes', 'duration_minutes');
         }
 
         return $query->orderBy('created_at', 'desc')->get();

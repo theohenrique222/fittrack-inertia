@@ -65,9 +65,15 @@ interface Workout {
     };
 }
 
-defineProps<{
+interface Session {
+    id: number;
+    started_at: string;
+}
+
+const props = defineProps<{
     workout: Workout;
     exercises: Exercise[];
+    session: Session | null;
 }>();
 
 const page = usePage();
@@ -172,6 +178,8 @@ return '—';
     return `~${mins}min`;
 }
 
+const sessionId = computed(() => props.session?.id);
+
 function openExerciseDetail(exercise: Exercise) {
     selectedExercise.value = exercise;
     isExerciseDetailOpen.value = true;
@@ -217,7 +225,7 @@ function getDifficultyLabel(difficulty?: string): string {
 function toggleCompletion(exercise: Exercise) {
     router.post(
         `/workouts/${(page.props as any).workout.id}/exercises/${exercise.id}/toggle-completion`,
-        {},
+        { session_id: sessionId.value },
         {
             preserveState: true,
             preserveScroll: true,
@@ -260,7 +268,7 @@ function completeWorkout() {
     isCompleting.value = true;
     router.post(
         `/workouts/${(page.props as any).workout.id}/complete`,
-        {},
+        { session_id: sessionId.value },
         {
             preserveState: true,
             preserveScroll: true,
@@ -281,7 +289,7 @@ function completeWorkout() {
             <div class="max-w-3xl mx-auto px-4 py-4">
                 <div class="flex items-center gap-3">
                     <Link
-                        :href="isStudent ? '/dashboard' : `/students/${workout.client?.id}`"
+                        :href="isStudent ? '/me/workouts' : `/students/${workout.client?.id}`"
                         class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
                     >
                         <ArrowLeft class="h-5 w-5 text-neutral-600 dark:text-neutral-300" />

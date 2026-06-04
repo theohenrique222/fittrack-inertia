@@ -5,15 +5,16 @@ namespace App\Actions\Workouts;
 use App\Models\ExerciseCompletion;
 use App\Models\User;
 use App\Models\Workout;
+use App\Models\WorkoutSession;
 
 readonly class CompleteWorkoutAction
 {
-    public function execute(Workout $workout, User $user): array
+    public function execute(Workout $workout, User $user, WorkoutSession $session): array
     {
-        if ($workout->completed_at) {
+        if ($session->status === 'completed') {
             return [
                 'success' => false,
-                'message' => 'Este treino já foi finalizado.',
+                'message' => 'Esta execução do treino já foi finalizada.',
             ];
         }
 
@@ -29,6 +30,7 @@ readonly class CompleteWorkoutAction
         $completedCount = ExerciseCompletion::where([
             'workout_id' => $workout->id,
             'user_id' => $user->id,
+            'workout_session_id' => $session->id,
         ])->count();
 
         if ($completedCount < $totalExercises) {
@@ -38,7 +40,15 @@ readonly class CompleteWorkoutAction
             ];
         }
 
-        $workout->update(['completed_at' => now()]);
+        $now = now();
+        $startedAt = $session->started_at ?? $now;
+        $durationMinutes = (int) $startedAt->diffInMinutes($now);
+
+        $session->update([
+            'completed_at' => $now,
+            'duration_minutes' => $durationMinutes,
+            'status' => 'completed',
+        ]);
 
         return [
             'success' => true,

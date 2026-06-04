@@ -17,12 +17,18 @@ class ToggleExerciseCompletionController extends Controller
         Request $request,
         ToggleExerciseCompletionAction $action,
     ): RedirectResponse {
-        $user = $request->user();
-
         $this->authorize('view', $workout);
 
-        $action->execute($workout, $exercise, $user);
+        $user = $request->user();
 
-        return redirect()->back();
+        $sessionId = $request->input('session_id');
+
+        $result = $action->execute($workout, $exercise, $user, $sessionId);
+
+        if ($result['completed']) {
+            return redirect()->back()->with('success', $result['message']);
+        }
+
+        return redirect()->back()->with('success', $result['message']);
     }
 }

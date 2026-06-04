@@ -11,9 +11,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { Check, ChevronRight, Clock, Dumbbell, Play, Repeat, Search, Target } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { Check, ChevronRight, Clock, Dumbbell, Play, Repeat, Search, Target, History, TrendingUp } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import {
     Dialog,
     DialogContent,
@@ -49,13 +49,27 @@ interface Workout {
     description?: string;
     is_active: boolean;
     exercises?: WorkoutExercise[];
+    total_sessions?: number;
+    last_completed_at?: string;
+    avg_duration_minutes?: number | null;
+}
+
+interface SessionHistoryItem {
+    id: number;
+    workout_id: number;
+    workout_name: string;
+    completed_at: string;
+    completed_at_full: string;
+    duration_minutes: number | null;
 }
 
 const props = defineProps<{
     workouts: Workout[];
+    sessionHistory: SessionHistoryItem[];
     stats: {
         total: number;
         totalExercises: number;
+        totalCompleted: number;
     };
 }>();
 
@@ -218,6 +232,33 @@ return 0;
     return workout.exercises.reduce((sum, ex) => sum + ex.pivot.sets * ex.pivot.reps, 0);
 }
 
+function formatDuration(minutes: number | null | undefined): string {
+    if (!minutes) {
+return '—';
+}
+
+    if (minutes < 60) {
+        return `${minutes} min`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    return mins > 0 ? `${hours}h${mins}min` : `${hours}h`;
+}
+
+function formatLastCompleted(date: string | undefined | null): string {
+    if (!date) {
+return null;
+}
+
+    const d = new Date(date);
+    return d.toLocaleDateString('pt-BR');
+}
+
+function sessionHistoryForWorkout(workoutId: number): SessionHistoryItem[] {
+    return props.sessionHistory.filter((s) => s.workout_id === workoutId).slice(0, 3);
+}
 </script>
 
 <template>
@@ -233,7 +274,7 @@ return 0;
                 <p class="text-sm text-emerald-100 mt-1">Visualize todos os seus treinos</p>
             </div>
 
-            <div class="relative grid grid-cols-2 gap-3">
+            <div class="relative grid grid-cols-3 gap-3">
                 <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3 transition hover:bg-white/20">
                     <div class="flex items-center gap-2 mb-1">
                         <Dumbbell class="h-4 w-4 text-emerald-100" />
@@ -248,6 +289,14 @@ return 0;
                         <span class="text-xs text-emerald-100">Total de Exercícios</span>
                     </div>
                     <p class="text-2xl font-bold">{{ stats.totalExercises }}</p>
+                </div>
+
+                <div class="rounded-xl bg-white/15 backdrop-blur-sm px-4 py-3 transition hover:bg-white/20">
+                    <div class="flex items-center gap-2 mb-1">
+                        <TrendingUp class="h-4 w-4 text-emerald-100" />
+                        <span class="text-xs text-emerald-100">Treinos Concluídos</span>
+                    </div>
+                    <p class="text-2xl font-bold">{{ stats.totalCompleted }}</p>
                 </div>
             </div>
         </div>
@@ -295,6 +344,32 @@ return 0;
                             <p v-if="workout.description" class="text-sm text-neutral-500 dark:text-neutral-400 mt-1 truncate">
                                 {{ workout.description }}
                             </p>
+
+                            <!-- Session Metrics -->
+                            <div
+                                v-if="workout.total_sessions && workout.total_sessions > 0"
+                                class="flex flex-wrap items-center gap-3 mt-2"
+                            >
+                                <span class="inline-flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
+                                    <Repeat class="h-3.5 w-3.5" />
+                                    Executado: <strong class="text-neutral-700 dark:text-neutral-300">{{ workout.total_sessions }}x</strong>
+                                </span>
+                                <span
+                                    v-if="workout.last_completed_at"
+                                    class="inline-flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400"
+                                >
+                                    <Clock class="h-3.5 w-3.5" />
+                                    Última: <strong class="text-neutral-700 dark:text-neutral-300">{{ formatLastCompleted(workout.last_completed_at) }}</strong>
+                                </span>
+                                <span
+                                    v-if="workout.avg_duration_minutes"
+                                    class="inline-flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400"
+                                >
+                                    <TrendingUp class="h-3.5 w-3.5" />
+                                    Média: <strong class="text-neutral-700 dark:text-neutral-300">{{ formatDuration(workout.avg_duration_minutes) }}</strong>
+                                </span>
+                            </div>
+
                             <div v-if="workoutMuscleGroups(workout).length" class="flex flex-wrap gap-1 mt-2">
                                 <span
                                     v-for="group in workoutMuscleGroups(workout)"
@@ -325,6 +400,41 @@ return 0;
                 <p class="text-sm text-neutral-400 dark:text-neutral-500 mt-1">
                     {{ searchQuery ? 'Tente buscar com outros termos' : 'Seu personal ainda não cadastrou treinos para você' }}
                 </p>
+            </div>
+
+            <!-- Session History Section -->
+            <div v-if="sessionHistory.length" class="mt-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <History class="h-5 w-5 text-emerald-500" />
+                    <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">Histórico de Treinos</h2>
+                    <span class="text-sm text-neutral-500 dark:text-neutral-400">({{ sessionHistory.length }})</span>
+                </div>
+
+                <div class="space-y-2">
+                    <div
+                        v-for="session in sessionHistory"
+                        :key="session.id"
+                        class="flex items-center gap-3 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 px-4 py-3"
+                    >
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                            <Check class="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">
+                                {{ session.workout_name }}
+                            </p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                Concluído em {{ session.completed_at }}
+                            </p>
+                        </div>
+                        <span
+                            v-if="session.duration_minutes"
+                            class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400"
+                        >
+                            {{ formatDuration(session.duration_minutes) }}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -365,6 +475,30 @@ return 0;
                     <Clock class="h-5 w-5 mx-auto mb-1.5 text-violet-500" />
                     <p class="text-xl font-bold text-violet-700 dark:text-violet-300">{{ estimatedTime(selectedWorkout) }}</p>
                     <p class="text-xs text-violet-600 dark:text-violet-400">Tempo Est.</p>
+                </div>
+            </div>
+
+            <!-- Session metrics in dialog -->
+            <div
+                v-if="selectedWorkout?.total_sessions && selectedWorkout.total_sessions > 0"
+                class="grid grid-cols-3 gap-3 pb-2"
+            >
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
+                    <Repeat class="h-5 w-5 mx-auto mb-1.5 text-amber-500" />
+                    <p class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ selectedWorkout.total_sessions }}x</p>
+                    <p class="text-xs text-amber-600 dark:text-amber-400">Execuções</p>
+                </div>
+
+                <div class="bg-teal-50 dark:bg-teal-900/20 rounded-xl p-3 text-center">
+                    <Clock class="h-5 w-5 mx-auto mb-1.5 text-teal-500" />
+                    <p class="text-xl font-bold text-teal-700 dark:text-teal-300">{{ selectedWorkout.last_completed_at ? formatLastCompleted(selectedWorkout.last_completed_at) : '—' }}</p>
+                    <p class="text-xs text-teal-600 dark:text-teal-400">Última</p>
+                </div>
+
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-3 text-center">
+                    <TrendingUp class="h-5 w-5 mx-auto mb-1.5 text-indigo-500" />
+                    <p class="text-xl font-bold text-indigo-700 dark:text-indigo-300">{{ formatDuration(selectedWorkout.avg_duration_minutes) }}</p>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400">Média</p>
                 </div>
             </div>
 

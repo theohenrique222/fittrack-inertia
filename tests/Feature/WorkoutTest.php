@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Exercise;
 use App\Models\User;
 use App\Models\Workout;
+use App\Models\WorkoutSession;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -103,7 +104,6 @@ class WorkoutTest extends TestCase
             'client_id',
             'trainer_id',
             'is_active',
-            'completed_at',
         ];
 
         $this->assertEquals($expectedFillable, $workout->getFillable());
@@ -288,5 +288,39 @@ class WorkoutTest extends TestCase
         ]);
 
         $this->assertEquals(1, $user->workouts->count());
+    }
+
+    public function test_workout_has_sessions_relationship(): void
+    {
+        $workout = Workout::factory()->create();
+
+        $session = $workout->sessions()->create([
+            'client_id' => $workout->client_id,
+            'started_at' => now(),
+            'status' => 'in_progress',
+        ]);
+
+        $this->assertInstanceOf(WorkoutSession::class, $session);
+        $this->assertEquals($workout->id, $session->workout_id);
+        $this->assertEquals(1, $workout->sessions->count());
+    }
+
+    public function test_workout_remains_active_after_session_completion(): void
+    {
+        $workout = Workout::factory()->create();
+
+        $session = $workout->sessions()->create([
+            'client_id' => $workout->client_id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'duration_minutes' => 60,
+            'status' => 'completed',
+        ]);
+
+        $workout->refresh();
+
+        $this->assertTrue($workout->is_active);
+        $this->assertNull($workout->completed_at);
+        $this->assertEquals('completed', $session->status);
     }
 }

@@ -19,14 +19,12 @@ class Workout extends Model
         'client_id',
         'trainer_id',
         'is_active',
-        'completed_at',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
-            'completed_at' => 'datetime',
         ];
     }
 
@@ -51,5 +49,10 @@ class Workout extends Model
     public function completions(): HasMany
     {
         return $this->hasMany(ExerciseCompletion::class);
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(WorkoutSession::class);
     }
 }

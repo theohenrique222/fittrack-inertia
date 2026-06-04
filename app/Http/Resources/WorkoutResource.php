@@ -7,6 +7,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class WorkoutResource extends JsonResource
 {
+    private ?int $sessionId = null;
+
+    public function withSessionId(?int $sessionId): static
+    {
+        $this->sessionId = $sessionId;
+
+        return $this;
+    }
+
     public function toArray(Request $request): array
     {
         return [
@@ -47,11 +56,17 @@ class WorkoutResource extends JsonResource
                     'order' => $exercise->pivot->order,
                     'notes' => $exercise->pivot->notes,
                 ],
-                'completed' => $this->relationLoaded('completions')
-                    ? $this->completions->where('user_id', auth()->id())->contains('exercise_id', $exercise->id)
+                'completed' => $this->relationLoaded('completions') && $this->sessionId
+                    ? $this->completions
+                        ->where('workout_session_id', $this->sessionId)
+                        ->where('user_id', auth()->id())
+                        ->contains('exercise_id', $exercise->id)
                     : false,
             ])),
             'is_active' => $this->is_active,
+            'total_sessions' => (int) ($this->total_sessions ?? 0),
+            'last_completed_at' => $this->last_completed_at,
+            'avg_duration_minutes' => $this->avg_duration_minutes ? (int) round((float) $this->avg_duration_minutes) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

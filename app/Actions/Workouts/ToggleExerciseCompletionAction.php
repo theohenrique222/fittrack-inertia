@@ -9,29 +9,35 @@ use App\Models\Workout;
 
 readonly class ToggleExerciseCompletionAction
 {
-    public function execute(Workout $workout, Exercise $exercise, User $user): array
+    public function execute(Workout $workout, Exercise $exercise, User $user, ?int $sessionId = null): array
     {
-        $completion = ExerciseCompletion::where([
+        $existing = ExerciseCompletion::where([
             'workout_id' => $workout->id,
             'exercise_id' => $exercise->id,
             'user_id' => $user->id,
+            'workout_session_id' => $sessionId,
         ])->first();
 
-        if ($completion) {
-            $completion->delete();
-            $completed = false;
-        } else {
-            ExerciseCompletion::create([
-                'workout_id' => $workout->id,
-                'exercise_id' => $exercise->id,
-                'user_id' => $user->id,
-                'completed_at' => now(),
-            ]);
-            $completed = true;
+        if ($existing) {
+            $existing->delete();
+
+            return [
+                'completed' => false,
+                'message' => 'Exercício marcado como não concluído.',
+            ];
         }
 
+        ExerciseCompletion::create([
+            'workout_id' => $workout->id,
+            'exercise_id' => $exercise->id,
+            'user_id' => $user->id,
+            'workout_session_id' => $sessionId,
+            'completed_at' => now(),
+        ]);
+
         return [
-            'completed' => $completed,
+            'completed' => true,
+            'message' => 'Exercício concluído!',
         ];
     }
 }
