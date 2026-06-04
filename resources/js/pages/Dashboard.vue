@@ -70,6 +70,8 @@ defineProps<{
     recentAchievements?: { title: string; description: string; icon: string; date: string }[];
     trainer?: { name: string; specialty: string; email: string };
     completedWorkouts?: { id: number; name: string; exercises: number; completed_at: string }[];
+    hasTodayMeasurement?: boolean;
+    clientId?: number;
 }>();
 
 const userRole = computed(() => user.value?.role);
@@ -145,6 +147,8 @@ defineOptions({
             :upcoming-workouts="upcomingWorkouts ?? []"
             :recent-achievements="recentAchievements ?? []"
             :trainer="trainer ?? { name: 'Sem treinador', specialty: '', email: '' }"
+            :has-today-measurement="hasTodayMeasurement ?? false"
+            :client-id="clientId ?? undefined"
         />
     </div>
 </template>

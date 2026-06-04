@@ -35,6 +35,11 @@ class GetClientDashboardStatsAction
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
 
         $latestMeasurement = $client ? $this->latestMeasurementAction->execute($client) : null;
+        $todayMeasurement = $client
+            ? $client->bodyMeasurements()
+                ->whereDate('recorded_at', today())
+                ->exists()
+            : false;
 
         return [
             'stats' => [
@@ -52,6 +57,8 @@ class GetClientDashboardStatsAction
             'upcomingWorkouts' => $this->getUpcomingWorkouts($user),
             'recentAchievements' => $this->getRecentAchievements($user),
             'trainer' => $this->getTrainerInfo($user),
+            'hasTodayMeasurement' => $todayMeasurement,
+            'clientId' => $client?->id,
         ];
     }
 

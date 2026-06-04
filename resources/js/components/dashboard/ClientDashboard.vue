@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Link, router } from '@inertiajs/vue3';
-import { Check, Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat } from 'lucide-vue-next';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { Check, Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat, Scale } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
+import { Button } from '@/components/ui/button';
+import { students } from '@/routes';
 import {
     Dialog,
     DialogContent,
@@ -63,6 +65,8 @@ interface DialogWorkoutData {
     exercises?: DialogExercise[];
 }
 
+const page = usePage();
+
 interface Props {
     stats: {
         totalWorkouts: number;
@@ -84,6 +88,8 @@ interface Props {
     upcomingWorkouts: UpcomingWorkout[];
     recentAchievements: { title: string; description: string; icon: string; date: string }[];
     trainer: { name: string; specialty: string; email: string };
+    hasTodayMeasurement: boolean;
+    clientId?: number;
 }
 
 const props = defineProps<Props>();
@@ -385,7 +391,7 @@ const completedThisWeek = computed(() => {
         <!-- Nutrition & Progress Row -->
         <div class="grid gap-4 lg:grid-cols-2">
             <!-- Nutrition -->
-            <div class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+            <div v-if="hasTodayMeasurement" class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-semibold text-neutral-900 dark:text-white">Nutrição do Dia</h3>
                     <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium">
@@ -445,6 +451,28 @@ const completedThisWeek = computed(() => {
                             <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Gordura</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Nutrition CTA (no measurement today) -->
+            <div v-else class="rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+                <div class="flex flex-col items-center justify-center h-full min-h-[280px] text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-lg mb-4">
+                        <Scale class="w-8 h-8" />
+                    </div>
+                    <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-2">Medidas do Dia</h3>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 max-w-xs mb-6">
+                        Registre suas medidas corporais de hoje para acompanhar sua evolução e receber suas metas nutricionais.
+                    </p>
+                    <Link
+                        v-if="clientId"
+                        :href="students.measurements.url({ student: clientId })"
+                    >
+                        <Button>
+                            <Scale class="w-4 h-4 mr-2" />
+                            Registrar Medidas
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
