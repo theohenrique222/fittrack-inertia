@@ -6,9 +6,11 @@ import {
     Droplets,
     Dumbbell,
     Flame,
+    Pencil,
     Plus,
     Ruler,
     Scale,
+    Trash2,
     TrendingUp,
     Zap,
 } from 'lucide-vue-next';
@@ -33,6 +35,7 @@ import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CompleteProfileCard from '@/pages/students/components/CompleteProfileCard.vue';
 import CreateBodyMeasurementSheet from '@/pages/students/components/CreateBodyMeasurementSheet.vue';
+import EditBodyMeasurementSheet from '@/pages/students/components/EditBodyMeasurementSheet.vue';
 
 const page = usePage();
 const { toasts, success, error } = useToast();
@@ -118,6 +121,8 @@ const props = defineProps<{
 }>();
 
 const isCreateOpen = ref(false);
+const isEditOpen = ref(false);
+const selectedMeasurement = ref<Measurement | null>(null);
 const isProfileComplete = ref(props.user_has_profile);
 
 function handleProfileSaved() {
@@ -191,6 +196,19 @@ return [];
 });
 
 const measurementsData = computed(() => props.measurements?.data ?? []);
+
+function handleDeleteMeasurement(id: number) {
+    if (!confirm('Tem certeza que deseja excluir esta medida?')) {
+        return;
+    }
+
+    router.delete(`/students/${props.student.id}/measurements/${id}`);
+}
+
+function handleEditClick(measurement: Measurement) {
+    selectedMeasurement.value = measurement;
+    isEditOpen.value = true;
+}
 </script>
 
 <template>
@@ -304,6 +322,7 @@ const measurementsData = computed(() => props.measurements?.data ?? []);
                             <th class="px-4 py-3">TMB</th>
                             <th class="px-4 py-3">Nível</th>
                             <th class="px-4 py-3">Objetivo</th>
+                            <th class="px-2 py-3 text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
@@ -356,6 +375,24 @@ const measurementsData = computed(() => props.measurements?.data ?? []);
                                     {{ m.goal }}
                                 </span>
                             </td>
+                            <td class="whitespace-nowrap px-2 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400"
+                                        title="Editar medida"
+                                        @click="handleEditClick(m)"
+                                    >
+                                        <Pencil class="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                                        title="Excluir medida"
+                                        @click="handleDeleteMeasurement(m.id)"
+                                    >
+                                        <Trash2 class="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -402,6 +439,21 @@ const measurementsData = computed(() => props.measurements?.data ?? []);
                 :student="student"
                 @close="isCreateOpen = false"
                 @saved="isCreateOpen = false"
+            />
+        </SheetContent>
+    </Sheet>
+
+    <!-- Sheet Editar Medição -->
+    <Sheet v-model:open="isEditOpen">
+        <SheetContent side="right" class="w-full p-0 sm:max-w-xl">
+            <SheetHeader class="sr-only">
+                <SheetTitle>Editar Medição</SheetTitle>
+            </SheetHeader>
+            <EditBodyMeasurementSheet
+                v-if="student && selectedMeasurement"
+                :student="student"
+                :measurement="selectedMeasurement"
+                @close="isEditOpen = false"
             />
         </SheetContent>
     </Sheet>

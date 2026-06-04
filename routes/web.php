@@ -4,9 +4,11 @@ use App\Http\Controllers\Auth\MustResetPasswordController;
 use App\Http\Controllers\Auth\StopImpersonationController;
 use App\Http\Controllers\Auth\UpdateFirstPasswordController;
 use App\Http\Controllers\Authentication\LoginController;
+use App\Http\Controllers\BodyMeasurements\DestroyBodyMeasurementController;
 use App\Http\Controllers\BodyMeasurements\LatestBodyMeasurementController;
 use App\Http\Controllers\BodyMeasurements\ListBodyMeasurementsController;
 use App\Http\Controllers\BodyMeasurements\StoreBodyMeasurementController;
+use App\Http\Controllers\BodyMeasurements\UpdateBodyMeasurementController;
 use App\Http\Controllers\Categories\ListCategoriesController;
 use App\Http\Controllers\Context\ChangeContextController;
 use App\Http\Controllers\Dashboard\DashboardController;
@@ -111,6 +113,16 @@ $router
 $router
     ->get(uri: '/students/{student}/measurements/latest', action: LatestBodyMeasurementController::class)
     ->name('students.measurements.latest')
+    ->middleware('auth');
+
+$router
+    ->delete(uri: '/students/{student}/measurements/{measurement}', action: DestroyBodyMeasurementController::class)
+    ->name('students.measurements.destroy')
+    ->middleware('auth');
+
+$router
+    ->put(uri: '/students/{student}/measurements/{measurement}', action: UpdateBodyMeasurementController::class)
+    ->name('students.measurements.update')
     ->middleware('auth');
 
 $router
