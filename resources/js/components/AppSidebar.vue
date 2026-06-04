@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Dumbbell, BarChart3, GraduationCap, Ruler, Users } from 'lucide-vue-next';
+import { LayoutGrid, Dumbbell, BarChart3, GraduationCap, Ruler, Users, Play } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { students, dashboard, exercises, trainers, reports, measurements } from '@/routes';
 import { students as adminStudents } from '@/routes/admin';
+import { workouts } from '@/routes/me';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -78,6 +79,16 @@ const mainNavItems: NavItem[] = [
                   title: 'Relatórios',
                   href: reports(),
                   icon: BarChart3,
+              },
+          ]
+        : []),
+
+    ...(user?.role === 'client'
+        ? [
+              {
+                  title: 'Meus Treinos',
+                  href: workouts(),
+                  icon: Play,
               },
           ]
         : []),
