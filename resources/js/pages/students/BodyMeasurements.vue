@@ -44,6 +44,16 @@ watch(
 success(flash.success);
 }
 
+        if (flash?.measurement_warnings) {
+            const warnings = Array.isArray(flash.measurement_warnings)
+                ? flash.measurement_warnings
+                : [flash.measurement_warnings];
+
+            warnings.forEach((warning: string) => {
+                success(warning);
+            });
+        }
+
         if (flash?.error) {
 error(flash.error);
 }

@@ -16,6 +16,8 @@ class StoreBodyMeasurementController extends Controller
     ) {
         $validated = $request->validated();
 
+        $warnings = $request->getCautionWarnings();
+
         $result = $action->execute($student, $validated);
 
         $metrics = $result['metrics'];
@@ -25,8 +27,14 @@ class StoreBodyMeasurementController extends Controller
             ."Gordura: {$metrics['body_fat']['value']}% | "
             ."TMB: {$metrics['bmr']} kcal";
 
-        return redirect()
+        $redirect = redirect()
             ->route('students.measurements', $student)
             ->with('success', $message);
+
+        if (! empty($warnings)) {
+            $redirect->with('measurement_warnings', $warnings);
+        }
+
+        return $redirect;
     }
 }

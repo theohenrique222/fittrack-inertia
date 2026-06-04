@@ -72,7 +72,7 @@ class BodyMetricsCalculator
                 'color' => $this->bodyFatColor($bodyFat),
             ],
             'lean_mass' => round($leanMass, 1),
-            'fat_mass' => round($this->weight - $leanMass, 1),
+            'fat_mass' => round(max(0, $this->weight - $leanMass), 1),
             'bmr' => round($bmr),
             'tdee' => round($tdee),
             'daily_water' => round($dailyWater),
@@ -96,7 +96,13 @@ class BodyMetricsCalculator
         $height = $this->height;
 
         if ($this->gender === 'male') {
-            return 86.010 * log10($this->waist - $this->neck)
+            $circumferenceDiff = $this->waist - $this->neck;
+
+            if ($circumferenceDiff <= 0) {
+                return 0;
+            }
+
+            return 86.010 * log10($circumferenceDiff)
                 - 70.041 * log10($height)
                 + 36.76;
         }
@@ -105,7 +111,13 @@ class BodyMetricsCalculator
             return 0;
         }
 
-        return 163.205 * log10($this->waist + $this->hip - $this->neck)
+        $circumferenceDiff = $this->waist + $this->hip - $this->neck;
+
+        if ($circumferenceDiff <= 0) {
+            return 0;
+        }
+
+        return 163.205 * log10($circumferenceDiff)
             - 97.684 * log10($height)
             - 78.387;
     }
@@ -116,7 +128,7 @@ class BodyMetricsCalculator
             return 0;
         }
 
-        return $this->weight * (1 - $bodyFat / 100);
+        return max(0, $this->weight * (1 - $bodyFat / 100));
     }
 
     private function calculateBmr(): float
@@ -155,19 +167,21 @@ class BodyMetricsCalculator
         $carbsCalories = $tdee - $proteinCalories - $fatCalories;
         $carbsGrams = max(0, $carbsCalories / 4);
 
+        $safeTdee = max($tdee, 1);
+
         return [
             'calories' => round($tdee),
             'protein' => [
                 'grams' => round($proteinGrams),
-                'percentage' => round(($proteinCalories / $tdee) * 100),
+                'percentage' => round(($proteinCalories / $safeTdee) * 100),
             ],
             'carbs' => [
                 'grams' => round($carbsGrams),
-                'percentage' => round(($carbsCalories / $tdee) * 100),
+                'percentage' => round(max(0, $carbsCalories) / $safeTdee * 100),
             ],
             'fat' => [
                 'grams' => round($fatGrams),
-                'percentage' => round(($fatCalories / $tdee) * 100),
+                'percentage' => round(($fatCalories / $safeTdee) * 100),
             ],
         ];
     }

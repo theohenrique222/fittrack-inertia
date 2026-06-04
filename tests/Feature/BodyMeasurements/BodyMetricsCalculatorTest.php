@@ -273,3 +273,69 @@ test('includes all macro keys', function () {
     expect($result['macros']['carbs'])->toHaveKeys(['grams', 'percentage']);
     expect($result['macros']['fat'])->toHaveKeys(['grams', 'percentage']);
 });
+
+test('handles waist smaller than neck for male without NaN', function () {
+    $measurement = BodyMeasurement::factory()->create([
+        'client_id' => $this->client->id,
+        'weight' => 80,
+        'height' => 180,
+        'neck' => 50,
+        'waist' => 40,
+        'activity_level' => ActivityLevel::Moderate,
+        'goal' => Goal::Maintain,
+    ]);
+
+    $calculator = new BodyMetricsCalculator($measurement, $this->user);
+    $result = $calculator->calculate();
+
+    expect($result['body_fat']['value'])->toBe(0.0);
+    expect($result['lean_mass'])->toBe(0.0);
+    expect($result['fat_mass'])->toBe(80.0);
+});
+
+test('handles waist plus hip smaller than neck for female without NaN', function () {
+    $femaleUser = User::factory()->create([
+        'gender' => 'female',
+        'birthdate' => '1990-01-01',
+    ]);
+
+    $femaleClient = Client::factory()->create([
+        'user_id' => $femaleUser,
+    ]);
+
+    $measurement = BodyMeasurement::factory()->create([
+        'client_id' => $femaleClient->id,
+        'weight' => 65,
+        'height' => 170,
+        'neck' => 60,
+        'waist' => 40,
+        'hip' => 15,
+        'activity_level' => ActivityLevel::Moderate,
+        'goal' => Goal::Maintain,
+    ]);
+
+    $calculator = new BodyMetricsCalculator($measurement, $femaleUser);
+    $result = $calculator->calculate();
+
+    expect($result['body_fat']['value'])->toBe(0.0);
+});
+
+test('handles very low weight with lose goal without INF', function () {
+    $measurement = BodyMeasurement::factory()->create([
+        'client_id' => $this->client->id,
+        'weight' => 20,
+        'height' => 150,
+        'neck' => null,
+        'waist' => null,
+        'activity_level' => ActivityLevel::Sedentary,
+        'goal' => Goal::Lose,
+    ]);
+
+    $calculator = new BodyMetricsCalculator($measurement, $this->user);
+    $result = $calculator->calculate();
+
+    expect($result['macros']['calories'])->toBeGreaterThan(0);
+    expect($result['macros']['protein']['percentage'])->toBeGreaterThanOrEqual(0);
+    expect($result['macros']['fat']['percentage'])->toBeGreaterThanOrEqual(0);
+    expect($result['macros']['carbs']['percentage'])->toBeGreaterThanOrEqual(0);
+});

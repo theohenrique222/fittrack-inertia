@@ -120,6 +120,76 @@ test('validates weight range', function () {
     $response->assertSessionHasErrors(['weight']);
 });
 
+test('validates weight high range boundary', function () {
+    actingAs($this->admin);
+
+    $response = $this->post(route('students.measurements.store', $this->client), [
+        'weight' => 701,
+        'height' => 170,
+        'activity_level' => 'moderate',
+        'goal' => 'maintain',
+    ]);
+
+    $response->assertSessionHasErrors(['weight']);
+});
+
+test('accepts diverse body measurements within inclusive bounds', function () {
+    actingAs($this->admin);
+
+    $response = $this->post(route('students.measurements.store', $this->client), [
+        'weight' => 300,
+        'height' => 250,
+        'neck' => 80,
+        'waist' => 220,
+        'hip' => 220,
+        'chest' => 230,
+        'thigh' => 120,
+        'arm' => 80,
+        'forearm' => 60,
+        'calf' => 70,
+        'shoulders' => 250,
+        'activity_level' => 'moderate',
+        'goal' => 'maintain',
+    ]);
+
+    $response->assertRedirect(route('students.measurements', $this->client));
+    $this->assertDatabaseHas('body_measurements', [
+        'client_id' => $this->client->id,
+        'weight' => 300,
+        'neck' => 80,
+        'thigh' => 120,
+        'arm' => 80,
+    ]);
+});
+
+test('includes caution warnings for unusual measurements', function () {
+    actingAs($this->admin);
+
+    $response = $this->post(route('students.measurements.store', $this->client), [
+        'weight' => 310,
+        'height' => 170,
+        'activity_level' => 'moderate',
+        'goal' => 'maintain',
+    ]);
+
+    $response->assertRedirect(route('students.measurements', $this->client));
+    $response->assertSessionHas('measurement_warnings');
+});
+
+test('does not include caution warnings for typical measurements', function () {
+    actingAs($this->admin);
+
+    $response = $this->post(route('students.measurements.store', $this->client), [
+        'weight' => 70,
+        'height' => 170,
+        'activity_level' => 'moderate',
+        'goal' => 'maintain',
+    ]);
+
+    $response->assertRedirect(route('students.measurements', $this->client));
+    $response->assertSessionMissing('measurement_warnings');
+});
+
 test('student without gender cannot store measurements', function () {
     $incompleteUser = User::factory()->create([
         'role' => UserRole::CLIENT,

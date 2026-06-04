@@ -198,6 +198,55 @@ Never generate commit messages in Portuguese.
 
 When asked to create a commit, always generate a Conventional Commit message in English.
 
+## 📏 Body Measurements Validation
+
+When validating body measurements, assume users may have a wide variety of body compositions, including obesity, athletic builds, bodybuilding physiques, and medical conditions that affect body size.
+
+### Rules
+
+- **Do not assume** a measurement is incorrect solely because it is above average.
+- **Accept** measurements that are physically plausible for humans.
+- **Suggest verification** instead of rejecting values that are unusually high or low.
+- **Never generate warnings** based only on comparison with population averages.
+- **Focus on trends** and progression over time rather than isolated measurements.
+- **Prioritize inclusivity** and real-world variability in body dimensions.
+
+### Hard Rejection Thresholds (only for clearly impossible values)
+
+- weight: 20–700 kg
+- height: 50–300 cm
+- neck: 5–120 cm
+- waist: 20–350 cm
+- hip: 20–350 cm
+- chest: 20–350 cm
+- thigh: 5–200 cm
+- arm: 5–150 cm
+- forearm: 5–100 cm
+- calf: 5–120 cm
+- shoulders: 20–350 cm
+
+### Caution Thresholds (soft warnings — value is accepted but verified)
+
+- weight > 300 or < 25 kg
+- height > 230 or < 80 cm
+- neck > 70 cm
+- waist > 200 cm
+- hip > 200 cm
+- chest > 200 cm
+- thigh > 100 cm
+- arm > 70 cm
+- forearm > 50 cm
+- calf > 60 cm
+- shoulders > 200 cm
+
+### Implementation
+
+- Hard limits are enforced in `StoreBodyMeasurementRequest` via `min`/`max` rules.
+- Caution warnings are generated in `getCautionWarnings()` on the FormRequest and flashed to the session by `StoreBodyMeasurementController`.
+- The frontend displays `measurement_warnings` flash data as dismissible alerts next to the success message.
+
+---
+
 ## 🧠 FitTrack Patterns
 
 ### Example Flow
