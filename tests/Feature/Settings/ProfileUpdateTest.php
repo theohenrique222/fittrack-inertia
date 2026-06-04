@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Storage;
 
 function createFakeImage(string $name = 'avatar.jpg'): UploadedFile
 {
-    $path = tempnam(sys_get_temp_dir(), 'test_') . '.jpg';
-    $jpegHeader = "\xFF\xD8\xFF\xE0" . str_repeat("\x00", 1020);
+    $path = tempnam(sys_get_temp_dir(), 'test_').'.jpg';
+    $jpegHeader = "\xFF\xD8\xFF\xE0".str_repeat("\x00", 1020);
     file_put_contents($path, $jpegHeader);
 
     return new UploadedFile($path, $name, 'image/jpeg', null, true);
@@ -30,7 +30,6 @@ test('profile information can be updated', function () {
         ->actingAs($user)
         ->patch(route('profile.update'), [
             'name' => 'Test User',
-            'email' => 'test@example.com',
         ]);
 
     $response
@@ -40,25 +39,7 @@ test('profile information can be updated', function () {
     $user->refresh();
 
     expect($user->name)->toBe('Test User');
-    expect($user->email)->toBe('test@example.com');
-    expect($user->email_verified_at)->toBeNull();
-});
-
-test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->patch(route('profile.update'), [
-            'name' => 'Test User',
-            'email' => $user->email,
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('profile.edit'));
-
-    expect($user->refresh()->email_verified_at)->not->toBeNull();
+    expect($user->email_verified_at)->not->toBeNull();
 });
 
 test('user can delete their account', function () {
@@ -106,7 +87,6 @@ test('profile photo can be uploaded', function () {
         ->actingAs($user)
         ->patch(route('profile.update'), [
             'name' => $user->name,
-            'email' => $user->email,
             'profile_photo' => $file,
         ]);
 
@@ -133,7 +113,6 @@ test('profile photo can be removed', function () {
         ->actingAs($user)
         ->patch(route('profile.update'), [
             'name' => $user->name,
-            'email' => $user->email,
             'remove_photo' => '1',
         ]);
 
@@ -162,7 +141,6 @@ test('profile photo is replaced when uploading a new one', function () {
         ->actingAs($user)
         ->patch(route('profile.update'), [
             'name' => $user->name,
-            'email' => $user->email,
             'profile_photo' => $newFile,
         ]);
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head, usePage } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import InputError from '@/components/InputError.vue';
@@ -25,7 +25,7 @@ type Props = {
     nickname?: string | null;
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 defineOptions({
     layout: {
@@ -42,16 +42,23 @@ const page = usePage();
 const user = computed(() => page.props.auth.user);
 const { getInitials } = useInitials();
 
+const form = useForm({
+    name: user.value.name,
+    nickname: props.nickname ?? '',
+    profile_photo: null as File | null,
+    remove_photo: false,
+});
+
 const photoPreview = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const removePhoto = ref(false);
 
 function onFileSelected(event: Event) {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
         photoPreview.value = URL.createObjectURL(file);
-        removePhoto.value = false;
+        form.profile_photo = file;
+        form.remove_photo = false;
     }
 }
 
@@ -61,10 +68,19 @@ function triggerFileInput() {
 
 function clearPhoto() {
     photoPreview.value = null;
-    removePhoto.value = true;
+    form.profile_photo = null;
+    form.remove_photo = true;
     if (fileInput.value) {
         fileInput.value.value = '';
     }
+}
+
+function submit() {
+    form.patch(ProfileController.update.url(), {
+        onSuccess: () => {
+            form.reset('profile_photo', 'remove_photo');
+        },
+    });
 }
 </script>
 
@@ -100,17 +116,12 @@ function clearPhoto() {
                 <CardHeader class="px-0 pt-0">
                     <CardTitle>Informações do perfil</CardTitle>
                     <CardDescription>
-                        Atualize seu nome, email e foto de perfil
+                        Atualize seu nome e foto de perfil
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent class="px-0 pb-0">
-                    <Form
-                        :action="ProfileController.update.url()"
-                        method="patch"
-                        class="space-y-6"
-                        v-slot="{ errors, processing, recentlySuccessful }"
-                    >
+                    <form @submit.prevent="submit" class="space-y-6">
                         <div class="flex items-center gap-4">
                             <Avatar class="h-20 w-20 rounded-full ring-2 ring-border">
                                 <AvatarImage
@@ -153,53 +164,38 @@ function clearPhoto() {
                                 class="hidden"
                                 @input="onFileSelected"
                             />
-
-                            <input
-                                name="remove_photo"
-                                type="hidden"
-                                :value="removePhoto ? '1' : '0'"
-                            />
                         </div>
 
-                        <InputError :message="errors.profile_photo" />
+                        <InputError :message="form.errors.profile_photo" />
 
                         <div class="grid gap-2">
                             <Label for="name">Nome completo</Label>
                             <Input
                                 id="name"
-                                name="name"
-                                :default-value="user.name"
+                                v-model="form.name"
                                 required
                                 autocomplete="name"
                                 placeholder="Seu nome completo"
                             />
-                            <InputError :message="errors.name" />
+                            <InputError :message="form.errors.name" />
                         </div>
 
                         <div class="grid gap-2">
                             <Label for="nickname">Apelido</Label>
                             <Input
                                 id="nickname"
-                                name="nickname"
-                                :default-value="nickname"
+                                v-model="form.nickname"
                                 autocomplete="nickname"
                                 placeholder="Como gosta de ser chamado"
                             />
-                            <InputError :message="errors.nickname" />
+                            <InputError :message="form.errors.nickname" />
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="email">E-mail</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                :default-value="user.email"
-                                required
-                                autocomplete="username"
-                                placeholder="seu@email.com"
-                            />
-                            <InputError :message="errors.email" />
+                            <Label>E-mail</Label>
+                            <p class="text-sm text-muted-foreground">
+                                {{ user.email }}
+                            </p>
                         </div>
 
                         <div
@@ -224,7 +220,7 @@ function clearPhoto() {
                         <div
                             class="flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center"
                         >
-                            <Button :disabled="processing">
+                            <Button :disabled="form.processing">
                                 Salvar alterações
                             </Button>
 
@@ -235,14 +231,14 @@ function clearPhoto() {
                                 leave-to-class="opacity-0"
                             >
                                 <p
-                                    v-show="recentlySuccessful"
+                                    v-show="form.recentlySuccessful"
                                     class="text-sm text-green-600"
                                 >
                                     Salvo com sucesso!
                                 </p>
                             </Transition>
                         </div>
-                    </Form>
+                    </form>
                 </CardContent>
             </div>
         </Card>
