@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -41,6 +41,31 @@ defineOptions({
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const { getInitials } = useInitials();
+
+const photoPreview = ref<string | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
+const removePhoto = ref(false);
+
+function onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+        photoPreview.value = URL.createObjectURL(file);
+        removePhoto.value = false;
+    }
+}
+
+function triggerFileInput() {
+    fileInput.value?.click();
+}
+
+function clearPhoto() {
+    photoPreview.value = null;
+    removePhoto.value = true;
+    if (fileInput.value) {
+        fileInput.value.value = '';
+    }
+}
 </script>
 
 <template>
@@ -50,8 +75,8 @@ const { getInitials } = useInitials();
         <div class="flex items-center gap-5">
             <Avatar class="h-14 w-14 rounded-full ring-2 ring-border">
                 <AvatarImage
-                    v-if="user.avatar"
-                    :src="user.avatar!"
+                    v-if="photoPreview ?? user.avatar"
+                    :src="photoPreview ?? user.avatar!"
                     :alt="user.name"
                 />
                 <AvatarFallback class="rounded-full text-lg font-medium">
@@ -75,7 +100,7 @@ const { getInitials } = useInitials();
                 <CardHeader class="px-0 pt-0">
                     <CardTitle>Informações do perfil</CardTitle>
                     <CardDescription>
-                        Atualize seu nome e endereço de email
+                        Atualize seu nome, email e foto de perfil
                     </CardDescription>
                 </CardHeader>
 
@@ -86,6 +111,58 @@ const { getInitials } = useInitials();
                         class="space-y-6"
                         v-slot="{ errors, processing, recentlySuccessful }"
                     >
+                        <div class="flex items-center gap-4">
+                            <Avatar class="h-20 w-20 rounded-full ring-2 ring-border">
+                                <AvatarImage
+                                    v-if="photoPreview ?? user.avatar"
+                                    :src="photoPreview ?? user.avatar!"
+                                    :alt="user.name"
+                                />
+                                <AvatarFallback class="rounded-full text-xl font-medium">
+                                    {{ getInitials(user.name) }}
+                                </AvatarFallback>
+                            </Avatar>
+
+                            <div class="flex flex-col gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    @click="triggerFileInput"
+                                >
+                                    Alterar foto
+                                </Button>
+
+                                <Button
+                                    v-if="user.avatar || photoPreview"
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    class="text-destructive"
+                                    @click="clearPhoto"
+                                >
+                                    Remover foto
+                                </Button>
+                            </div>
+
+                            <input
+                                ref="fileInput"
+                                name="profile_photo"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                class="hidden"
+                                @input="onFileSelected"
+                            />
+
+                            <input
+                                name="remove_photo"
+                                type="hidden"
+                                :value="removePhoto ? '1' : '0'"
+                            />
+                        </div>
+
+                        <InputError :message="errors.profile_photo" />
+
                         <div class="grid gap-2">
                             <Label for="name">Nome completo</Label>
                             <Input
