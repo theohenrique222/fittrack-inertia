@@ -5,7 +5,6 @@ import { computed, ref } from 'vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
 import ProgressRing from '@/components/dashboard/ProgressRing.vue';
 import { Button } from '@/components/ui/button';
-import { students } from '@/routes';
 import {
     Dialog,
     DialogContent,
@@ -13,6 +12,7 @@ import {
     DialogFooter,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { students } from '@/routes';
 
 interface ExercisePivot {
     sets: number;

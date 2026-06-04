@@ -253,6 +253,7 @@ return null;
 }
 
     const d = new Date(date);
+
     return d.toLocaleDateString('pt-BR');
 }
 
