@@ -320,7 +320,7 @@ class WorkoutTest extends TestCase
         $workout->refresh();
 
         $this->assertTrue($workout->is_active);
-        $this->assertNull($workout->completed_at);
+        $this->assertTrue($workout->sessions()->where('status', 'completed')->exists());
         $this->assertEquals('completed', $session->status);
     }
 }

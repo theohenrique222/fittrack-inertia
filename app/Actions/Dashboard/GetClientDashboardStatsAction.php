@@ -8,7 +8,10 @@ use App\Models\Client;
 use App\Models\ExerciseCompletion;
 use App\Models\Trainer;
 use App\Models\User;
+use App\Models\Workout;
+use App\Models\WorkoutSession;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class GetClientDashboardStatsAction
@@ -22,7 +25,12 @@ class GetClientDashboardStatsAction
         $client = Client::where('user_id', $user->id)->first();
 
         $totalWorkouts = $client ? $client->workouts()->count() : 0;
-        $completedWorkouts = $client ? $client->workouts()->whereNotNull('completed_at')->count() : 0;
+        $completedWorkouts = $client
+            ? WorkoutSession::where('client_id', $client->id)
+                ->where('status', 'completed')
+                ->distinct('workout_id')
+                ->count('workout_id')
+            : 0;
         $currentStreak = $this->calculateStreak($user);
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
 
@@ -253,7 +261,12 @@ class GetClientDashboardStatsAction
     private function getRecentAchievements(User $user): array
     {
         $client = Client::where('user_id', $user->id)->first();
-        $totalCompleted = $client ? $client->workouts()->whereNotNull('completed_at')->count() : 0;
+        $totalCompleted = $client
+            ? WorkoutSession::where('client_id', $client->id)
+                ->where('status', 'completed')
+                ->distinct('workout_id')
+                ->count('workout_id')
+            : 0;
         $streak = $this->calculateStreak($user);
 
         $achievements = [];
@@ -317,14 +330,26 @@ class GetClientDashboardStatsAction
         }
 
         $workout = $client->workouts()
-            ->with(['exercises.category', 'completions'])
+            ->with(['exercises.category'])
             ->where('is_active', true)
-            ->whereNull('completed_at')
             ->latest()
             ->first();
 
         if (! $workout) {
             return null;
+        }
+
+        $activeSession = WorkoutSession::where('workout_id', $workout->id)
+            ->where('client_id', $client->id)
+            ->where('status', 'in_progress')
+            ->latest()
+            ->first();
+
+        $sessionCompletions = collect();
+        if ($activeSession) {
+            $sessionCompletions = ExerciseCompletion::where('workout_session_id', $activeSession->id)
+                ->where('user_id', $user->id)
+                ->get();
         }
 
         $exercises = $workout->exercises->map(fn ($exercise) => [
@@ -336,9 +361,7 @@ class GetClientDashboardStatsAction
                 'reps' => $exercise->pivot->reps,
                 'rest_seconds' => $exercise->pivot->rest_seconds,
             ],
-            'completed' => $workout->completions
-                ->where('user_id', $user->id)
-                ->contains('exercise_id', $exercise->id),
+            'completed' => $sessionCompletions->contains('exercise_id', $exercise->id),
         ]);
 
         $totalSeconds = $exercises->sum(fn ($ex) => $ex['pivot']['sets'] * ($ex['pivot']['reps'] * 3 + $ex['pivot']['rest_seconds']));
@@ -366,7 +389,6 @@ class GetClientDashboardStatsAction
         return $client->workouts()
             ->withCount('exercises')
             ->where('is_active', true)
-            ->whereNull('completed_at')
             ->latest()
             ->take(5)
             ->get()
@@ -389,18 +411,33 @@ class GetClientDashboardStatsAction
             return [];
         }
 
-        return $client->workouts()
-            ->withCount('exercises')
+        $latestCompleted = DB::table('workout_sessions')
+            ->select('workout_id', DB::raw('MAX(completed_at) as last_completed_at'))
+            ->where('client_id', $client->id)
+            ->where('status', 'completed')
             ->whereNotNull('completed_at')
-            ->latest('completed_at')
+            ->groupBy('workout_id')
+            ->orderByDesc('last_completed_at')
             ->take(10)
+            ->get();
+
+        if ($latestCompleted->isEmpty()) {
+            return [];
+        }
+
+        $workoutIds = $latestCompleted->pluck('workout_id');
+
+        /** @var Collection<int, Workout> $workouts */
+        $workouts = Workout::whereIn('id', $workoutIds)
+            ->withCount('exercises')
             ->get()
-            ->map(fn ($workout) => [
-                'id' => $workout->id,
-                'name' => $workout->name,
-                'exercises' => $workout->exercises_count,
-                'completed_at' => $workout->completed_at->diffForHumans(),
-            ])
-            ->toArray();
+            ->keyBy('id');
+
+        return $latestCompleted->map(fn ($item) => [
+            'id' => $item->workout_id,
+            'name' => $workouts[$item->workout_id]->name,
+            'exercises' => $workouts[$item->workout_id]->exercises_count,
+            'completed_at' => Carbon::parse($item->last_completed_at)->diffForHumans(),
+        ])->toArray();
     }
 }
