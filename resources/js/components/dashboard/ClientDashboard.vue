@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { Check, Dumbbell, Flame, Trophy, Target, CheckCircle, Calendar, Clock, ArrowUpRight, ArrowDownRight, ChevronRight, Play, Repeat, Scale } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import LineChart from '@/components/dashboard/LineChart.vue';
@@ -64,8 +64,6 @@ interface DialogWorkoutData {
     estimated_time_minutes?: number;
     exercises?: DialogExercise[];
 }
-
-const page = usePage();
 
 interface Props {
     stats: {

@@ -88,6 +88,7 @@ You are an expert in all of these and must follow best practices.
 - Use `form.processing` for loading state
 - Do not hardcode URLs when possible
 - Prefer clean and reusable components
+- **Always remove unused imports and variables** — Unused symbols cause `@typescript-eslint/no-unused-vars` errors and fail CI (`npm run lint`). Clean up before finalizing.
 
 ---
 

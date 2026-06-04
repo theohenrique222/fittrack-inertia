@@ -11,7 +11,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { Check, ChevronRight, Clock, Dumbbell, Play, Repeat, Search, Target, History, TrendingUp } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import {
@@ -257,9 +257,6 @@ return null;
     return d.toLocaleDateString('pt-BR');
 }
 
-function sessionHistoryForWorkout(workoutId: number): SessionHistoryItem[] {
-    return props.sessionHistory.filter((s) => s.workout_id === workoutId).slice(0, 3);
-}
 </script>
 
 <template>
