@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from 'lucide-vue-next';
+import {
+    LogOut,
+    Shield,
+    Palette,
+    User as UserIcon,
+} from 'lucide-vue-next';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -9,7 +14,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
 import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
+import { edit as editProfile } from '@/routes/profile';
+import { edit as editSecurity } from '@/routes/security';
+import { edit as editAppearance } from '@/routes/appearance';
 import type { User } from '@/types';
 
 type Props = {
@@ -29,26 +36,58 @@ defineProps<Props>();
             <UserInfo :user="user" :show-email="true" />
         </div>
     </DropdownMenuLabel>
+
     <DropdownMenuSeparator />
+
+    <DropdownMenuLabel class="text-xs font-medium text-muted-foreground">
+        Configurações
+    </DropdownMenuLabel>
+
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
-                <Settings class="mr-2 h-4 w-4" />
-                Settings
+            <Link
+                class="flex w-full cursor-pointer items-center gap-2"
+                :href="editProfile()"
+                prefetch
+            >
+                <UserIcon class="h-4 w-4" />
+                Perfil
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link
+                class="flex w-full cursor-pointer items-center gap-2"
+                :href="editSecurity()"
+                prefetch
+            >
+                <Shield class="h-4 w-4" />
+                Segurança
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link
+                class="flex w-full cursor-pointer items-center gap-2"
+                :href="editAppearance()"
+                prefetch
+            >
+                <Palette class="h-4 w-4" />
+                Aparência
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
+
     <DropdownMenuSeparator />
-    <DropdownMenuItem :as-child="true">
+
+    <DropdownMenuItem :as-child="true" variant="destructive">
         <Link
-            class="block w-full cursor-pointer"
+            class="flex w-full cursor-pointer items-center gap-2"
             :href="logout()"
             @click="handleLogout"
             as="button"
             data-test="logout-button"
         >
-            <LogOut class="mr-2 h-4 w-4" />
-            Log out
+            <LogOut class="h-4 w-4" />
+            Sair
         </Link>
     </DropdownMenuItem>
 </template>

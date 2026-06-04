@@ -242,8 +242,7 @@ const rightNavItems: NavItem[] = [
                         <DropdownMenuTrigger :as-child="true">
                             <Button
                                 variant="ghost"
-                                size="icon"
-                                class="relative size-10 w-auto rounded-full p-1 focus-within:ring-2 focus-within:ring-primary"
+                                class="flex items-center gap-2 rounded-full px-2 py-1 focus-within:ring-2 focus-within:ring-primary"
                             >
                                 <Avatar
                                     class="size-8 overflow-hidden rounded-full"
@@ -259,6 +258,7 @@ const rightNavItems: NavItem[] = [
                                         {{ getInitials(auth.user?.name) }}
                                     </AvatarFallback>
                                 </Avatar>
+                                <span class="hidden text-sm font-medium md:block">{{ auth.user.name }}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-56">
