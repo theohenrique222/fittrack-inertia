@@ -47,6 +47,7 @@ const form = useForm({
     nickname: props.nickname ?? '',
     profile_photo: null as File | null,
     remove_photo: false,
+    _method: 'PATCH',
 });
 
 const photoPreview = ref<string | null>(null);
@@ -55,6 +56,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 function onFileSelected(event: Event) {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
+
     if (file) {
         photoPreview.value = URL.createObjectURL(file);
         form.profile_photo = file;
@@ -70,13 +72,14 @@ function clearPhoto() {
     photoPreview.value = null;
     form.profile_photo = null;
     form.remove_photo = true;
+
     if (fileInput.value) {
         fileInput.value.value = '';
     }
 }
 
 function submit() {
-    form.patch(ProfileController.update.url(), {
+    form.post(ProfileController.update.url(), {
         onSuccess: () => {
             form.reset('profile_photo', 'remove_photo');
         },
