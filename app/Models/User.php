@@ -21,7 +21,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 #[Fillable(['name', 'email', 'password', 'role', 'email_verified_at', 'trainer_id', 'must_reset_password', 'gender', 'birthdate', 'profile_photo_path'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'profile_photo_path'])]
-#[Appended(['avatar'])]
+#[Appended(['profile_photo_url'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -55,7 +55,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected function avatar(): Attribute
+    protected function profilePhotoUrl(): Attribute
     {
         return Attribute::get(fn () => $this->profile_photo_path
             ? Storage::disk('public')->url($this->profile_photo_path)

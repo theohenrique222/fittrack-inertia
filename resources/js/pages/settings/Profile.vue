@@ -94,8 +94,8 @@ function submit() {
         <div class="flex items-center gap-5">
             <Avatar class="h-14 w-14 rounded-full ring-2 ring-border">
                 <AvatarImage
-                    v-if="photoPreview ?? user.avatar"
-                    :src="photoPreview ?? user.avatar!"
+                    v-if="photoPreview ?? user.profile_photo_url"
+                    :src="photoPreview ?? user.profile_photo_url!"
                     :alt="user.name"
                 />
                 <AvatarFallback class="rounded-full text-lg font-medium">
@@ -128,8 +128,8 @@ function submit() {
                         <div class="flex items-center gap-4">
                             <Avatar class="h-20 w-20 rounded-full ring-2 ring-border">
                                 <AvatarImage
-                                    v-if="photoPreview ?? user.avatar"
-                                    :src="photoPreview ?? user.avatar!"
+                                    v-if="photoPreview ?? user.profile_photo_url"
+                                    :src="photoPreview ?? user.profile_photo_url!"
                                     :alt="user.name"
                                 />
                                 <AvatarFallback class="rounded-full text-xl font-medium">
@@ -148,7 +148,7 @@ function submit() {
                                 </Button>
 
                                 <Button
-                                    v-if="user.avatar || photoPreview"
+                                    v-if="user.profile_photo_url || photoPreview"
                                     type="button"
                                     variant="ghost"
                                     size="sm"
