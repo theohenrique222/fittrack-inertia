@@ -15,6 +15,7 @@ class StudentResource extends JsonResource
             'email' => $this->user?->email ?? '',
             'nickname' => $this->nickname,
             'trainer_name' => $this->user?->trainer?->name ?? null,
+            'deleted_at' => $this->deleted_at?->toISOString(),
         ];
     }
 }

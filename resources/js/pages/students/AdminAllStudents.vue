@@ -12,16 +12,20 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import {
+    Archive,
+    RotateCcw,
     Search,
+    Trash2,
     Users,
-    GraduationCap,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
+import { restore, forceDelete } from '@/routes/students';
 
 interface Student {
     id: number;
@@ -29,26 +33,33 @@ interface Student {
     email: string;
     nickname?: string;
     trainer_name?: string;
+    deleted_at: string | null;
 }
 
 const props = defineProps<{
     title: string;
     students: Student[];
+    archivedStudents: Student[];
 }>();
 
 const page = usePage();
 const { toasts, success, error } = useToast();
 
+const activeTab = ref<'active' | 'archived'>('active');
 const searchQuery = ref('');
+
+const currentList = computed(() =>
+    activeTab.value === 'active' ? props.students : props.archivedStudents,
+);
 
 const filteredStudents = computed(() => {
     if (!searchQuery.value) {
-        return props.students;
+        return currentList.value;
     }
 
     const query = searchQuery.value.toLowerCase();
 
-    return props.students.filter(
+    return currentList.value.filter(
         (s) =>
             s.name.toLowerCase().includes(query) ||
             s.email.toLowerCase().includes(query) ||
@@ -59,6 +70,7 @@ const filteredStudents = computed(() => {
 
 const stats = computed(() => ({
     total: props.students.length,
+    archived: props.archivedStudents.length,
 }));
 
 watch(
@@ -74,6 +86,26 @@ watch(
     },
     { immediate: true },
 );
+
+const handleRestoreClick = (id: number, event: Event) => {
+    event.stopPropagation();
+
+    if (!confirm('Tem certeza que deseja restaurar este aluno?')) {
+        return;
+    }
+
+    router.post(restore.url({ student: id }));
+};
+
+const handleForceDeleteClick = (id: number, event: Event) => {
+    event.stopPropagation();
+
+    if (!confirm('Tem certeza que deseja excluir permanentemente este aluno? Esta ação não pode ser desfeita.')) {
+        return;
+    }
+
+    router.delete(forceDelete.url({ student: id }));
+};
 
 function getInitials(name: string): string {
     return name
@@ -104,7 +136,6 @@ function getAvatarColor(id: number): string {
     <ToastContainer v-model="toasts" />
 
     <div class="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
-        <!-- Header com gradiente -->
         <div class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 px-6 py-8 text-white">
             <div class="mb-6">
                 <h1 class="text-3xl font-bold">Todos os Alunos</h1>
@@ -113,48 +144,63 @@ function getAvatarColor(id: number): string {
                 </p>
             </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="flex items-center gap-4">
                 <div class="rounded-xl bg-white/15 px-5 py-4 backdrop-blur-sm">
                     <div class="mb-2 flex items-center gap-2">
                         <Users class="h-5 w-5 text-purple-100" />
-                        <span class="text-sm font-medium text-purple-100">Total</span>
+                        <span class="text-sm font-medium text-purple-100">Ativos</span>
                     </div>
                     <p class="text-3xl font-bold">{{ stats.total }}</p>
                 </div>
 
                 <div class="rounded-xl bg-white/15 px-5 py-4 backdrop-blur-sm">
                     <div class="mb-2 flex items-center gap-2">
-                        <GraduationCap class="h-5 w-5 text-purple-100" />
-                        <span class="text-sm font-medium text-purple-100">Cadastrados</span>
+                        <Archive class="h-5 w-5 text-purple-100" />
+                        <span class="text-sm font-medium text-purple-100">Arquivados</span>
                     </div>
-                    <p class="text-3xl font-bold">{{ stats.total }}</p>
+                    <p class="text-3xl font-bold">{{ stats.archived }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Content -->
         <div class="flex-1 bg-neutral-50 px-6 py-5 dark:bg-neutral-900">
-            <!-- Search Bar -->
-            <div class="mb-6">
-                <div class="relative">
+            <div class="mb-6 flex items-center gap-4">
+                <div class="relative flex-1">
                     <Search class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-neutral-400" />
                     <Input
                         v-model="searchQuery"
-                        placeholder="Buscar aluno por nome, email, apelido ou personal..."
+                        :placeholder="activeTab === 'active' ? 'Buscar aluno por nome, email, apelido ou personal...' : 'Buscar aluno arquivado...'"
                         class="border-neutral-200 bg-white pl-12 py-6 text-base dark:border-neutral-700 dark:bg-neutral-800"
                     />
                 </div>
+
+                <div class="flex rounded-lg border border-neutral-200 bg-white p-1 dark:border-neutral-700 dark:bg-neutral-800">
+                    <Button
+                        size="sm"
+                        :variant="activeTab === 'active' ? 'default' : 'ghost'"
+                        @click="activeTab = 'active'"
+                    >
+                        <Users class="mr-1.5 h-4 w-4" />
+                        Ativos
+                    </Button>
+                    <Button
+                        size="sm"
+                        :variant="activeTab === 'archived' ? 'default' : 'ghost'"
+                        @click="activeTab = 'archived'"
+                    >
+                        <Archive class="mr-1.5 h-4 w-4" />
+                        Arquivados
+                    </Button>
+                </div>
             </div>
 
-            <!-- Student Cards -->
             <div v-if="filteredStudents.length" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div
                     v-for="student in filteredStudents"
                     :key="student.id"
-                    class="group cursor-default overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:border-purple-300 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-purple-600"
+                    class="group cursor-default overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+                    :class="activeTab === 'archived' ? 'border-amber-200 hover:border-amber-300 dark:border-amber-800 dark:hover:border-amber-600' : 'hover:border-purple-300 dark:hover:border-purple-600'"
                 >
-                    <!-- Card Header -->
                     <div class="border-b border-neutral-100 bg-gradient-to-r from-neutral-50 to-white p-5 dark:border-neutral-700 dark:from-neutral-900/50 dark:to-neutral-800">
                         <div class="flex items-center gap-4">
                             <div :class="[
@@ -177,7 +223,6 @@ function getAvatarColor(id: number): string {
                         </div>
                     </div>
 
-                    <!-- Card Body -->
                     <div class="p-5">
                         <p class="truncate text-sm text-neutral-500 dark:text-neutral-400">
                             {{ student.email }}
@@ -189,19 +234,39 @@ function getAvatarColor(id: number): string {
                             Sem personal vinculado
                         </p>
                     </div>
+
+                    <div v-if="activeTab === 'archived'" class="flex items-center justify-end gap-2 border-t border-neutral-100 px-4 py-3 dark:border-neutral-700">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            class="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400"
+                            @click.stop="handleRestoreClick(student.id, $event)"
+                        >
+                            <RotateCcw class="mr-1.5 h-4 w-4" />
+                            Restaurar
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            class="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400"
+                            @click.stop="handleForceDeleteClick(student.id, $event)"
+                        >
+                            <Trash2 class="mr-1.5 h-4 w-4" />
+                            Excluir
+                        </Button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Empty State -->
             <div v-else class="flex flex-col items-center justify-center py-20 text-center">
                 <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-neutral-800">
-                    <Users class="h-10 w-10 text-neutral-300 dark:text-neutral-600" />
+                    <component :is="activeTab === 'archived' ? Archive : Users" class="h-10 w-10 text-neutral-300 dark:text-neutral-600" />
                 </div>
                 <p class="text-lg font-semibold text-neutral-600 dark:text-neutral-400">
-                    {{ searchQuery ? 'Nenhum aluno encontrado' : 'Nenhum aluno cadastrado' }}
+                    {{ searchQuery ? 'Nenhum aluno encontrado' : (activeTab === 'archived' ? 'Nenhum aluno arquivado' : 'Nenhum aluno cadastrado') }}
                 </p>
-                <p v-if="searchQuery" class="mt-2 text-sm text-neutral-400 dark:text-neutral-500">
-                    Tente buscar com outros termos
+                <p class="mt-2 text-sm text-neutral-400 dark:text-neutral-500">
+                    {{ searchQuery ? 'Tente buscar com outros termos' : '' }}
                 </p>
             </div>
         </div>

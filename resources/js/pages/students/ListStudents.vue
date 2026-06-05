@@ -113,7 +113,7 @@ const handleEditClick = (student: Student, event: Event) => {
 const handleDeleteClick = (id: number, event: Event) => {
     event.stopPropagation();
 
-    if (!confirm('Tem certeza que deseja deletar este aluno?')) {
+    if (!confirm('Tem certeza que deseja arquivar este aluno? Ele poderá ser restaurado posteriormente por um administrador.')) {
         return;
     }
 

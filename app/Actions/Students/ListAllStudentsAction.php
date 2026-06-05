@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ListAllStudentsAction
 {
-    public function execute(): Collection
+    public function execute(bool $trashed = false): Collection
     {
-        return Client::with(['user', 'user.trainer'])
-            ->get();
+        $query = Client::with(['user', 'user.trainer']);
+
+        if ($trashed) {
+            $query->onlyTrashed();
+        }
+
+        return $query->get();
     }
 }

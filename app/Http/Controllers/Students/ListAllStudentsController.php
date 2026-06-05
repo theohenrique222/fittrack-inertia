@@ -13,10 +13,12 @@ class ListAllStudentsController extends Controller
     public function __invoke(ListAllStudentsAction $action): Response
     {
         $students = $action->execute();
+        $archivedStudents = $action->execute(trashed: true);
 
         return Inertia::render('students/AdminAllStudents', [
             'title' => 'Todos os Alunos',
             'students' => StudentResource::collection($students),
+            'archivedStudents' => StudentResource::collection($archivedStudents),
         ]);
     }
 }

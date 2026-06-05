@@ -19,10 +19,12 @@ use App\Http\Controllers\Exercises\UpdateExerciseController;
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Settings\CompleteProfileController;
 use App\Http\Controllers\Students\DestroyStudentController;
+use App\Http\Controllers\Students\ForceDeleteStudentController;
 use App\Http\Controllers\Students\ListAllStudentsController;
 use App\Http\Controllers\Students\ListMeasurementsOverviewController;
 use App\Http\Controllers\Students\ListStudentsController;
 use App\Http\Controllers\Students\ResetPasswordStudentController;
+use App\Http\Controllers\Students\RestoreStudentController;
 use App\Http\Controllers\Students\ShowStudentController;
 use App\Http\Controllers\Students\StoreStudentController;
 use App\Http\Controllers\Students\UpdateStudentController;
@@ -99,6 +101,18 @@ $router
 $router
     ->post(uri: '/students/{student}/reset-password', action: ResetPasswordStudentController::class)
     ->name('students.reset-password');
+
+$router
+    ->post(uri: '/students/{student}/restore', action: RestoreStudentController::class)
+    ->name('students.restore')
+    ->middleware('auth')
+    ->withTrashed();
+
+$router
+    ->delete(uri: '/students/{student}/force-delete', action: ForceDeleteStudentController::class)
+    ->name('students.force-delete')
+    ->middleware('auth')
+    ->withTrashed();
 
 $router
     ->get(uri: '/students/{student}/measurements', action: ListBodyMeasurementsController::class)
