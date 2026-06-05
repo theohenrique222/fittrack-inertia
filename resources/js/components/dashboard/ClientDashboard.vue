@@ -13,6 +13,7 @@ import {
     DialogFooter,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { workouts } from '@/routes/me';
 import students from '@/routes/students';
 
 interface ExercisePivot {
@@ -67,6 +68,7 @@ interface DialogWorkoutData {
 }
 
 interface Props {
+    userName: string;
     stats: {
         totalWorkouts: number;
         completedWorkouts: number;
@@ -177,6 +179,7 @@ const statCards = computed(() => [
         color: 'from-emerald-500 to-emerald-600',
         bg: 'bg-emerald-50 dark:bg-emerald-900/20',
         text: 'text-emerald-600 dark:text-emerald-400',
+        href: workouts.url(),
     },
     {
         label: 'Sequência',
@@ -222,7 +225,7 @@ const statCards = computed(() => [
                             <span class="text-xs font-medium uppercase tracking-wider">Painel do Aluno</span>
                         </div>
                         <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
-                            Meu Progresso
+                            {{ userName }}
                         </h1>
                         <p class="text-sm md:text-base text-emerald-50/90 max-w-xl">
                             Continue assim! Você está no caminho certo para alcançar seus objetivos
@@ -253,6 +256,8 @@ const statCards = computed(() => [
                 v-for="card in statCards"
                 :key="card.label"
                 class="group relative overflow-hidden rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 bg-white dark:bg-neutral-900 p-4 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                :class="card.href ? 'cursor-pointer' : ''"
+                @click="card.href ? router.visit(card.href) : undefined"
             >
                 <div class="flex items-start justify-between">
                     <div class="space-y-1.5">
@@ -337,42 +342,42 @@ const statCards = computed(() => [
         </div>
 
         <!-- ========== WEEKLY WORKOUT CALENDAR ========== -->
-        <div class="rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 bg-white dark:bg-neutral-900 p-5 shadow-xs">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                    <Calendar class="h-4 w-4 text-emerald-500" />
-                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Semana</h3>
+        <div class="rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 bg-white dark:bg-neutral-900 p-4 sm:p-5 shadow-xs">
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <Calendar class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
+                    <h3 class="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white">Semana</h3>
                 </div>
-                <Badge variant="secondary" class="text-xs">
+                <Badge variant="secondary" class="text-[10px] sm:text-xs">
                     {{ completedThisWeek }}/{{ weeklyWorkouts.length }} concluídos
                 </Badge>
             </div>
-            <div class="grid grid-cols-7 gap-2">
+            <div class="grid grid-cols-7 gap-1 sm:gap-2">
                 <div
                     v-for="workout in weeklyWorkouts"
                     :key="workout.day"
-                    class="flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all duration-200"
+                    class="flex flex-col items-center gap-1 sm:gap-1.5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl transition-all duration-200"
                     :class="workout.completed
                         ? 'bg-emerald-50 dark:bg-emerald-900/20'
                         : workout.type === 'Descanso'
                             ? 'bg-neutral-50 dark:bg-neutral-800/50'
                             : 'bg-amber-50 dark:bg-amber-900/10'"
                 >
-                    <span class="text-[11px] font-semibold text-neutral-600 dark:text-neutral-400 uppercase">{{ workout.day }}</span>
+                    <span class="text-[10px] sm:text-[11px] font-semibold text-neutral-600 dark:text-neutral-400 uppercase">{{ workout.day }}</span>
                     <div class="relative flex items-center justify-center">
                         <div
-                            class="h-9 w-9 rounded-full flex items-center justify-center shadow-xs transition-transform duration-200 hover:scale-110"
+                            class="h-7 w-7 sm:h-9 sm:w-9 rounded-full flex items-center justify-center shadow-xs transition-transform duration-200 hover:scale-110"
                             :class="workout.completed
                                 ? 'bg-emerald-500 text-white'
                                 : workout.type === 'Descanso'
                                     ? 'bg-neutral-200 dark:bg-neutral-600 text-neutral-400 dark:text-neutral-300'
                                     : 'bg-amber-500 text-white'"
                         >
-                            <Check v-if="workout.completed" class="h-4 w-4" />
-                            <span v-else class="text-xs font-bold">{{ workout.type === 'Descanso' ? '—' : '!' }}</span>
+                            <Check v-if="workout.completed" class="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span v-else class="text-[10px] sm:text-xs font-bold">{{ workout.type === 'Descanso' ? '—' : '!' }}</span>
                         </div>
                     </div>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium leading-tight text-center">
+                    <span class="text-[9px] sm:text-[10px] text-neutral-500 dark:text-neutral-400 font-medium leading-tight text-center">
                         {{ workout.type }}
                     </span>
                 </div>

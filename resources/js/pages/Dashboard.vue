@@ -72,6 +72,7 @@ defineProps<{
     completedWorkouts?: { id: number; name: string; exercises: number; completed_at: string }[];
     hasTodayMeasurement?: boolean;
     clientId?: number;
+    userName?: string;
 }>();
 
 const userRole = computed(() => user.value?.role);
@@ -127,6 +128,7 @@ defineOptions({
 
         <ClientDashboard
             v-else
+            :user-name="userName ?? user.name"
             :stats="{
                 totalWorkouts: stats?.totalWorkouts ?? 0,
                 completedWorkouts: stats?.completedWorkouts ?? 0,

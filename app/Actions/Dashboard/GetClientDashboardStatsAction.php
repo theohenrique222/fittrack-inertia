@@ -42,6 +42,7 @@ class GetClientDashboardStatsAction
             : false;
 
         return [
+            'userName' => $user->name,
             'stats' => [
                 'totalWorkouts' => $totalWorkouts,
                 'completedWorkouts' => $completedWorkouts,
