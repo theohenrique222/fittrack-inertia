@@ -3,6 +3,8 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     Activity,
     ArrowLeft,
+    CalendarDays,
+    Crosshair,
     Droplets,
     Dumbbell,
     Flame,
@@ -209,6 +211,62 @@ function handleEditClick(measurement: Measurement) {
     selectedMeasurement.value = measurement;
     isEditOpen.value = true;
 }
+
+function getBadgeClass(color: string): string {
+    const colorMap: Record<string, string> = {
+        '#059669': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+        '#d97706': 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+        '#dc2626': 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+        '#2563eb': 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+        '#7c3aed': 'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+    };
+
+    return colorMap[color] ?? 'bg-neutral-50 text-neutral-700 dark:bg-neutral-900/30 dark:text-neutral-400';
+}
+
+function formatDateDay(date: string): string {
+    const d = new Date(date);
+
+    return d.getDate().toString().padStart(2, '0');
+}
+
+function formatDateFull(date: string): string {
+    const d = new Date(date);
+
+    return d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function formatTime(date: string): string {
+    const d = new Date(date);
+
+    if (d.getHours() === 0 && d.getMinutes() === 0) {
+return '';
+}
+
+    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+const activityLabels: Record<string, string> = {
+    sedentary: 'Sedentário',
+    light: 'Leve',
+    moderate: 'Moderado',
+    active: 'Ativo',
+    very_active: 'Intenso',
+};
+
+const goalLabels: Record<string, string> = {
+    maintain: 'Manter',
+    lose: 'Perder gordura',
+    gain: 'Ganhar massa',
+};
+
+function activityLabel(value: string): string {
+    return activityLabels[value] ?? value;
+}
+
+function goalLabel(value: string): string {
+    return goalLabels[value] ?? value;
+}
 </script>
 
 <template>
@@ -225,27 +283,28 @@ function handleEditClick(measurement: Measurement) {
         <CompleteProfileCard @saved="handleProfileSaved" />
     </div>
 
-    <div v-else class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+    <div v-else class="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
         <!-- Header -->
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800">
-            <div class="absolute top-0 right-0 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl"></div>
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6 shadow-xl dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 md:p-8">
+            <div class="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl"></div>
+            <div class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/3 h-40 w-40 rounded-full bg-teal-500/5 blur-2xl"></div>
 
-            <div class="relative flex items-center justify-between">
+            <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-4">
                     <Link
                         :href="`/students/${student.id}`"
-                        class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 hover:shadow-lg"
                     >
                         <ArrowLeft class="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 class="text-xl font-bold text-white">Medidas Corporais</h1>
-                        <p class="text-sm text-neutral-300">{{ student.name }}</p>
+                        <h1 class="text-2xl font-bold tracking-tight text-white">Medidas Corporais</h1>
+                        <p class="mt-0.5 text-sm text-neutral-400">{{ student.name }}</p>
                     </div>
                 </div>
                 <Button
-                    class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 hover:brightness-110"
+                    class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 hover:brightness-110"
                     @click="isCreateOpen = true"
                 >
                     <Plus class="mr-2 h-4 w-4" />
@@ -255,27 +314,35 @@ function handleEditClick(measurement: Measurement) {
         </div>
 
         <!-- Métricas Atuais -->
-        <div v-if="latest" class="space-y-4">
-            <h2 class="flex items-center gap-2 text-lg font-semibold text-neutral-900 dark:text-white">
-                <TrendingUp class="h-5 w-5 text-emerald-500" />
-                Métricas Atuais
-                <span class="text-sm font-normal text-neutral-400">· {{ latest.recorded_at }}</span>
-            </h2>
+        <div v-if="latest" class="space-y-5">
+            <div class="flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+                    <TrendingUp class="h-4 w-4 text-white" />
+                </div>
+                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                    Métricas Atuais
+                </h2>
+                <span class="text-sm text-neutral-400">· {{ latest.recorded_at }}</span>
+            </div>
 
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 <div
                     v-for="card in metricCards"
                     :key="card.label"
-                    class="group rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800"
+                    class="group relative overflow-hidden rounded-xl border border-neutral-200/60 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-neutral-700/60 dark:bg-neutral-800/80"
                 >
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ card.label }}</p>
-                            <p class="mt-1 text-2xl font-bold text-neutral-900 dark:text-white">{{ card.value }}</p>
-                            <p class="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{{ card.sub }}</p>
+                    <div class="absolute top-0 right-0 h-24 w-24 rounded-bl-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        :class="card.bg">
+                    </div>
+                    <div class="relative flex items-start gap-4">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm"
+                            :class="[card.bg, card.iconColor]">
+                            <component :is="card.icon" class="h-6 w-6" />
                         </div>
-                        <div :class="['flex h-10 w-10 items-center justify-center rounded-xl', card.bg]">
-                            <component :is="card.icon" :class="['h-5 w-5', card.iconColor]" />
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-medium tracking-wide text-neutral-500 dark:text-neutral-400 uppercase">{{ card.label }}</p>
+                            <p class="mt-1 truncate text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">{{ card.value }}</p>
+                            <p class="mt-0.5 truncate text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ card.sub }}</p>
                         </div>
                     </div>
                 </div>
@@ -285,17 +352,17 @@ function handleEditClick(measurement: Measurement) {
         <!-- Empty State -->
         <div
             v-else
-            class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-20 text-center dark:border-neutral-700 dark:bg-neutral-900/50"
+            class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-300 bg-gradient-to-b from-neutral-50 to-white py-24 text-center dark:border-neutral-700 dark:from-neutral-900/30 dark:to-neutral-900/10"
         >
-            <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-700">
-                <Ruler class="h-10 w-10 text-neutral-400" />
+            <div class="mb-6 flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-neutral-100 to-neutral-200 shadow-inner dark:from-neutral-800 dark:to-neutral-700">
+                <Ruler class="h-12 w-12 text-neutral-400" />
             </div>
-            <h3 class="text-xl font-bold text-neutral-900 dark:text-white">Nenhuma medição registrada</h3>
-            <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 max-w-md">
+            <h3 class="text-2xl font-bold text-neutral-900 dark:text-white">Nenhuma medição registrada</h3>
+            <p class="mt-2 max-w-md text-sm text-neutral-500 dark:text-neutral-400">
                 Registre a primeira medição corporal de {{ student.name }} para começar a acompanhar a evolução.
             </p>
             <Button
-                class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 hover:brightness-110"
+                class="mt-8 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 hover:brightness-110"
                 @click="isCreateOpen = true"
             >
                 <Plus class="mr-2 h-5 w-5" />
@@ -304,104 +371,132 @@ function handleEditClick(measurement: Measurement) {
         </div>
 
         <!-- Histórico -->
-        <div v-if="measurementsData.length > 0" class="rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-            <div class="border-b border-neutral-200 px-6 py-4 dark:border-neutral-700">
-                <h3 class="font-semibold text-neutral-900 dark:text-white">Histórico de Medições</h3>
+        <div v-if="measurementsData.length > 0" class="space-y-5">
+            <div class="flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-neutral-600 to-neutral-700">
+                    <CalendarDays class="h-4 w-4 text-white" />
+                </div>
+                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                    Histórico de Medições
+                </h2>
+                <span class="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
+                    {{ measurementsData.length }}
+                </span>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-neutral-100 bg-neutral-50 text-left text-xs font-medium text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400">
-                            <th class="px-6 py-3">Data</th>
-                            <th class="px-4 py-3">Peso</th>
-                            <th class="px-4 py-3">Altura</th>
-                            <th class="px-4 py-3">IMC</th>
-                            <th class="px-4 py-3">% Gordura</th>
-                            <th class="px-4 py-3">M. Magra</th>
-                            <th class="px-4 py-3">TMB</th>
-                            <th class="px-4 py-3">Nível</th>
-                            <th class="px-4 py-3">Objetivo</th>
-                            <th class="px-2 py-3 text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
-                        <tr
-                            v-for="m in measurementsData"
-                            :key="m.id"
-                            class="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-700/50"
-                        >
-                            <td class="whitespace-nowrap px-6 py-4 font-medium text-neutral-900 dark:text-white">
-                                {{ m.recorded_at }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-neutral-700 dark:text-neutral-300">
-                                {{ m.weight }} kg
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-neutral-700 dark:text-neutral-300">
-                                {{ m.height }} cm
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4">
-                                <span
-                                    v-if="m.metrics"
-                                    class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
-                                    :style="{
-                                        backgroundColor: m.metrics.bmi.color + '20',
-                                        color: m.metrics.bmi.color,
-                                    }"
-                                >
-                                    {{ m.metrics.bmi.value }}
+            <div class="space-y-4">
+                <div
+                    v-for="(m, index) in measurementsData"
+                    :key="m.id"
+                    class="group relative"
+                >
+                    <!-- Timeline line -->
+                    <div
+                        v-if="index < measurementsData.length - 1"
+                        class="absolute left-6 top-14 bottom-0 w-px bg-gradient-to-b from-emerald-200 via-emerald-100 to-transparent dark:from-emerald-800 dark:via-emerald-900/50"
+                    ></div>
+
+                    <div class="relative flex items-start gap-5">
+                        <!-- Timeline dot -->
+                        <div class="relative z-10 flex shrink-0 items-center justify-center">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-emerald-200 bg-white shadow-sm dark:border-emerald-700 dark:bg-neutral-800">
+                                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                    {{ formatDateDay(m.recorded_at) }}
                                 </span>
-                                <span v-else class="text-neutral-400">—</span>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-neutral-700 dark:text-neutral-300">
-                                <span v-if="m.metrics">{{ m.metrics.body_fat.value }}%</span>
-                                <span v-else class="text-neutral-400">—</span>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-neutral-700 dark:text-neutral-300">
-                                <span v-if="m.metrics">{{ m.metrics.lean_mass }} kg</span>
-                                <span v-else class="text-neutral-400">—</span>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-neutral-700 dark:text-neutral-300">
-                                <span v-if="m.metrics">{{ m.metrics.bmr }} kcal</span>
-                                <span v-else class="text-neutral-400">—</span>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4">
-                                <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
-                                    {{ m.activity_level }}
-                                </span>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-4">
-                                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                                    {{ m.goal }}
-                                </span>
-                            </td>
-                            <td class="whitespace-nowrap px-2 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1">
+                            </div>
+                        </div>
+
+                        <!-- Card -->
+                        <div class="min-w-0 flex-1 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800/80 dark:hover:border-emerald-700">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                                        {{ formatDateFull(m.recorded_at) }}
+                                    </p>
+                                    <p class="mt-0.5 text-sm text-neutral-400 dark:text-neutral-500">
+                                        {{ formatTime(m.recorded_at) }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-1">
                                     <button
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 opacity-0 transition-all hover:bg-emerald-50 hover:text-emerald-600 group-hover:opacity-100 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400"
                                         title="Editar medida"
                                         @click="handleEditClick(m)"
                                     >
                                         <Pencil class="h-4 w-4" />
                                     </button>
                                     <button
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-900/20 dark:hover:text-red-400"
                                         title="Excluir medida"
                                         @click="handleDeleteMeasurement(m.id)"
                                     >
                                         <Trash2 class="h-4 w-4" />
                                     </button>
                                 </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+
+                            <!-- Key metrics grid -->
+                            <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Peso</p>
+                                    <p class="mt-0.5 text-lg font-bold text-neutral-900 dark:text-white">{{ m.weight }} <span class="text-sm font-medium text-neutral-400">kg</span></p>
+                                </div>
+                                <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Altura</p>
+                                    <p class="mt-0.5 text-lg font-bold text-neutral-900 dark:text-white">{{ m.height }} <span class="text-sm font-medium text-neutral-400">cm</span></p>
+                                </div>
+                                <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">IMC</p>
+                                    <p v-if="m.metrics" class="mt-0.5 text-lg font-bold text-neutral-900 dark:text-white">
+                                        {{ m.metrics.bmi.value }}
+                                        <span class="ml-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold align-middle" :class="getBadgeClass(m.metrics.bmi.color)">
+                                            {{ m.metrics.bmi.classification }}
+                                        </span>
+                                    </p>
+                                    <p v-else class="mt-0.5 text-neutral-400">—</p>
+                                </div>
+                                <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-700/50">
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">% Gordura</p>
+                                    <p v-if="m.metrics" class="mt-0.5 text-lg font-bold text-neutral-900 dark:text-white">
+                                        {{ m.metrics.body_fat.value }}<span class="text-sm font-medium text-neutral-400">%</span>
+                                    </p>
+                                    <p v-else class="mt-0.5 text-neutral-400">—</p>
+                                </div>
+                            </div>
+
+                            <!-- Secondary info row -->
+                            <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                                <span v-if="m.metrics" class="inline-flex items-center gap-1">
+                                    <Flame class="h-3.5 w-3.5 text-orange-400" />
+                                    TMB: {{ m.metrics.bmr }} kcal
+                                </span>
+                                <span v-if="m.metrics" class="inline-flex items-center gap-1">
+                                    <Dumbbell class="h-3.5 w-3.5 text-emerald-400" />
+                                    M. Magra: {{ m.metrics.lean_mass }} kg
+                                </span>
+                                <span class="inline-flex items-center gap-1">
+                                    <Activity class="h-3.5 w-3.5 text-blue-400" />
+                                    {{ activityLabel(m.activity_level) }}
+                                </span>
+                                <span class="inline-flex items-center gap-1">
+                                    <Crosshair class="h-3.5 w-3.5 text-violet-400" />
+                                    {{ goalLabel(m.goal) }}
+                                </span>
+                            </div>
+
+                            <!-- Notes -->
+                            <p v-if="m.notes" class="mt-3 border-t border-neutral-100 pt-3 text-sm italic text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                                {{ m.notes }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Paginação -->
             <div
                 v-if="measurements.meta?.last_page > 1"
-                class="flex items-center justify-between border-t border-neutral-200 px-6 py-4 dark:border-neutral-700"
+                class="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-6 py-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800"
             >
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">
                     Página {{ measurements.meta.current_page }} de {{ measurements.meta.last_page }}
