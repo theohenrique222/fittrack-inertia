@@ -32,6 +32,7 @@ class GetClientDashboardStatsAction
                 ->count('workout_id')
             : 0;
         $currentStreak = $this->calculateStreak($user);
+        $recentAchievements = $this->getRecentAchievements($user, $currentStreak, $completedWorkouts);
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
 
         $latestMeasurement = $client ? $this->latestMeasurementAction->execute($client) : null;
@@ -56,7 +57,7 @@ class GetClientDashboardStatsAction
             'nutritionData' => $latestMeasurement ? $this->getNutritionData($latestMeasurement) : $this->emptyNutritionData(),
             'bodyMetrics' => $latestMeasurement ? $this->getBodyMetrics($latestMeasurement) : [],
             'upcomingWorkouts' => $this->getUpcomingWorkouts($user),
-            'recentAchievements' => $this->getRecentAchievements($user),
+            'recentAchievements' => $recentAchievements,
             'trainer' => $this->getTrainerInfo($user),
             'hasTodayMeasurement' => $todayMeasurement,
             'clientId' => $client?->id,
@@ -213,13 +214,16 @@ class GetClientDashboardStatsAction
             return 0;
         }
 
-        $streak = 0;
-        $today = now()->startOfDay();
+        $streak = 1;
+        $lastDate = $dates[0]->startOfDay();
 
-        foreach ($dates as $date) {
-            $expected = $today->copy()->subDays($streak);
-            if ($date->startOfDay()->eq($expected)) {
+        for ($i = 1; $i < $dates->count(); $i++) {
+            $currentDate = $dates[$i]->startOfDay();
+            $expected = $lastDate->copy()->subDay();
+
+            if ($currentDate->eq($expected)) {
                 $streak++;
+                $lastDate = $currentDate;
             } else {
                 break;
             }
@@ -266,16 +270,16 @@ class GetClientDashboardStatsAction
         return $weeklyWorkouts;
     }
 
-    private function getRecentAchievements(User $user): array
+    private function getRecentAchievements(User $user, ?int $preCalculatedStreak = null, ?int $preCalculatedCompleted = null): array
     {
         $client = Client::where('user_id', $user->id)->first();
-        $totalCompleted = $client
+        $totalCompleted = $preCalculatedCompleted ?? ($client
             ? WorkoutSession::where('client_id', $client->id)
                 ->where('status', 'completed')
                 ->distinct('workout_id')
                 ->count('workout_id')
-            : 0;
-        $streak = $this->calculateStreak($user);
+            : 0);
+        $streak = $preCalculatedStreak ?? $this->calculateStreak($user);
 
         $achievements = [];
 
