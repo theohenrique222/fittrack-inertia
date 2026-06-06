@@ -91,29 +91,8 @@ function submit() {
     <Head title="Configurações do perfil" />
 
     <div class="space-y-10">
-        <div class="flex items-center gap-5">
-            <Avatar class="h-14 w-14 rounded-full ring-2 ring-border">
-                <AvatarImage
-                    v-if="photoPreview ?? user.profile_photo_url"
-                    :src="photoPreview ?? user.profile_photo_url!"
-                    :alt="user.name"
-                />
-                <AvatarFallback class="rounded-full text-lg font-medium">
-                    {{ getInitials(user.name) }}
-                </AvatarFallback>
-            </Avatar>
-            <div class="space-y-0.5">
-                <h1 class="text-xl font-semibold tracking-tight">
-                    {{ user.name }}
-                </h1>
-                <p class="text-sm text-muted-foreground">
-                    Gerencie suas informações pessoais
-                </p>
-            </div>
-        </div>
-
         <Card class="overflow-hidden p-0 w-full">
-            <div class="h-1.5 w-full bg-gradient-to-r from-primary/80 to-primary/30" />
+            <div class="h-1.5 w-full bg-linear-to-r frto-emerald-500/80 to-emerald-500/30" />
 
             <div class="p-6 sm:p-8">
                 <CardHeader class="px-0 pt-0">
@@ -123,7 +102,7 @@ function submit() {
                     </CardDescription>
                 </CardHeader>
 
-                <CardContent class="px-0 pb-0">
+                <CardContent class="px-0 pb-0 py-2">
                     <form @submit.prevent="submit" class="space-y-6">
                         <div class="flex items-center gap-4">
                             <Avatar class="h-20 w-20 rounded-full ring-2 ring-border">
@@ -177,7 +156,6 @@ function submit() {
                                 id="name"
                                 v-model="form.name"
                                 required
-                                autocomplete="name"
                                 placeholder="Seu nome completo"
                             />
                             <InputError :message="form.errors.name" />
@@ -188,7 +166,6 @@ function submit() {
                             <Input
                                 id="nickname"
                                 v-model="form.nickname"
-                                autocomplete="nickname"
                                 placeholder="Como gosta de ser chamado"
                             />
                             <InputError :message="form.errors.nickname" />
