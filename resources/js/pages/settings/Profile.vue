@@ -47,7 +47,6 @@ const form = useForm({
     nickname: props.nickname ?? '',
     profile_photo: null as File | null,
     remove_photo: false,
-    _method: 'PATCH',
 });
 
 const photoPreview = ref<string | null>(null);
@@ -79,7 +78,7 @@ function clearPhoto() {
 }
 
 function submit() {
-    form.post(ProfileController.update.url(), {
+    form.post(ProfileController.update.url({ query: { _method: 'PATCH' } }), {
         onSuccess: () => {
             form.reset('profile_photo', 'remove_photo');
         },
