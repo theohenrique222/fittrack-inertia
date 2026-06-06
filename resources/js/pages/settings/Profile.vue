@@ -112,7 +112,7 @@ function submit() {
             </div>
         </div>
 
-        <Card class="overflow-hidden p-0">
+        <Card class="overflow-hidden p-0 w-full">
             <div class="h-1.5 w-full bg-gradient-to-r from-primary/80 to-primary/30" />
 
             <div class="p-6 sm:p-8">
