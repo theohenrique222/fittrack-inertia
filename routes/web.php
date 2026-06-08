@@ -16,6 +16,10 @@ use App\Http\Controllers\Exercises\DestroyExerciseController;
 use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
+use App\Http\Controllers\Payments\ListPaymentsController;
+use App\Http\Controllers\Payments\MarkPaymentAsPaidController;
+use App\Http\Controllers\Payments\ReopenPaymentController;
+use App\Http\Controllers\Payments\StorePaymentController;
 use App\Http\Controllers\Plans\DestroyPlanController;
 use App\Http\Controllers\Plans\ListPlansController;
 use App\Http\Controllers\Plans\StorePlanController;
@@ -256,6 +260,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('plans/{plan}', DestroyPlanController::class)->name('plans.destroy');
 
     Route::put('students/{student}/plan', UpdateStudentPlanController::class)->name('students.plan.update');
+
+    Route::get('payments', ListPaymentsController::class)->name('payments');
+    Route::post('payments', StorePaymentController::class)->name('payments.store');
+    Route::put('payments/{payment}/mark-as-paid', MarkPaymentAsPaidController::class)->name('payments.mark-as-paid');
+    Route::put('payments/{payment}/reopen', ReopenPaymentController::class)->name('payments.reopen');
 });
 
 require __DIR__.'/settings.php';

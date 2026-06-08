@@ -50,6 +50,11 @@ class Client extends Model
         return $this->hasMany(ExerciseCustomWeight::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
