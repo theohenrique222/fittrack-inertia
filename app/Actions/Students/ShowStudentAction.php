@@ -12,7 +12,7 @@ class ShowStudentAction
 {
     public function execute(Client $student): array
     {
-        $student->loadMissing(['user', 'workouts.exercises.category']);
+        $student->loadMissing(['user', 'workouts.exercises.category', 'plan']);
 
         $activeWorkout = $student->workouts
             ->where('is_active', true)

@@ -12,7 +12,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage, useForm } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Calendar,
@@ -25,16 +25,22 @@ import {
     User,
     Activity,
     TrendingUp,
-    Clock,
     ChevronRight,
     Search,
     Plus,
     Ruler,
     Scale,
+    CreditCard,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -42,6 +48,13 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Sheet,
     SheetContent,
@@ -76,6 +89,12 @@ interface Student {
     name: string;
     email: string;
     nickname?: string;
+    plan?: {
+        id: number;
+        name: string;
+        price: number;
+    } | null;
+    plan_id?: number | null;
 }
 
 interface ExerciseOption {
@@ -142,6 +161,12 @@ interface Stats {
     latest_measurement?: LatestMeasurement | null;
 }
 
+interface PlanOption {
+    id: number;
+    name: string;
+    price: number;
+}
+
 const props = defineProps<{
     title: string;
     student: Student;
@@ -150,6 +175,7 @@ const props = defineProps<{
     stats: Stats;
     exercises: ExerciseOption[];
     categories: CategoryOption[];
+    plans?: PlanOption[];
 }>();
 
 const isCreateOpen = ref(false);
@@ -255,6 +281,21 @@ const avatarColors = [
 
 function getAvatarColor(id: number): string {
     return avatarColors[id % avatarColors.length];
+}
+
+const isPlanChangeOpen = ref(false);
+
+const planForm = useForm({
+    plan_id: String(props.student.plan_id ?? ''),
+});
+
+function handlePlanChange() {
+    planForm.put(`/students/${props.student.id}/plan`, {
+        onSuccess: () => {
+            isPlanChangeOpen.value = false;
+        },
+        preserveScroll: true,
+    });
 }
 </script>
 
@@ -372,14 +413,17 @@ function getAvatarColor(id: number): string {
                 </div>
             </div>
 
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+            <div
+                class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md cursor-pointer dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-emerald-600"
+                @click="isPlanChangeOpen = true"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
-                        <Clock class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                        <CreditCard class="h-5 w-5 text-orange-600 dark:text-orange-400" />
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ stats.created_at?.split('/')[1] || '-' }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Mês de Início</p>
+                        <p class="text-lg font-bold text-neutral-900 dark:text-white truncate">{{ student.plan?.name || 'Sem Plano' }}</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Plano Atual</p>
                     </div>
                 </div>
             </div>
@@ -789,6 +833,57 @@ function getAvatarColor(id: number): string {
             />
         </SheetContent>
     </Sheet>
+
+    <Dialog v-model:open="isPlanChangeOpen">
+        <DialogContent class="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>Alterar Plano do Aluno</DialogTitle>
+            </DialogHeader>
+
+            <form @submit.prevent="handlePlanChange" class="space-y-4">
+                <div>
+                    <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Selecione o plano
+                    </label>
+                    <Select v-model="planForm.plan_id">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Sem plano..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="">Sem plano</SelectItem>
+                            <SelectItem
+                                v-for="plan in props.plans"
+                                :key="plan.id"
+                                :value="String(plan.id)"
+                            >
+                                {{ plan.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <span v-if="planForm.errors.plan_id" class="text-xs text-red-500">
+                        {{ planForm.errors.plan_id }}
+                    </span>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        @click="isPlanChangeOpen = false"
+                        :disabled="planForm.processing"
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="submit"
+                        :disabled="planForm.processing"
+                    >
+                        {{ planForm.processing ? 'Salvando...' : 'Salvar' }}
+                    </Button>
+                </div>
+            </form>
+        </DialogContent>
+    </Dialog>
 
     <ToastContainer v-model="toasts" />
 </template>

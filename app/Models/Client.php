@@ -17,6 +17,7 @@ class Client extends Model
     protected $fillable = [
         'user_id',
         'nickname',
+        'plan_id',
     ];
 
     public function user()
@@ -47,5 +48,16 @@ class Client extends Model
     public function customWeights(): HasMany
     {
         return $this->hasMany(ExerciseCustomWeight::class);
+    }
+
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
+    public function changePlan(?Plan $plan): void
+    {
+        $this->plan()->associate($plan);
+        $this->save();
     }
 }

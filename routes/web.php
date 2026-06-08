@@ -16,6 +16,11 @@ use App\Http\Controllers\Exercises\DestroyExerciseController;
 use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
+use App\Http\Controllers\Plans\DestroyPlanController;
+use App\Http\Controllers\Plans\ListPlansController;
+use App\Http\Controllers\Plans\StorePlanController;
+use App\Http\Controllers\Plans\UpdatePlanController;
+use App\Http\Controllers\Plans\UpdateStudentPlanController;
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Settings\CompleteProfileController;
 use App\Http\Controllers\Students\DestroyStudentController;
@@ -244,6 +249,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('measurements', ListMeasurementsOverviewController::class)->name('measurements');
     Route::get('reports', ReportsController::class)->name('reports');
     Route::get('me/workouts', ListStudentWorkoutsController::class)->name('me.workouts');
+
+    Route::get('plans', ListPlansController::class)->name('plans');
+    Route::post('plans', StorePlanController::class)->name('plans.store');
+    Route::put('plans/{plan}', UpdatePlanController::class)->name('plans.update');
+    Route::delete('plans/{plan}', DestroyPlanController::class)->name('plans.destroy');
+
+    Route::put('students/{student}/plan', UpdateStudentPlanController::class)->name('students.plan.update');
 });
 
 require __DIR__.'/settings.php';
