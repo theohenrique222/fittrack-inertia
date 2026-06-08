@@ -27,14 +27,15 @@ import {
 import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import { ToastContainer } from '@/components/ui/toast';
 import { useToast } from '@/composables/useToast';
 import CreatePlanSheet from '@/pages/plans/components/CreatePlanSheet.vue';
@@ -158,24 +159,27 @@ function formatPrice(value: number): string {
                     </p>
                 </div>
 
-                <Dialog v-model:open="isCreateOpen">
-                    <DialogTrigger as-child>
+                <Sheet v-model:open="isCreateOpen">
+                    <SheetTrigger as-child>
                         <Button
                             class="inline-flex items-center gap-2 border-0 bg-white text-emerald-700 shadow-lg transition-all hover:bg-emerald-50 hover:shadow-xl active:scale-95"
                         >
                             <Plus class="h-4 w-4" />
                             Novo Plano
                         </Button>
-                    </DialogTrigger>
+                    </SheetTrigger>
 
-                    <DialogContent class="max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Criar Plano</DialogTitle>
-                        </DialogHeader>
+                    <SheetContent side="right" class="flex flex-col p-0 sm:max-w-md">
+                        <SheetHeader class="border-b border-border px-4 py-4">
+                            <SheetTitle>Criar Plano</SheetTitle>
+                            <SheetDescription>
+                                Preencha os dados para cadastrar um novo plano de assinatura
+                            </SheetDescription>
+                        </SheetHeader>
 
                         <CreatePlanSheet @close="closeCreateSheet" />
-                    </DialogContent>
-                </Dialog>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div class="relative z-10 grid grid-cols-3 gap-3">
