@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { LayoutGrid, Dumbbell, BarChart3, GraduationCap, Ruler, Users, Play } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -22,18 +22,18 @@ import type { NavItem } from '@/types';
 
 const page = usePage();
 
-const can = page.props.auth.can;
-const user = page.props.auth.user;
-const clientId = page.props.auth.client_id;
+const can = computed(() => page.props.auth.can);
+const user = computed(() => page.props.auth.user);
+const clientId = computed(() => page.props.auth.client_id);
 
-const mainNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
     {
         title: 'Painel de Controle',
         href: dashboard(),
         icon: LayoutGrid,
     },
 
-    ...(can.view_students && !can.impersonate
+    ...(can.value?.view_students && !can.value?.impersonate
         ? [
               {
                   title: 'Alunos',
@@ -43,7 +43,7 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(can.view_trainers
+    ...(can.value?.view_trainers
         ? [
               {
                   title: 'Treinadores',
@@ -53,7 +53,7 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(can.impersonate
+    ...(can.value?.impersonate
         ? [
               {
                   title: 'Todos os Alunos',
@@ -63,7 +63,7 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(can.view_students || can.view_trainers
+    ...(can.value?.view_students || can.value?.view_trainers
         ? [
               {
                   title: 'Exercícios',
@@ -73,7 +73,7 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(can.view_students
+    ...(can.value?.view_students
         ? [
               {
                   title: 'Relatórios',
@@ -83,7 +83,7 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(user?.role === 'client'
+    ...(user.value?.role === 'client'
         ? [
               {
                   title: 'Meus Treinos',
@@ -93,18 +93,18 @@ const mainNavItems: NavItem[] = [
           ]
         : []),
 
-    ...(can.view_students || user?.role === 'client'
+    ...(can.value?.view_students || user.value?.role === 'client'
         ? [
               {
                   title: 'Medidas',
-                  href: user?.role === 'client' && clientId
-                      ? `/students/${clientId}/measurements`
+                  href: user.value?.role === 'client' && clientId.value
+                      ? `/students/${clientId.value}/measurements`
                       : measurements(),
                   icon: Ruler,
               },
           ]
         : []),
-];
+]);
 </script>
 
 <template>
