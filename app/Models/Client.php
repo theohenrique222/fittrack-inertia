@@ -43,4 +43,9 @@ class Client extends Model
     {
         return $this->hasMany(WorkoutSession::class);
     }
+
+    public function customWeights(): HasMany
+    {
+        return $this->hasMany(ExerciseCustomWeight::class);
+    }
 }

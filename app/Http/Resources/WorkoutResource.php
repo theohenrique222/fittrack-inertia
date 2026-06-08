@@ -53,6 +53,7 @@ class WorkoutResource extends JsonResource
                     'sets' => $exercise->pivot->sets,
                     'reps' => $exercise->pivot->reps,
                     'rest_seconds' => $exercise->pivot->rest_seconds,
+                    'weight' => $exercise->pivot->weight ? (float) $exercise->pivot->weight : null,
                     'order' => $exercise->pivot->order,
                     'notes' => $exercise->pivot->notes,
                 ],

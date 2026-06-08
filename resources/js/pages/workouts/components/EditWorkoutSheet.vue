@@ -35,6 +35,7 @@ interface WorkoutExercise {
     sets: number;
     reps: number;
     rest_seconds: number;
+    weight: number | null;
     order: number;
     notes: string;
 }
@@ -52,6 +53,7 @@ interface Workout {
             sets: number;
             reps: number;
             rest_seconds: number;
+            weight: number | null;
             order: number;
             notes?: string;
         };
@@ -78,6 +80,7 @@ watch(
             sets: ex.pivot.sets,
             reps: ex.pivot.reps,
             rest_seconds: ex.pivot.rest_seconds,
+            weight: ex.pivot.weight ?? null,
             order: ex.pivot.order,
             notes: ex.pivot.notes ?? '',
         })) ?? [];
@@ -99,6 +102,7 @@ function addExercise() {
         sets: 3,
         reps: 10,
         rest_seconds: 60,
+        weight: null,
         order: workoutExercises.value.length,
         notes: '',
     });
@@ -286,7 +290,7 @@ function handleCancel() {
                                 </Select>
                             </div>
 
-                            <div class="grid grid-cols-3 gap-3">
+                            <div class="grid grid-cols-4 gap-3">
                                 <div>
                                     <Label class="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5 flex items-center gap-1">
                                         <ChevronDown class="w-3 h-3" />
@@ -377,6 +381,20 @@ function handleCancel() {
                                             <Plus class="w-4 h-4" />
                                         </button>
                                     </div>
+                                </div>
+
+                                <div>
+                                    <Label class="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5 flex items-center gap-1">
+                                        Peso (kg)
+                                    </Label>
+                                    <Input
+                                        v-model.number="exercise.weight"
+                                        type="number"
+                                        min="0"
+                                        step="0.5"
+                                        class="h-9"
+                                        placeholder="—"
+                                    />
                                 </div>
                             </div>
 

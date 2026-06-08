@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Workouts;
 
 use App\Actions\Exercises\ListExercisesAction;
+use App\Actions\Workouts\ListExerciseCustomWeightsAction;
 use App\Actions\Workouts\StartWorkoutSessionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WorkoutResource;
@@ -19,6 +20,7 @@ class ShowWorkoutDetailController extends Controller
         Workout $workout,
         ListExercisesAction $exercisesAction,
         StartWorkoutSessionAction $startSession,
+        ListExerciseCustomWeightsAction $customWeightsAction,
         Request $request,
     ): Response {
         $this->authorize('view', $workout);
@@ -28,6 +30,7 @@ class ShowWorkoutDetailController extends Controller
         $client = Client::where('user_id', $request->user()->id)->first();
 
         $session = null;
+        $customWeights = [];
         if ($client) {
             $session = WorkoutSession::where([
                 'workout_id' => $workout->id,
@@ -40,6 +43,10 @@ class ShowWorkoutDetailController extends Controller
             }
 
             $workout->load('completions');
+
+            $customWeights = $customWeightsAction->execute($workout->id, $client->id)
+                ->mapWithKeys(fn ($cw) => [$cw->exercise_id => $cw->weight !== null ? (float) $cw->weight : null])
+                ->toArray();
         }
 
         $exercises = $exercisesAction->execute();
@@ -51,6 +58,7 @@ class ShowWorkoutDetailController extends Controller
                 'id' => $session->id,
                 'started_at' => $session->started_at,
             ] : null,
+            'customWeights' => $customWeights,
         ]);
     }
 }

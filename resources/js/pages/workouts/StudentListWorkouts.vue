@@ -27,6 +27,7 @@ interface ExercisePivot {
     sets: number;
     reps: number;
     rest_seconds: number;
+    weight: number | null;
     order: number;
     notes?: string;
 }
@@ -71,6 +72,7 @@ const props = defineProps<{
         totalExercises: number;
         totalCompleted: number;
     };
+    customWeights?: Record<number, Record<number, number | null>>;
 }>();
 
 const searchQuery = ref('');
@@ -198,6 +200,16 @@ function startWorkout() {
         isDialogOpen.value = false;
         router.visit(`/workouts/${selectedWorkout.value.id}`);
     }
+}
+
+function effectiveWeight(workoutId: number, exerciseId: number, pivotWeight: number | null): number | null {
+    const custom = props.customWeights?.[workoutId]?.[exerciseId];
+
+    if (custom !== undefined && custom !== null) {
+        return custom;
+    }
+
+    return pivotWeight ?? null;
 }
 
 function formatRest(seconds: number): string {
@@ -539,6 +551,10 @@ return null;
                                 <span>{{ exercise.pivot.reps }} reps</span>
                                 <span v-if="exercise.pivot.rest_seconds" class="text-neutral-300 dark:text-neutral-600">·</span>
                                 <span v-if="exercise.pivot.rest_seconds">descanso {{ formatRest(exercise.pivot.rest_seconds) }}</span>
+                                <span v-if="effectiveWeight(selectedWorkout?.id ?? 0, exercise.id, exercise.pivot.weight)" class="text-neutral-300 dark:text-neutral-600">·</span>
+                                <span v-if="effectiveWeight(selectedWorkout?.id ?? 0, exercise.id, exercise.pivot.weight)" class="font-medium text-amber-600 dark:text-amber-400">
+                                    {{ effectiveWeight(selectedWorkout?.id ?? 0, exercise.id, exercise.pivot.weight) }} kg
+                                </span>
                             </div>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ interface WorkoutExercise {
         sets: number;
         reps: number;
         rest_seconds: number;
+        weight: number | null;
         order: number;
         notes?: string;
     };
@@ -166,6 +167,11 @@ function getExerciseIcon(index: number): string {
                                         <span class="text-sm font-bold text-neutral-900 dark:text-white">{{ formatRest(exercise.pivot.rest_seconds) }}</span>
                                         <span class="text-xs text-neutral-500 dark:text-neutral-400">descanso</span>
                                     </div>
+                                </div>
+
+                                <div v-if="exercise.pivot.weight" class="flex items-center gap-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2">
+                                    <span class="text-lg font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.weight }}</span>
+                                    <span class="text-xs text-neutral-500 dark:text-neutral-400">kg</span>
                                 </div>
                             </div>
 

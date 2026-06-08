@@ -41,9 +41,15 @@ class Workout extends Model
     public function exercises(): BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'exercise_workout')
-            ->withPivot('sets', 'reps', 'rest_seconds', 'order', 'notes')
+            ->using(WorkoutExercise::class)
+            ->withPivot('sets', 'reps', 'rest_seconds', 'weight', 'order', 'notes')
             ->withTimestamps()
             ->orderByPivot('order');
+    }
+
+    public function customWeights(): HasMany
+    {
+        return $this->hasMany(ExerciseCustomWeight::class);
     }
 
     public function completions(): HasMany

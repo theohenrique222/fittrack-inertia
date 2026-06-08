@@ -39,6 +39,7 @@ use App\Http\Controllers\Workouts\DestroyWorkoutController;
 use App\Http\Controllers\Workouts\GenerateWorkoutController;
 use App\Http\Controllers\Workouts\ListStudentWorkoutsController;
 use App\Http\Controllers\Workouts\ShowWorkoutDetailController;
+use App\Http\Controllers\Workouts\StoreExerciseCustomWeightController;
 use App\Http\Controllers\Workouts\StoreWorkoutController;
 use App\Http\Controllers\Workouts\ToggleExerciseCompletionController;
 use App\Http\Controllers\Workouts\UpdateWorkoutController;
@@ -218,6 +219,11 @@ $router
 $router
     ->post(uri: '/workouts/{workout}/exercises/{exercise}/toggle-completion', action: ToggleExerciseCompletionController::class)
     ->name('workouts.exercises.toggle-completion')
+    ->middleware('auth');
+
+$router
+    ->post(uri: '/workouts/{workout}/exercises/{exercise}/custom-weight', action: StoreExerciseCustomWeightController::class)
+    ->name('workouts.exercises.custom-weight')
     ->middleware('auth');
 
 $router

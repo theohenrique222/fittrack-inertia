@@ -2,22 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class WorkoutExercise extends Pivot
+class ExerciseCustomWeight extends Model
 {
-    protected $table = 'exercise_workout';
-
     protected $fillable = [
         'workout_id',
         'exercise_id',
-        'sets',
-        'reps',
-        'rest_seconds',
+        'client_id',
         'weight',
-        'order',
-        'notes',
     ];
 
     protected function casts(): array
@@ -35,5 +29,10 @@ class WorkoutExercise extends Pivot
     public function exercise(): BelongsTo
     {
         return $this->belongsTo(Exercise::class);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
     }
 }

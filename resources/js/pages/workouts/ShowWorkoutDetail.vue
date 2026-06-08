@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Check,
@@ -11,6 +11,7 @@ import {
     Info,
     Film,
     Image as ImageIcon,
+    Weight as WeightIcon,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +33,7 @@ interface ExercisePivot {
     sets: number;
     reps: number;
     rest_seconds: number;
+    weight: number | null;
     order: number;
     notes?: string;
 }
@@ -74,6 +76,7 @@ const props = defineProps<{
     workout: Workout;
     exercises: Exercise[];
     session: Session | null;
+    customWeights?: Record<number, number | null>;
 }>();
 
 const page = usePage();
@@ -182,6 +185,7 @@ const sessionId = computed(() => props.session?.id);
 
 function openExerciseDetail(exercise: Exercise) {
     selectedExercise.value = exercise;
+    customWeightForm.weight = effectiveWeight(exercise) ?? null;
     isExerciseDetailOpen.value = true;
 }
 
@@ -207,6 +211,37 @@ function getDifficultyColor(difficulty?: string): string {
         default:
             return 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300';
     }
+}
+
+const customWeightForm = useForm({
+    weight: null as number | null,
+});
+
+function saveCustomWeight() {
+    if (!selectedExercise.value || !sessionId.value) {
+        return;
+    }
+
+    customWeightForm.post(
+        `/workouts/${(page.props as any).workout.id}/exercises/${selectedExercise.value.id}/custom-weight`,
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                customWeightForm.defaults('weight', customWeightForm.weight);
+            },
+        },
+    );
+}
+
+function effectiveWeight(exercise: Exercise): number | null {
+    const custom = props.customWeights?.[exercise.id];
+
+    if (custom !== undefined && custom !== null) {
+        return custom;
+    }
+
+    return exercise.pivot.weight ?? null;
 }
 
 function getDifficultyLabel(difficulty?: string): string {
@@ -452,7 +487,7 @@ function completeWorkout() {
                                                 <ChevronRight class="h-5 w-5 text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-500 transition-colors shrink-0 mt-1" />
                                             </div>
 
-                                            <div class="mt-3 grid grid-cols-3 gap-3">
+                                            <div class="mt-3 grid grid-cols-4 gap-3">
                                                 <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
                                                     <p class="text-xs text-neutral-500 dark:text-neutral-400">Séries</p>
                                                     <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ exercise.pivot.sets }}</p>
@@ -466,6 +501,12 @@ function completeWorkout() {
                                                 <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-lg p-2 text-center">
                                                     <p class="text-xs text-neutral-500 dark:text-neutral-400">Descanso</p>
                                                     <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ formatRestSeconds(exercise.pivot.rest_seconds) }}</p>
+                                                </div>
+
+                                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 text-center">
+                                                    <p class="text-xs text-amber-600 dark:text-amber-400">Carga</p>
+                                                    <p class="text-lg font-bold text-neutral-900 dark:text-white">{{ effectiveWeight(exercise) ?? '—' }}</p>
+                                                    <p v-if="effectiveWeight(exercise)" class="text-xs text-amber-500 dark:text-amber-400">kg</p>
                                                 </div>
                                             </div>
 
@@ -638,6 +679,46 @@ function completeWorkout() {
                         <div class="bg-violet-50 dark:bg-violet-900/20 rounded-xl p-3 text-center">
                             <p class="text-xs font-medium text-violet-600 dark:text-violet-400">Descanso</p>
                             <p class="text-2xl font-bold text-violet-700 dark:text-violet-300">{{ formatRestSeconds(selectedExercise.pivot.rest_seconds) }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Weight / Custom Weight -->
+                    <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                                <WeightIcon class="w-3.5 h-3.5" />
+                                Carga (kg)
+                            </p>
+                            <div class="text-xs text-amber-500 dark:text-amber-400">
+                                <span v-if="props.customWeights?.[selectedExercise.id] !== undefined">Personalizado</span>
+                                <span v-else-if="selectedExercise.pivot.weight">Padrão do treino</span>
+                                <span v-else>Não definido</span>
+                            </div>
+                        </div>
+
+                        <div v-if="isStudent" class="flex items-center gap-2 mt-2">
+                            <input
+                                v-model.number="customWeightForm.weight"
+                                type="number"
+                                min="0"
+                                step="0.5"
+                                placeholder="0"
+                                class="flex-1 rounded-lg border border-amber-200 dark:border-amber-700 bg-white dark:bg-neutral-800 px-3 py-2 text-lg font-bold text-center text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400"
+                            />
+                            <button
+                                :disabled="customWeightForm.processing"
+                                class="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-60 transition-colors"
+                                @click="saveCustomWeight"
+                            >
+                                {{ customWeightForm.processing ? 'Salvando...' : 'Salvar' }}
+                            </button>
+                        </div>
+
+                        <div v-else class="mt-1">
+                            <p class="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                                {{ effectiveWeight(selectedExercise) ?? '—' }}
+                                <span v-if="effectiveWeight(selectedExercise)" class="text-sm font-normal text-amber-500">kg</span>
+                            </p>
                         </div>
                     </div>
 

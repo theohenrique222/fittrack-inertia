@@ -27,6 +27,7 @@ class UpdateWorkoutAction
                     'sets' => $exercise['sets'],
                     'reps' => $exercise['reps'],
                     'rest_seconds' => $exercise['rest_seconds'],
+                    'weight' => $exercise['weight'] ?? null,
                     'order' => $exercise['order'],
                     'notes' => $exercise['notes'] ?? null,
                 ]);

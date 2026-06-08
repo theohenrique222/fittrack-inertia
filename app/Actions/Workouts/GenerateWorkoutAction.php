@@ -37,6 +37,7 @@ class GenerateWorkoutAction
                     'sets' => $this->getDefaultSets($exercise->difficulty),
                     'reps' => $this->getDefaultReps($exercise->difficulty),
                     'rest_seconds' => $this->getDefaultRest($exercise->difficulty),
+                    'weight' => null,
                     'order' => $order++,
                     'notes' => null,
                 ]);

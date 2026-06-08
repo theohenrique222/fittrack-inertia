@@ -40,6 +40,7 @@ class UpdateWorkoutRequest extends FormRequest
             'exercises.*.sets' => ['required', 'integer', 'min:1'],
             'exercises.*.reps' => ['required', 'integer', 'min:1'],
             'exercises.*.rest_seconds' => ['required', 'integer', 'min:0'],
+            'exercises.*.weight' => ['nullable', 'numeric', 'min:0'],
             'exercises.*.order' => ['required', 'integer', 'min:0'],
             'exercises.*.notes' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],

@@ -62,6 +62,7 @@ interface WorkoutExercise {
     sets: number;
     reps: number;
     rest_seconds: number;
+    weight: number | null;
     order: number;
     notes: string;
 }
@@ -95,6 +96,7 @@ function addExercise() {
         sets: 3,
         reps: 10,
         rest_seconds: 60,
+        weight: null,
         order: workoutExercises.value.length,
         notes: '',
     });
@@ -496,7 +498,7 @@ function handleCancel() {
                                 </Select>
                             </div>
 
-                            <div class="grid grid-cols-3 gap-3">
+                            <div class="grid grid-cols-4 gap-3">
                                 <div>
                                     <Label class="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5 flex items-center gap-1">
                                         <ChevronDown class="w-3 h-3" />
@@ -532,6 +534,20 @@ function handleCancel() {
                                         type="number"
                                         min="0"
                                         class="h-9"
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label class="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5 flex items-center gap-1">
+                                        Peso (kg)
+                                    </Label>
+                                    <Input
+                                        v-model.number="exercise.weight"
+                                        type="number"
+                                        min="0"
+                                        step="0.5"
+                                        class="h-9"
+                                        placeholder="—"
                                     />
                                 </div>
                             </div>

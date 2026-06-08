@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Workouts;
 
+use App\Actions\Workouts\ListExerciseCustomWeightsAction;
 use App\Actions\Workouts\ListWorkoutsAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WorkoutResource;
@@ -16,6 +17,7 @@ class ListStudentWorkoutsController extends Controller
     public function __invoke(
         Request $request,
         ListWorkoutsAction $action,
+        ListExerciseCustomWeightsAction $customWeightsAction,
     ): Response {
         $client = Client::where('user_id', $request->user()->id)->firstOrFail();
 
@@ -47,6 +49,11 @@ class ListStudentWorkoutsController extends Controller
                 'totalExercises' => $workouts->sum(fn ($w) => $w->exercises->count()),
                 'totalCompleted' => $workouts->sum(fn ($w) => (int) ($w->total_sessions ?? 0)),
             ],
+            'customWeights' => $workouts->mapWithKeys(fn ($w) => [
+                $w->id => $customWeightsAction->execute($w->id, $client->id)
+                    ->mapWithKeys(fn ($cw) => [$cw->exercise_id => $cw->weight !== null ? (float) $cw->weight : null])
+                    ->toArray(),
+            ])->toArray(),
         ]);
     }
 }
