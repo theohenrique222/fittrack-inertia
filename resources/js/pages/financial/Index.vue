@@ -86,12 +86,12 @@ const page = usePage();
 const { toasts, success, error } = useToast();
 
 const selectedPeriod = ref(props.selected_period);
-const selectedStudent = ref('');
-const selectedStatus = ref('');
-const selectedPaymentMethod = ref('');
+const selectedStudent = ref('all');
+const selectedStatus = ref('all');
+const selectedPaymentMethod = ref('all');
 
 const paymentMethods = [
-    { value: '', label: 'Todos' },
+    { value: 'all', label: 'Todos' },
     { value: 'pix', label: 'PIX' },
     { value: 'credit_card', label: 'Cartão de Crédito' },
     { value: 'boleto', label: 'Boleto' },
@@ -106,15 +106,15 @@ function applyFilters() {
 params.period = selectedPeriod.value;
 }
 
-    if (selectedStudent.value) {
+    if (selectedStudent.value && selectedStudent.value !== 'all') {
 params.student_id = selectedStudent.value;
 }
 
-    if (selectedStatus.value) {
+    if (selectedStatus.value && selectedStatus.value !== 'all') {
 params.status = selectedStatus.value;
 }
 
-    if (selectedPaymentMethod.value) {
+    if (selectedPaymentMethod.value && selectedPaymentMethod.value !== 'all') {
 params.payment_method = selectedPaymentMethod.value;
 }
 
@@ -127,14 +127,14 @@ params.payment_method = selectedPaymentMethod.value;
 
 function clearFilters() {
     selectedPeriod.value = '30d';
-    selectedStudent.value = '';
-    selectedStatus.value = '';
-    selectedPaymentMethod.value = '';
+    selectedStudent.value = 'all';
+    selectedStatus.value = 'all';
+    selectedPaymentMethod.value = 'all';
     applyFilters();
 }
 
 const hasActiveFilters = computed(() =>
-    selectedStudent.value || selectedStatus.value || selectedPaymentMethod.value,
+    selectedStudent.value !== 'all' || selectedStatus.value !== 'all' || selectedPaymentMethod.value !== 'all',
 );
 
 watch(
@@ -291,7 +291,7 @@ return '---';
                             <SelectValue placeholder="Todos os alunos" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Todos os alunos</SelectItem>
+                            <SelectItem value="all">Todos os alunos</SelectItem>
                             <SelectItem v-for="s in students" :key="s.id" :value="String(s.id)">
                                 {{ s.name }}
                             </SelectItem>
@@ -306,7 +306,7 @@ return '---';
                             <SelectValue placeholder="Todos" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Todos</SelectItem>
+                            <SelectItem value="all">Todos</SelectItem>
                             <SelectItem value="pending">Pendente</SelectItem>
                             <SelectItem value="paid">Pago</SelectItem>
                             <SelectItem value="overdue">Vencido</SelectItem>
