@@ -11,8 +11,10 @@ export type User = {
 };
 
 export type Auth = {
+    client_id: any;
     user: User;
     can: {
+        impersonate: any;
         view_trainers: any;
         view_students: any;
         create_student: boolean;

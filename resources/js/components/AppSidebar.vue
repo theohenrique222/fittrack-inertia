@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Dumbbell, BarChart3, DollarSign, GraduationCap, Ruler, Users, Play, CreditCard } from 'lucide-vue-next';
+import { LayoutGrid, Dumbbell, BarChart3, DollarSign, GraduationCap, Ruler, Users, Play, CreditCard, Banknote } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
-import ContextSheet from '@/components/ContextSheet.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
@@ -15,7 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { students, dashboard, exercises, trainers, reports, measurements, plans, payments } from '@/routes';
+import { students, dashboard, exercises, trainers, reports, measurements, plans, payments, financial } from '@/routes';
 import { students as adminStudents } from '@/routes/admin';
 import { workouts } from '@/routes/me';
 import type { NavItem } from '@/types';
@@ -103,6 +102,16 @@ const mainNavItems = computed<NavItem[]>(() => [
           ]
         : []),
 
+    ...(can.value?.view_students
+        ? [
+              {
+                  title: 'Financeiro',
+                  href: financial(),
+                  icon: Banknote,
+              },
+          ]
+        : []),
+
     ...(user.value?.role === 'client'
         ? [
               {
@@ -147,7 +156,7 @@ const mainNavItems = computed<NavItem[]>(() => [
         </SidebarContent>
 
         <SidebarFooter>
-            <ContextSheet />
+<!--            <ContextSheet />-->
             <NavUser />
         </SidebarFooter>
     </Sidebar>

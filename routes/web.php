@@ -16,6 +16,7 @@ use App\Http\Controllers\Exercises\DestroyExerciseController;
 use App\Http\Controllers\Exercises\ListExercisesController;
 use App\Http\Controllers\Exercises\StoreExerciseController;
 use App\Http\Controllers\Exercises\UpdateExerciseController;
+use App\Http\Controllers\Financial\FinancialDashboardController;
 use App\Http\Controllers\Payments\ListPaymentsController;
 use App\Http\Controllers\Payments\MarkPaymentAsPaidController;
 use App\Http\Controllers\Payments\ReopenPaymentController;
@@ -265,6 +266,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('payments', StorePaymentController::class)->name('payments.store');
     Route::put('payments/{payment}/mark-as-paid', MarkPaymentAsPaidController::class)->name('payments.mark-as-paid');
     Route::put('payments/{payment}/reopen', ReopenPaymentController::class)->name('payments.reopen');
+
+    Route::get('financial', FinancialDashboardController::class)->name('financial');
 });
 
 require __DIR__.'/settings.php';

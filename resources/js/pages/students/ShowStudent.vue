@@ -31,6 +31,10 @@ import {
     Ruler,
     Scale,
     CreditCard,
+    DollarSign,
+    Clock,
+    AlertTriangle,
+    CheckCircle,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -167,6 +171,26 @@ interface PlanOption {
     price: number;
 }
 
+interface FinancialPayment {
+    id: number;
+    amount: number;
+    due_date: string;
+    paid_at: string | null;
+    payment_method: string | null;
+    status: 'pending' | 'paid' | 'overdue';
+    plan_name: string | null;
+    notes: string | null;
+}
+
+interface Financial {
+    plan: { id: number; name: string; price: number } | null;
+    next_due_date: string | null;
+    next_due_amount: number;
+    total_paid: number;
+    total_pending: number;
+    payments: FinancialPayment[];
+}
+
 const props = defineProps<{
     title: string;
     student: Student;
@@ -176,6 +200,7 @@ const props = defineProps<{
     exercises: ExerciseOption[];
     categories: CategoryOption[];
     plans?: PlanOption[];
+    financial?: Financial;
 }>();
 
 const isCreateOpen = ref(false);
@@ -183,7 +208,7 @@ const isEditOpen = ref(false);
 const searchQuery = ref('');
 const selectedWorkout = ref<Workout | null>(null);
 
-const activeTab = ref<'overview' | 'workout' | 'history' | 'measurements'>('overview');
+const activeTab = ref<'overview' | 'workout' | 'history' | 'measurements' | 'financial'>('overview');
 
 const filteredWorkouts = computed(() => {
     if (!searchQuery.value) {
@@ -204,6 +229,7 @@ const tabs = computed(() => [
     { id: 'workout' as const, label: 'Treino Ativo' },
     { id: 'history' as const, label: 'Histórico' },
     { id: 'measurements' as const, label: 'Medidas' },
+    { id: 'financial' as const, label: 'Financeiro' },
 ]);
 
 function getInitials(name: string | undefined | null): string {
@@ -217,6 +243,13 @@ return '';
         .slice(0, 2)
         .join('')
         .toUpperCase();
+}
+
+function formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    }).format(value);
 }
 
 function formatRestSeconds(seconds: number): string {
@@ -724,6 +757,136 @@ function handlePlanChange() {
                         <Plus class="h-4 w-4" />
                         {{ stats.latest_measurement ? 'Ver Medições' : 'Nova Medição' }}
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Financeiro -->
+        <div v-if="activeTab === 'financial'" class="space-y-4">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <div class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                            <CreditCard class="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Plano Atual</p>
+                            <p class="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                                {{ financial?.plan?.name || 'Sem plano' }}
+                            </p>
+                            <p v-if="financial?.plan" class="text-xs text-neutral-500 dark:text-neutral-400">
+                                {{ formatCurrency(financial.plan.price) }}/mês
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                            <Clock class="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <div>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Próximo Vencimento</p>
+                            <p class="text-sm font-bold text-neutral-900 dark:text-white">
+                                {{ financial?.next_due_date || '---' }}
+                            </p>
+                            <p v-if="financial?.next_due_amount" class="text-xs text-neutral-500 dark:text-neutral-400">
+                                {{ formatCurrency(financial.next_due_amount) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
+                            <CheckCircle class="h-5 w-5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Pago</p>
+                            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                                {{ formatCurrency(financial?.total_paid || 0) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
+                            <AlertTriangle class="h-5 w-5 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Pendente</p>
+                            <p class="text-lg font-bold text-red-600 dark:text-red-400">
+                                {{ formatCurrency(financial?.total_pending || 0) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                <div class="border-b border-neutral-200 px-6 py-4 dark:border-neutral-700">
+                    <h3 class="font-semibold text-neutral-900 dark:text-white">Histórico de Pagamentos</h3>
+                </div>
+
+                <div v-if="financial?.payments && financial.payments.length > 0" class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b border-neutral-200 text-left text-sm font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                                <th class="px-6 py-3">Vencimento</th>
+                                <th class="px-6 py-3">Valor</th>
+                                <th class="px-6 py-3">Status</th>
+                                <th class="px-6 py-3">Pagamento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="payment in financial.payments"
+                                :key="payment.id"
+                                class="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-700/30"
+                            >
+                                <td class="px-6 py-3 text-sm text-neutral-600 dark:text-neutral-400">
+                                    {{ payment.due_date }}
+                                </td>
+                                <td class="px-6 py-3 font-medium text-neutral-900 dark:text-white tabular-nums">
+                                    {{ formatCurrency(payment.amount) }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    <Badge
+                                        :variant="payment.status === 'paid' ? 'default' : payment.status === 'overdue' ? 'destructive' : 'secondary'"
+                                    >
+                                        {{ payment.status === 'paid' ? 'Pago' : payment.status === 'overdue' ? 'Vencido' : 'Pendente' }}
+                                    </Badge>
+                                </td>
+                                <td class="px-6 py-3 text-sm text-neutral-600 dark:text-neutral-400">
+                                    <template v-if="payment.paid_at">
+                                        {{ payment.paid_at }}
+                                        <span v-if="payment.payment_method" class="ml-1 text-xs text-neutral-400">
+                                            ({{ payment.payment_method === 'credit_card' ? 'Cartão' : payment.payment_method === 'boleto' ? 'Boleto' : payment.payment_method === 'pix' ? 'PIX' : payment.payment_method === 'cash' ? 'Dinheiro' : payment.payment_method === 'transfer' ? 'Transferência' : payment.payment_method }})
+                                        </span>
+                                    </template>
+                                    <span v-else class="text-neutral-400">---</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-else class="flex flex-col items-center justify-center py-12 text-center">
+                    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-700">
+                        <DollarSign class="h-6 w-6 text-neutral-400" />
+                    </div>
+                    <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                        Nenhum pagamento registrado
+                    </p>
+                    <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
+                        Os pagamentos deste aluno aparecerão aqui
+                    </p>
                 </div>
             </div>
         </div>
