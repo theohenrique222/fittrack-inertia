@@ -328,19 +328,22 @@ function formatPrice(value: number): string {
         </div>
     </div>
 
-    <Dialog v-model:open="isEditOpen">
-        <DialogContent class="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>Editar Plano</DialogTitle>
-            </DialogHeader>
+    <Sheet v-model:open="isEditOpen">
+        <SheetContent side="right" class="flex flex-col p-0 sm:max-w-md">
+            <SheetHeader class="border-b border-border px-4 py-4">
+                <SheetTitle>Editar Plano</SheetTitle>
+                <SheetDescription>
+                    Altere os dados do plano de assinatura
+                </SheetDescription>
+            </SheetHeader>
 
             <EditPlanSheet
                 v-if="selectedPlan"
                 :plan="selectedPlan"
                 @close="closeEditSheet"
             />
-        </DialogContent>
-    </Dialog>
+        </SheetContent>
+    </Sheet>
 </template>
 
 <style scoped>
