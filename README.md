@@ -160,4 +160,4 @@ docker-compose.yml          # Orquestração dos serviços
 **Theo Henrique**
 
 - 📧 theodoro222@hotmail.com
-- 💼 [linkedin.com/in/theohenrique](https://linkedin.com/in/theohenrique)
+- 💼 [Linkedin](https://www.linkedin.com/in/theodoro-henrique-20458827a/)
