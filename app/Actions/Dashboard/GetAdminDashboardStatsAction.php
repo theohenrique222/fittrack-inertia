@@ -3,8 +3,13 @@
 namespace App\Actions\Dashboard;
 
 use App\Enums\UserRole;
+use App\Models\BodyMeasurement;
 use App\Models\Client;
+use App\Models\Exercise;
+use App\Models\Trainer;
 use App\Models\User;
+use App\Models\Workout;
+use App\Models\WorkoutSession;
 use Illuminate\Support\Facades\DB;
 
 class GetAdminDashboardStatsAction
@@ -15,14 +20,13 @@ class GetAdminDashboardStatsAction
         $totalClients = Client::count();
         $totalTrainers = User::where('role', UserRole::PERSONAL)->count();
         $totalExercises = DB::table('exercises')->where('is_active', true)->count();
-        $totalCategories = DB::table('categories')->where('is_active', true)->count();
 
         $usersByRole = $this->getUsersByRole();
-        $monthlyGrowth = $this->generateMonthlyGrowth();
-        $systemActivity = $this->generateSystemActivity();
+        $monthlyGrowth = $this->getMonthlyGrowth();
+        $systemActivity = $this->getSystemActivity();
         $recentUsers = $this->getRecentUsers();
-        $topTrainers = $this->generateTopTrainers();
-        $platformMetrics = $this->generatePlatformMetrics();
+        $topTrainers = $this->getTopTrainers();
+        $platformMetrics = $this->getPlatformMetrics();
 
         return [
             'stats' => [
@@ -62,30 +66,60 @@ class GetAdminDashboardStatsAction
         ])->all();
     }
 
-    private function generateMonthlyGrowth(): array
+    private function getMonthlyGrowth(): array
     {
         $months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        $users = [15, 22, 28, 35, 42, 48, 55, 62, 68, 75, 82, 88];
-        $trainers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 12];
 
-        return collect($months)->map(fn ($month, $i) => [
-            'month' => $month,
-            'users' => $users[$i],
-            'trainers' => $trainers[$i],
-        ])->all();
+        $usersPerMonth = User::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('count', 'month');
+
+        $trainersPerMonth = User::where('role', UserRole::PERSONAL)
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('count', 'month');
+
+        $cumulativeUsers = 0;
+        $cumulativeTrainers = 0;
+
+        return $usersPerMonth->map(function ($count, $monthKey) use ($trainersPerMonth, $months, &$cumulativeUsers, &$cumulativeTrainers) {
+            $cumulativeUsers += $count;
+            $cumulativeTrainers += $trainersPerMonth->get($monthKey, 0);
+
+            $monthNum = (int) substr($monthKey, 5, 2);
+
+            return [
+                'month' => $months[$monthNum - 1],
+                'users' => $cumulativeUsers,
+                'trainers' => $cumulativeTrainers,
+            ];
+        })->values()->all();
     }
 
-    private function generateSystemActivity(): array
+    private function getSystemActivity(): array
     {
-        $days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        $logins = [45, 62, 38, 55, 72, 28, 15];
-        $registrations = [3, 5, 2, 4, 6, 1, 0];
+        $dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-        return collect($days)->map(fn ($day, $i) => [
-            'day' => $day,
-            'logins' => $logins[$i],
-            'registrations' => $registrations[$i],
-        ])->all();
+        $today = now();
+
+        return collect(range(6, 0))->map(function ($daysAgo) use ($today, $dayNames) {
+            $date = $today->copy()->subDays($daysAgo);
+
+            $logins = DB::table('sessions')
+                ->whereRaw('FROM_UNIXTIME(last_activity) >= ?', [$date->startOfDay()])
+                ->whereRaw('FROM_UNIXTIME(last_activity) < ?', [$date->copy()->endOfDay()])
+                ->count();
+
+            $registrations = User::whereDate('created_at', $date)->count();
+
+            return [
+                'day' => $dayNames[$date->dayOfWeek],
+                'logins' => $logins,
+                'registrations' => $registrations,
+            ];
+        })->all();
     }
 
     private function getRecentUsers(): array
@@ -103,23 +137,40 @@ class GetAdminDashboardStatsAction
             ->all();
     }
 
-    private function generateTopTrainers(): array
+    private function getTopTrainers(): array
     {
-        return [
-            ['name' => 'Carlos Silva', 'students' => 15, 'specialty' => 'Musculação', 'rating' => 4.9],
-            ['name' => 'Ana Santos', 'students' => 12, 'specialty' => 'Funcional', 'rating' => 4.8],
-            ['name' => 'Pedro Oliveira', 'students' => 10, 'specialty' => 'Crossfit', 'rating' => 4.7],
-            ['name' => 'Maria Costa', 'students' => 8, 'specialty' => 'Yoga', 'rating' => 4.9],
-        ];
+        $studentCounts = User::whereNotNull('trainer_id')
+            ->selectRaw('trainer_id, COUNT(*) as count')
+            ->groupBy('trainer_id')
+            ->pluck('count', 'trainer_id');
+
+        return Trainer::with('user')
+            ->get()
+            ->map(function ($trainer) use ($studentCounts) {
+                return [
+                    'name' => $trainer->user->name,
+                    'students' => $studentCounts->get($trainer->user_id, 0),
+                    'specialty' => $trainer->specialty ?? 'Geral',
+                    'rating' => 4.5,
+                ];
+            })
+            ->sortByDesc('students')
+            ->values()
+            ->all();
     }
 
-    private function generatePlatformMetrics(): array
+    private function getPlatformMetrics(): array
     {
+        $totalWorkouts = Workout::count();
+        $totalSessions = WorkoutSession::count();
+        $totalMeasurements = BodyMeasurement::count();
+        $totalExercises = Exercise::where('is_active', true)->count();
+
         return [
-            ['label' => 'Uptime', 'value' => '99.9%', 'change' => '+0.1%', 'trend' => 'up'],
-            ['label' => 'Tempo de Resposta', 'value' => '245ms', 'change' => '-15ms', 'trend' => 'down'],
-            ['label' => 'Armazenamento', 'value' => '68%', 'change' => '+5%', 'trend' => 'up'],
-            ['label' => 'API Requests/dia', 'value' => '12.5k', 'change' => '+8%', 'trend' => 'up'],
+            ['label' => 'Total de Treinos', 'value' => (string) $totalWorkouts, 'change' => 'Planos de treino', 'trend' => 'up'],
+            ['label' => 'Sessões Realizadas', 'value' => (string) $totalSessions, 'change' => 'Treinos executados', 'trend' => 'up'],
+            ['label' => 'Medidas Registradas', 'value' => (string) $totalMeasurements, 'change' => 'Avaliações físicas', 'trend' => 'up'],
+            ['label' => 'Exercícios', 'value' => (string) $totalExercises, 'change' => 'No catálogo', 'trend' => 'up'],
         ];
     }
 }

@@ -35,6 +35,11 @@ const iconMap: Record<string, any> = {
     'bar-chart-3': BarChart3,
 };
 
+const monthlySeries = [
+    { key: 'users', color: '#10b981', label: 'Usuários' },
+    { key: 'trainers', color: '#14b8a6', label: 'Treinadores' },
+];
+
 const userGrowthRate = computed(() => {
     if (props.monthlyGrowth.length < 2) {
 return 0;
@@ -223,7 +228,7 @@ const activityChartData = computed(() => {
                     </div>
                 </div>
             </div>
-            <LineChart :data="monthlyGrowth" :height="220" />
+            <LineChart :data="monthlyGrowth" :series="monthlySeries" :height="220" />
         </div>
 
         <!-- Platform Metrics -->
