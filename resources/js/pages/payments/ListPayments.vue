@@ -230,51 +230,51 @@ function statusVariant(status: string) {
                 </Sheet>
             </div>
 
-            <div class="relative z-10 grid grid-cols-4 gap-3">
+            <div class="relative z-10 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                 <div
-                    class="group rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20"
+                    class="group rounded-xl bg-white/10 px-3 py-2 backdrop-blur-sm transition-all hover:bg-white/20 sm:px-4 sm:py-3"
                 >
-                    <div class="mb-1 flex items-center gap-2">
-                        <DollarSign class="h-4 w-4 text-violet-100/70" />
-                        <span class="text-xs font-medium text-violet-100/70">Total</span>
+                    <div class="mb-1 flex items-center gap-1.5 sm:gap-2">
+                        <DollarSign class="h-3.5 w-3.5 text-violet-100/70 sm:h-4 sm:w-4" />
+                        <span class="text-[10px] font-medium text-violet-100/70 sm:text-xs">Total</span>
                     </div>
-                    <p class="text-2xl font-bold tracking-tight tabular-nums">
+                    <p class="text-sm font-bold tracking-tight tabular-nums sm:text-2xl">
                         {{ formatCurrency(stats.totalAmount) }}
                     </p>
                 </div>
 
                 <div
-                    class="group rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20"
+                    class="group rounded-xl bg-white/10 px-3 py-2 backdrop-blur-sm transition-all hover:bg-white/20 sm:px-4 sm:py-3"
                 >
-                    <div class="mb-1 flex items-center gap-2">
-                        <Clock class="h-4 w-4 text-violet-100/70" />
-                        <span class="text-xs font-medium text-violet-100/70">Pendentes</span>
+                    <div class="mb-1 flex items-center gap-1.5 sm:gap-2">
+                        <Clock class="h-3.5 w-3.5 text-violet-100/70 sm:h-4 sm:w-4" />
+                        <span class="text-[10px] font-medium text-violet-100/70 sm:text-xs">Pendentes</span>
                     </div>
-                    <p class="text-2xl font-bold tracking-tight tabular-nums">
+                    <p class="text-sm font-bold tracking-tight tabular-nums sm:text-2xl">
                         {{ stats.pending }}
                     </p>
                 </div>
 
                 <div
-                    class="group rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20"
+                    class="group rounded-xl bg-white/10 px-3 py-2 backdrop-blur-sm transition-all hover:bg-white/20 sm:px-4 sm:py-3"
                 >
-                    <div class="mb-1 flex items-center gap-2">
-                        <Banknote class="h-4 w-4 text-violet-100/70" />
-                        <span class="text-xs font-medium text-violet-100/70">Pagos</span>
+                    <div class="mb-1 flex items-center gap-1.5 sm:gap-2">
+                        <Banknote class="h-3.5 w-3.5 text-violet-100/70 sm:h-4 sm:w-4" />
+                        <span class="text-[10px] font-medium text-violet-100/70 sm:text-xs">Pagos</span>
                     </div>
-                    <p class="text-2xl font-bold tracking-tight tabular-nums">
+                    <p class="text-sm font-bold tracking-tight tabular-nums sm:text-2xl">
                         {{ stats.paid }}
                     </p>
                 </div>
 
                 <div
-                    class="group rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20"
+                    class="group rounded-xl bg-white/10 px-3 py-2 backdrop-blur-sm transition-all hover:bg-white/20 sm:px-4 sm:py-3"
                 >
-                    <div class="mb-1 flex items-center gap-2">
-                        <ChevronDown class="h-4 w-4 text-violet-100/70" />
-                        <span class="text-xs font-medium text-violet-100/70">Vencidos</span>
+                    <div class="mb-1 flex items-center gap-1.5 sm:gap-2">
+                        <ChevronDown class="h-3.5 w-3.5 text-violet-100/70 sm:h-4 sm:w-4" />
+                        <span class="text-[10px] font-medium text-violet-100/70 sm:text-xs">Vencidos</span>
                     </div>
-                    <p class="text-2xl font-bold tracking-tight tabular-nums">
+                    <p class="text-sm font-bold tracking-tight tabular-nums sm:text-2xl">
                         {{ stats.overdue }}
                     </p>
                 </div>
@@ -301,7 +301,7 @@ function statusVariant(status: string) {
                     </button>
                 </div>
 
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-1.5 sm:gap-2">
                     <Button
                         variant="outline"
                         size="sm"
@@ -337,8 +337,155 @@ function statusVariant(status: string) {
                 </div>
             </div>
 
+            <template v-if="filteredPayments.length">
+                <!-- Mobile card list -->
+                <div class="space-y-3 sm:hidden">
+                    <div
+                        v-for="payment in filteredPayments"
+                        :key="payment.id"
+                        class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800"
+                    >
+                        <div class="mb-3 flex items-start justify-between">
+                            <div class="min-w-0 flex-1 pr-2">
+                                <p class="truncate font-medium text-neutral-900 dark:text-white">
+                                    {{ payment.client?.user?.name || payment.client?.nickname || '---' }}
+                                </p>
+                                <p class="mt-0.5 truncate text-sm text-neutral-500 dark:text-neutral-400">
+                                    {{ payment.plan?.name || '---' }}
+                                </p>
+                            </div>
+                            <Badge :variant="statusVariant(payment.status)" class="shrink-0">
+                                {{ payment.status === 'paid' ? 'Pago' : payment.status === 'overdue' ? 'Vencido' : 'Pendente' }}
+                            </Badge>
+                        </div>
+
+                        <div class="mb-3 flex items-center justify-between text-sm">
+                            <span class="text-base font-semibold text-neutral-900 dark:text-white">
+                                {{ formatCurrency(payment.amount) }}
+                            </span>
+                            <span class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
+                                <Calendar class="h-3.5 w-3.5" />
+                                {{ formatDate(payment.due_date) }}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-neutral-100 pt-3 dark:border-neutral-700">
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                                <template v-if="payment.paid_at">
+                                    Pago {{ formatDate(payment.paid_at) }}
+                                    <span v-if="payment.payment_method" class="ml-1 lowercase">
+                                        ({{ payment.payment_method === 'credit_card' ? 'Cartão' : payment.payment_method === 'boleto' ? 'Boleto' : payment.payment_method === 'pix' ? 'PIX' : payment.payment_method }})
+                                    </span>
+                                </template>
+                                <template v-else>Não pago</template>
+                            </span>
+                            <div class="flex gap-1.5">
+                                <Button
+                                    v-if="payment.status !== 'paid'"
+                                    variant="outline"
+                                    size="sm"
+                                    class="h-8 gap-1 text-xs"
+                                    @click="handleMarkAsPaidClick(payment)"
+                                >
+                                    <Check class="h-3.5 w-3.5" />
+                                    Pago
+                                </Button>
+                                <Button
+                                    v-if="payment.status === 'paid'"
+                                    variant="outline"
+                                    size="sm"
+                                    class="h-8 gap-1 text-xs"
+                                    @click="handleReopenClick(payment)"
+                                >
+                                    Reabrir
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop table -->
+                <div class="hidden overflow-x-auto rounded-xl border border-neutral-200 bg-white sm:block dark:border-neutral-700 dark:bg-neutral-800">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-neutral-200 bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400">
+                                <th class="px-4 py-3.5">Aluno</th>
+                                <th class="px-4 py-3.5">Plano</th>
+                                <th class="px-4 py-3.5">Valor</th>
+                                <th class="px-4 py-3.5">Vencimento</th>
+                                <th class="px-4 py-3.5">Status</th>
+                                <th class="px-4 py-3.5">Pagamento</th>
+                                <th class="px-4 py-3.5 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="payment in filteredPayments"
+                                :key="payment.id"
+                                class="border-b border-neutral-100 transition-colors last:border-0 hover:bg-violet-50/40 dark:border-neutral-700/50 dark:hover:bg-violet-900/10"
+                            >
+                                <td class="px-4 py-3.5">
+                                    <span class="font-medium text-neutral-900 dark:text-white">
+                                        {{ payment.client?.user?.name || payment.client?.nickname || '---' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3.5 text-sm text-neutral-600 dark:text-neutral-400">
+                                    {{ payment.plan?.name || '---' }}
+                                </td>
+                                <td class="px-4 py-3.5 font-semibold tabular-nums text-neutral-900 dark:text-white">
+                                    {{ formatCurrency(payment.amount) }}
+                                </td>
+                                <td class="px-4 py-3.5 text-sm text-neutral-600 dark:text-neutral-400">
+                                    <div class="flex items-center gap-1.5">
+                                        <Calendar class="h-3.5 w-3.5 shrink-0" />
+                                        {{ formatDate(payment.due_date) }}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3.5">
+                                    <Badge :variant="statusVariant(payment.status)">
+                                        {{ payment.status === 'paid' ? 'Pago' : payment.status === 'overdue' ? 'Vencido' : 'Pendente' }}
+                                    </Badge>
+                                </td>
+                                <td class="px-4 py-3.5 text-sm text-neutral-600 dark:text-neutral-400">
+                                    <template v-if="payment.paid_at">
+                                        {{ formatDate(payment.paid_at) }}
+                                        <span v-if="payment.payment_method" class="ml-1 text-xs text-neutral-400">
+                                            ({{ payment.payment_method === 'credit_card' ? 'Cartão' : payment.payment_method === 'boleto' ? 'Boleto' : payment.payment_method === 'pix' ? 'PIX' : payment.payment_method }})
+                                        </span>
+                                    </template>
+                                    <span v-else class="text-neutral-400">---</span>
+                                </td>
+                                <td class="px-4 py-3.5 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <Button
+                                            v-if="payment.status !== 'paid'"
+                                            variant="outline"
+                                            size="sm"
+                                            class="h-8 gap-1 text-xs"
+                                            @click="handleMarkAsPaidClick(payment)"
+                                        >
+                                            <Check class="h-3.5 w-3.5" />
+                                            Pago
+                                        </Button>
+                                        <Button
+                                            v-if="payment.status === 'paid'"
+                                            variant="outline"
+                                            size="sm"
+                                            class="h-8 gap-1 text-xs"
+                                            @click="handleReopenClick(payment)"
+                                        >
+                                            Reabrir
+                                        </Button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
             <div
-                v-if="!filteredPayments.length"
+                v-else
                 class="flex flex-col items-center justify-center py-16 text-center"
             >
                 <div
@@ -352,84 +499,6 @@ function statusVariant(status: string) {
                 <p class="mt-1 text-sm text-neutral-400 dark:text-neutral-500">
                     Clique em "Novo Pagamento" para registrar
                 </p>
-            </div>
-
-            <div v-else class="overflow-x-auto">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="border-b border-neutral-200 text-left text-sm font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
-                            <th class="pb-3 pr-4">Aluno</th>
-                            <th class="pb-3 pr-4">Plano</th>
-                            <th class="pb-3 pr-4">Valor</th>
-                            <th class="pb-3 pr-4">Vencimento</th>
-                            <th class="pb-3 pr-4">Status</th>
-                            <th class="pb-3 pr-4">Pagamento</th>
-                            <th class="pb-3 text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="payment in filteredPayments"
-                            :key="payment.id"
-                            class="border-b border-neutral-100 transition-colors hover:bg-neutral-100/50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
-                        >
-                            <td class="py-3 pr-4">
-                                <span class="font-medium text-neutral-900 dark:text-white">
-                                    {{ payment.client?.user?.name || payment.client?.nickname || '---' }}
-                                </span>
-                            </td>
-                            <td class="py-3 pr-4 text-sm text-neutral-600 dark:text-neutral-400">
-                                {{ payment.plan?.name || '---' }}
-                            </td>
-                            <td class="py-3 pr-4 font-medium tabular-nums">
-                                {{ formatCurrency(payment.amount) }}
-                            </td>
-                            <td class="py-3 pr-4 text-sm text-neutral-600 dark:text-neutral-400">
-                                <div class="flex items-center gap-1.5">
-                                    <Calendar class="h-3.5 w-3.5" />
-                                    {{ formatDate(payment.due_date) }}
-                                </div>
-                            </td>
-                            <td class="py-3 pr-4">
-                                <Badge :variant="statusVariant(payment.status)">
-                                    {{ payment.status === 'paid' ? 'Pago' : payment.status === 'overdue' ? 'Vencido' : 'Pendente' }}
-                                </Badge>
-                            </td>
-                            <td class="py-3 pr-4 text-sm text-neutral-600 dark:text-neutral-400">
-                                <template v-if="payment.paid_at">
-                                    {{ formatDate(payment.paid_at) }}
-                                    <span v-if="payment.payment_method" class="ml-1 text-xs text-neutral-400">
-                                        ({{ payment.payment_method === 'credit_card' ? 'Cartão' : payment.payment_method === 'boleto' ? 'Boleto' : payment.payment_method === 'pix' ? 'PIX' : payment.payment_method }})
-                                    </span>
-                                </template>
-                                <span v-else class="text-neutral-400">---</span>
-                            </td>
-                            <td class="py-3 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <Button
-                                        v-if="payment.status !== 'paid'"
-                                        variant="outline"
-                                        size="sm"
-                                        class="h-8 gap-1 text-xs"
-                                        @click="handleMarkAsPaidClick(payment)"
-                                    >
-                                        <Check class="h-3.5 w-3.5" />
-                                        Pago
-                                    </Button>
-                                    <Button
-                                        v-if="payment.status === 'paid'"
-                                        variant="outline"
-                                        size="sm"
-                                        class="h-8 gap-1 text-xs"
-                                        @click="handleReopenClick(payment)"
-                                    >
-                                        Reabrir
-                                    </Button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
